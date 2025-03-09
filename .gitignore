@@ -1,0 +1,47 @@
+# Build Folders
+bin/
+obj/
+
+# User-specific files
+.vs/
+.vscode/
+.idea/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+
+# ASP.NET temporary files
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+# Azure DevOps Service hook configuration
+.git/hooks/
+
+# Rider IDE config folder
+.idea/
+
+# JetBrains Rider user-specific files
+.idea/*
+
+# Ignore Mac OS X system files
+.DS_Store
+
+# Ignore npm package lock file if using Yarn
+yarn.lock
+
+# Log files
+*.log
