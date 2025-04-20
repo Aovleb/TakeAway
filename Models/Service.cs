@@ -1,4 +1,6 @@
-﻿namespace TakeAway.Models
+﻿using TakeAway.DAL.Interfaces;
+
+namespace TakeAway.Models
 {
     public class Service
     {
@@ -28,5 +30,10 @@
             EndTime = endTime;
         }
         public Service() { }
+
+        public async static Task<(Service lunchService, Service dinnerService)> GetServicesAsync(IServiceDAL serviceDAL, Restaurant r)
+        {
+            return await serviceDAL.GetServicesAsync(r);
+        }
     }
 }

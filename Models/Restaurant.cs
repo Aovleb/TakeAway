@@ -1,4 +1,6 @@
-﻿namespace TakeAway.Models
+﻿using TakeAway.DAL;
+using TakeAway.DAL.Interfaces;
+namespace TakeAway.Models
 {
     public class Restaurant
     {
@@ -94,6 +96,9 @@
 
         public Restaurant() { }
 
-
+        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL)
+        {
+            return await restaurantDAL.GetRestaurantsAsync(serviceDdAL);
+        }
     }
 }
