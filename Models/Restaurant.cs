@@ -2,5 +2,7 @@
 {
     public class Restaurant
     {
+        public static int cpt = 0;
+
     }
 }
