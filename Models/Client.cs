@@ -1,4 +1,7 @@
-﻿namespace TakeAway.Models
+﻿using TakeAway.DAL;
+using TakeAway.DAL.Interfaces;
+
+namespace TakeAway.Models
 {
     public class Client : User
     {
@@ -72,5 +75,10 @@
             MealsInBasket = mealsInBasket;
         }
         public Client() { }
+
+        public static async Task<Client> GetOrderAsync(IClientDAL clientDAL, Order order)
+        {
+            return await clientDAL.GetOrderAsync(order);
+        }
     }
 }

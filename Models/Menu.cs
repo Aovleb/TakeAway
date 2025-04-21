@@ -1,4 +1,7 @@
-﻿namespace TakeAway.Models
+﻿using TakeAway.DAL;
+using TakeAway.DAL.Interfaces;
+
+namespace TakeAway.Models
 {
     public class Menu : Meal
     {

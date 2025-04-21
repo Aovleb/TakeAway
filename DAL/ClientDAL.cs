@@ -13,6 +13,12 @@ namespace TakeAway.DAL
         {
             this.connectionString = connectionString;
         }
+
+        public async Task<List<Meal>> GetBasketAsync(Client c)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Client> GetOrderAsync(Order o)
         {
             throw new NotImplementedException();

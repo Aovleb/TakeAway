@@ -11,6 +11,11 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
+        public async Task<Meal> GetMealAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<Meal>> GetMealsAsync(Restaurant r)
         {
             throw new NotImplementedException();

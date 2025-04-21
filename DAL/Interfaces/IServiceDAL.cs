@@ -8,5 +8,6 @@ namespace TakeAway.DAL.Interfaces
         Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Dish d);
         Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Menu m);
         Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Order o);
+        Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Meal m);
     }
 }

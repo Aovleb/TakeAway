@@ -1,4 +1,7 @@
-﻿namespace TakeAway.Models
+﻿using TakeAway.DAL;
+using TakeAway.DAL.Interfaces;
+
+namespace TakeAway.Models
 {
     public abstract class User
     {
@@ -28,5 +31,10 @@
             Password = password;
         }
         public User() { }
+
+        public static async Task<User> GetUserAsync(IUserDAL userDAL, string email, string password)
+        {
+            return await userDAL.GetUserAsync(email, password);
+        }
     }
 }

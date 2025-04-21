@@ -6,6 +6,7 @@ namespace TakeAway.DAL.Interfaces
     {
         Task<List<Meal>> GetMealsAsync(Restaurant r);
         Task<List<Meal>> GetMealsAsync(Order o);
+        Task<Meal> GetMealAsync(int id);
 
     }
 }

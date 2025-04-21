@@ -1,4 +1,5 @@
-﻿using TakeAway.DAL.Interfaces;
+﻿using TakeAway.DAL;
+using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {

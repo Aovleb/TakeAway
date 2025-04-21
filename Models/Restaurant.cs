@@ -1,5 +1,6 @@
 ﻿using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
+
 namespace TakeAway.Models
 {
     public class Restaurant

@@ -60,5 +60,10 @@ namespace TakeAway.DAL
         {
             throw new NotImplementedException();
         }
+
+        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Meal m)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
