@@ -61,7 +61,7 @@ namespace TakeAway.Models
             set { mealsInBasket = value; }
         }
 
-        public Client(int id, string email, string password, string lastName, string firstName, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country, List<Meal> mealsInBasket)
+        public Client(int id, string email, string password, string lastName, string firstName, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country)
             : base(id, email, password)
         {
             LastName = lastName;
@@ -72,11 +72,11 @@ namespace TakeAway.Models
             PostalCode = postal_code;
             City = city;
             Country = country;
-            MealsInBasket = mealsInBasket;
+            MealsInBasket = new List<Meal>();
         }
         public Client() { }
 
-        public static async Task<Client> GetOrderAsync(IClientDAL clientDAL, Order order)
+        public static async Task<Client> GetClientOfOrderAsync(IClientDAL clientDAL, Order order)
         {
             return await clientDAL.GetOrderAsync(order);
         }

@@ -1,0 +1,80 @@
+﻿@model Restaurant
+
+@if (Model == null)
+{
+    <p>Restaurant inconnu !</p>
+}
+else
+{
+    <h2>@Model.Name</h2>
+    <p>@Model.Description</p>
+
+    <h3>Liste des plats et menus</h3>
+    @if (Model.Meals == null || !Model.Meals.Any())
+    {
+        <p>Ce restaurant ne propose actuellement aucun plat ni menu.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Prix</th>
+                    <th>Type</th>
+                    <th>Lunch Service</th>
+                    <th>Dinner Service</th>
+                    <th>Détails</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Meal meal in Model.Meals)
+                {
+                    <tr>
+                        <td>@meal.Name</td>
+                        <td>@meal.Description</td>
+                        <td>@meal.Price €</td>
+                        <td>
+                            @if (meal is Menu)
+                            {
+                                <span class="badge bg-info">Menu</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Plat</span>
+                            }
+                        </td>
+                        <td>
+                            @if(meal.LunchService != null)
+                            {
+                                <span>@meal.LunchService.StartTime.ToString(@"hh\:mm") - @meal.LunchService.EndTime.ToString(@"hh\:mm")</span>
+                            }
+                            else
+                            {
+                                <span>Non disponible</span>
+                            }
+
+                        </td>
+                        <td>
+                            @if (meal.DinnerService != null)
+                            {
+                                <span>@meal.DinnerService.StartTime.ToString(@"hh\:mm") - @meal.DinnerService.EndTime.ToString(@"hh\:mm")</span>
+                            }
+                            else
+                            {
+                                <span>Non disponible</span>
+                            }
+                        </td>
+
+                        <td>
+                            <a asp-action="Details" asp-controller="Meal" asp-route-id="@meal.Id">Voir plus</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+<a asp-action="Index">Retour à la liste des restaurants</a>

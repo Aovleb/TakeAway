@@ -18,5 +18,10 @@ namespace TakeAway.Models
         public Menu()
         {
         }
+
+        public async static Task<List<Menu>> GetRestaurantMenusAsync(IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
+        {
+            return await menuDAL.GetRestaurantMenusAsync(dishDAL, serviceDAL, id);
+        }
     }
 }

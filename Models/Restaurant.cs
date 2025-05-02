@@ -79,7 +79,7 @@ namespace TakeAway.Models
             set { meals = value; }
         }
 
-        public Restaurant(int id, string name, string description, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country, Service lunchService, Service dinnerService, List<Meal> meals)
+        public Restaurant(int id, string name, string description, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country, Service lunchService, Service dinnerService)
         {
             Id = id;
             Name = name;
@@ -92,14 +92,25 @@ namespace TakeAway.Models
             Country = country;
             LunchService = lunchService;
             DinnerService = dinnerService;
-            Meals = meals;
+            Meals = new List<Meal>();
         }
+
+        public void AddMeal(Meal meal)
+        {
+            Meals.Add(meal);
+        }
+
 
         public Restaurant() { }
 
         public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL)
         {
             return await restaurantDAL.GetRestaurantsAsync(serviceDdAL);
+        }
+
+        public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int id)
+        {
+            return await restaurantDAL.GetRestaurantAsync(serviceDdAL, id);
         }
     }
 }

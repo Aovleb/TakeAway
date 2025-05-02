@@ -6,25 +6,25 @@ namespace TakeAway.Models
     public class Service
     {
         private int id;
-        private DateTime startTime;
-        private DateTime endTime;
+        private TimeSpan startTime;
+        private TimeSpan endTime;
 
         public int Id
         {
             get { return id; }
             set { id = value; }
         }
-        public DateTime StartTime
+        public TimeSpan StartTime
         {
             get { return startTime; }
             set { startTime = value; }
         }
-        public DateTime EndTime
+        public TimeSpan EndTime
         {
             get { return endTime; }
             set { endTime = value; }
         }
-        public Service(int id, DateTime startTime, DateTime endTime)
+        public Service(int id, TimeSpan startTime, TimeSpan endTime)
         {
             Id = id;
             StartTime = startTime;
@@ -32,9 +32,14 @@ namespace TakeAway.Models
         }
         public Service() { }
 
-        public async static Task<(Service lunchService, Service dinnerService)> GetServicesAsync(IServiceDAL serviceDAL, Restaurant r)
+        public async static Task<(Service lunchService, Service dinnerService)> GetRestaurantServicesAsync(IServiceDAL serviceDAL, int id)
         {
-            return await serviceDAL.GetServicesAsync(r);
+            return await serviceDAL.GetRestaurantServicesAsync(id);
+        }
+
+        public async static Task<(Service lunchService, Service dinnerService)> GetMealServicesAsync(IServiceDAL serviceDAL, int id)
+        {
+            return await serviceDAL.GetMealServicesAsync(id);
         }
     }
 }

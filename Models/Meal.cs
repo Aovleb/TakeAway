@@ -54,5 +54,9 @@ namespace TakeAway.Models
             DinnerService = dinnerService;
         }
         public Meal() { }
+        public async static Task<List<Meal>> GetRestaurantMealsAsync(IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
+        {
+            return await mealDAL.GetRestaurantMealsAsync(menuDAL, dishDAL, serviceDAL, id);
+        }
     }
 }

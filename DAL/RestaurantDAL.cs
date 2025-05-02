@@ -27,28 +27,50 @@ namespace TakeAway.DAL
                 {
                     while (await reader.ReadAsync())
                     {
-                        Restaurant r = new Restaurant();
-                        r.Id = reader.GetInt32("id_restaurant");
-                        r.Name = reader.GetString("name");
-                        r.Description = reader.GetString("description");
-                        r.PhoneNumber = reader.GetString("phoneNumber");
-                        r.StreetName = reader.GetString("street_name");
-                        r.StreetNumber = reader.GetString("street_number");
-                        r.PostalCode = reader.GetString("postal_code");
-                        r.City = reader.GetString("city");
-                        r.Country = reader.GetString("country");
-                        (Service lunchService, Service dinnerService) = await Service.GetServicesAsync(serviceDAL, r);
-                        r.LunchService = lunchService;
-                        r.DinnerService = dinnerService;
+                        int restaurantId = reader.GetInt32("id_restaurant");
+                        string name = reader.GetString("name");
+                        string description = reader.GetString("description");
+                        string phoneNumber = reader.GetString("phoneNumber");
+                        string streetName = reader.GetString("street_name");
+                        string streetNumber = reader.GetString("street_number");
+                        string postalCode = reader.GetString("postal_code");
+                        string city = reader.GetString("city");
+                        string country = reader.GetString("country");
+                        (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, restaurantId);
+                        Restaurant r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
                         restaurants.Add(r);
                     }
                 }
                 return restaurants;
             }
         }
-        public async Task<Restaurant> GetRestaurantAsync(int id)
+        public async Task<Restaurant> GetRestaurantAsync(IServiceDAL serviceDAL, int id)
         {
-            throw new NotImplementedException();
+            Restaurant r = null;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Restaurant r INNER JOIN Address a ON a.id_address = r.id_address WHERE id_restaurant = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string name = reader.GetString("name");
+                        string description = reader.GetString("description");
+                        string phoneNumber = reader.GetString("phoneNumber");
+                        string streetName = reader.GetString("street_name");
+                        string streetNumber = reader.GetString("street_number");
+                        string postalCode = reader.GetString("postal_code");
+                        string city = reader.GetString("city");
+                        string country = reader.GetString("country");
+                        (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, id);
+                        r = new Restaurant(id, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
+                    }
+                }
+                return r;
+            }
         }
     }
 }

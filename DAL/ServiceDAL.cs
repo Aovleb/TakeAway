@@ -14,7 +14,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
-        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Restaurant r)
+        public async Task<(Service lunchService, Service dinnerService)> GetRestaurantServicesAsync(int id)
         {
             Service lunchService = null;
             Service dinnerService = null;
@@ -22,7 +22,7 @@ namespace TakeAway.DAL
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Service s WHERE id_restaurant = @id ORDER BY startTime", conn);
-                cmd.Parameters.AddWithValue("@id", r.Id);
+                cmd.Parameters.AddWithValue("@id", id);
                 await conn.OpenAsync();
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
@@ -33,8 +33,8 @@ namespace TakeAway.DAL
                         s.Id = reader.GetInt32("id_service");
                         TimeSpan startTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("startTime"));
                         TimeSpan endTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("endTime"));
-                        s.StartTime = new DateTime(1, 1, 1, startTimeSpan.Hours, startTimeSpan.Minutes, startTimeSpan.Seconds);
-                        s.EndTime = new DateTime(1, 1, 1, endTimeSpan.Hours, endTimeSpan.Minutes, endTimeSpan.Seconds);
+                        s.StartTime = startTimeSpan;
+                        s.EndTime = endTimeSpan;
                         if (cpt == 0)
                             lunchService = s;
                         else
@@ -46,22 +46,37 @@ namespace TakeAway.DAL
             }
         }
 
-        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Dish d)
+        public async Task<(Service lunchService, Service dinnerService)> GetMealServicesAsync(int id)
         {
-            throw new NotImplementedException();
+            Service lunchService = null;
+            Service dinnerService = null;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("SELECT * FROM Service s INNER JOIN Meal_Service ms ON s.id_service = ms.id_service AND ms.id_meal = @id ORDER BY startTime", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    int cpt = 0;
+                    while (await reader.ReadAsync())
+                    {
+                        int service_id = reader.GetInt32("id_service");
+                        TimeSpan startTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("startTime"));
+                        TimeSpan endTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("endTime"));
+                        Service s = new Service(service_id, startTimeSpan, endTimeSpan);
+                        if (cpt == 0)
+                            lunchService = s;
+                        else
+                            dinnerService = s;
+                        cpt++;
+                    }
+                }
+                return (lunchService, dinnerService);
+            }
         }
 
-        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Menu m)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Order o)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<(Service lunchService, Service dinnerService)> GetServicesAsync(Meal m)
+        public async Task<(Service lunchService, Service dinnerService)> GetOrderServicesAsync(int id)
         {
             throw new NotImplementedException();
         }

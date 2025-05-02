@@ -4,6 +4,6 @@ namespace TakeAway.DAL.Interfaces
 {
     public interface IMenuDAL
     {
-        Task<List<Menu>> GetMenusAsync(Restaurant r);
+        Task<List<Menu>> GetRestaurantMenusAsync(IDishDAL dishDAL, IServiceDAL serviceDAL, int id);
     }
 }
