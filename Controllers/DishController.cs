@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TakeAway.DAL.Interfaces;
+using TakeAway.Models;
 
 namespace TakeAway.Controllers
 {
@@ -16,9 +17,35 @@ namespace TakeAway.Controllers
             this.dishDAL = dishDAL;
         }
 
-        public IActionResult Index()
+        public IActionResult Create()
         {
+            int? restaurantId = HttpContext.Session.GetInt32("restaurantId");
+            int? userId = HttpContext.Session.GetInt32("userId");
+            if (restaurantId == null || userId == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ViewData["RestaurantId"] = restaurantId;
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Dish dish)
+        {
+            int? restaurantId = HttpContext.Session.GetInt32("restaurantId");
+            int? userId = HttpContext.Session.GetInt32("userId");
+            if (restaurantId == null || userId == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewData["RestaurantId"] = restaurantId;
+            if (ModelState.IsValid)
+            {           
+                bool success = await dish.CreateAsync(dishDAL, serviceDAL);
+                return RedirectToAction("Index");
+            }
+            return View(dish);
         }
     }
 }

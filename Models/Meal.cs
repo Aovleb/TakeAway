@@ -1,5 +1,7 @@
-﻿using TakeAway.DAL;
+﻿using System.ComponentModel.DataAnnotations;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
+using TakeAway.Validations;
 
 namespace TakeAway.Models
 {
@@ -17,27 +19,40 @@ namespace TakeAway.Models
             get { return id; }
             set { id = value; }
         }
+
+        [Required(ErrorMessage = "Name is required.")]
+        [Display(Name = "Name")]
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
+
+        [Required(ErrorMessage = "Description is required.")]
+        [Display(Name = "Description")]
         public string Description
         {
             get { return description; }
             set { description = value; }
         }
+
+        [Required(ErrorMessage = "Price is required.")]
+        [Display(Name = "Price")]
         public decimal Price
         {
             get { return price; }
             set { price = value; }
         }
 
+        [Display(Name = "Lunch Service")]
+        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
         public Service LunchService
         {
             get { return lunchService; }
             set { lunchService = value; }
         }
+
+        [Display(Name = "Dinner Service")]
         public Service DinnerService
         {
             get { return dinnerService; }

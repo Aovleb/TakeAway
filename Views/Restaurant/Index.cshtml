@@ -2,21 +2,21 @@
 @using System.Globalization
 
 @{
-    ViewData["Title"] = "Restaurateur Page";
+    ViewData["Title"] = "Restaurateur Dashboard";
 }
 
 <div class="container py-5">
     <div class="header">
-        <h1 class="display-4">Espace Restaurateur</h1>
-        <p class="lead">Gérez vos restaurants, menus et plats sur TakeAway.</p>
+        <h1 class="display-4">Restaurateur Dashboard</h1>
+        <p class="lead">Manage your restaurants, menus, and dishes on TakeAway.</p>
     </div>
 
     @if (Model == null || Model.Count == 0)
     {
         <div class="alert alert-warning text-center" role="alert">
-            <h4 class="alert-heading">Aucun restaurant disponible</h4>
-            <p>Vous n'avez pas encore ajouté de restaurant. Commencez dès maintenant !</p>
-            <a asp-action="Create" class="btn btn-success btn-create mt-3">Ajouter un restaurant</a>
+            <h4 class="alert-heading">No Restaurants Available</h4>
+            <p>You haven't added any restaurants yet. Start now!</p>
+            <a asp-action="Create" class="btn btn-success btn-create mt-3">Add a Restaurant</a>
         </div>
     }
     else
@@ -30,33 +30,36 @@
                             <h5 class="card-title">@r.Name</h5>
                             <p class="card-text">@r.Description</p>
                             <p class="card-text">
-                                <strong>Téléphone :</strong> @r.PhoneNumber
+                                <strong>Phone:</strong> @r.PhoneNumber
+                            </p>
+                            <p class="card-text">
+                                <strong>Address:</strong> @r.StreetNumber @r.StreetName, @r.PostalCode @r.City, @r.Country
                             </p>
                             <p class="service-time">
-                                <strong>Déjeuner :</strong>
+                                <strong>Lunch:</strong>
                                 @if (r.LunchService != null)
                                 {
                                     <span>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</span>
                                 }
                                 else
                                 {
-                                    <span>Non disponible</span>
+                                    <span>Not available</span>
                                 }
                             </p>
                             <p class="service-time">
-                                <strong>Dîner :</strong>
+                                <strong>Dinner:</strong>
                                 @if (r.DinnerService != null)
                                 {
                                     <span>@r.DinnerService.StartTime?.ToString(@"hh\:mm") - @r.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
                                 }
                                 else
                                 {
-                                    <span>Non disponible</span>
+                                    <span>Not available</span>
                                 }
                             </p>
                             <div class="d-flex gap-2">
-                                <a asp-action="Menus" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Gérer les menus</a>
-                                <a asp-action="Dishes" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Gérer les plats</a>
+                                <a asp-action="Menus" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Manage Menus</a>
+                                <a asp-action="Dishes" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Manage Dishes</a>
                             </div>
                         </div>
                     </div>
@@ -66,7 +69,7 @@
     }
 
     <div class="text-center mt-5">
-        <a asp-action="Create" class="btn btn-outline-success btn-create">Ajouter un restaurant</a>
+        <a asp-action="Create" class="btn btn-outline-success btn-create">Add a Restaurant</a>
     </div>
 </div>
 

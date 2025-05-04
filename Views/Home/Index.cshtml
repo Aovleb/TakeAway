@@ -7,15 +7,15 @@
 
 <div class="container py-5">
     <div class="header">
-        <h1 class="display-4">Bienvenue sur TakeAway</h1>
-        <p class="lead">Découvrez nos restaurants partenaires et leurs délicieux menus.</p>
+        <h1 class="display-4">Welcome to TakeAway</h1>
+        <p class="lead">Discover our partner restaurants and their delicious menus.</p>
     </div>
 
     @if (Model == null || Model.Count == 0)
     {
         <div class="alert alert-warning text-center" role="alert">
-            <h4 class="alert-heading">Aucun restaurant disponible</h4>
-            <p>Il n'y a pas de restaurant actuellement. Revenez bientôt !</p>
+            <h4 class="alert-heading">No Restaurants Available</h4>
+            <p>There are currently no restaurants. Check back soon!</p>
         </div>
     }
     else
@@ -29,31 +29,34 @@
                             <h5 class="card-title">@r.Name</h5>
                             <p class="card-text">@r.Description</p>
                             <p class="card-text">
-                                <strong>Téléphone :</strong> @r.PhoneNumber
+                                <strong>Phone:</strong> @r.PhoneNumber
+                            </p>
+                            <p class="card-text">
+                                <strong>Address:</strong> @r.StreetNumber @r.StreetName, @r.PostalCode @r.City, @r.Country
                             </p>
                             <p class="service-time">
-                                <strong>Déjeuner :</strong>
+                                <strong>Lunch:</strong>
                                 @if (r.LunchService != null)
                                 {
                                     <span>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</span>
                                 }
                                 else
                                 {
-                                    <span>Non disponible</span>
+                                    <span>Not available</span>
                                 }
                             </p>
                             <p class="service-time">
-                                <strong>Dîner :</strong>
+                                <strong>Dinner:</strong>
                                 @if (r.DinnerService != null)
                                 {
                                     <span>@r.DinnerService.StartTime?.ToString(@"hh\:mm") - @r.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
                                 }
                                 else
                                 {
-                                    <span>Non disponible</span>
+                                    <span>Not available</span>
                                 }
                             </p>
-                            <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-outline-primary btn-details">Voir les détails</a>
+                            <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-outline-primary btn-details">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -62,7 +65,7 @@
     }
 
     <div class="text-center mt-5">
-        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-success btn-nav">Aller vers la page restaurateur</a>
+        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-success btn-nav">Go to Restaurateur Page</a>
     </div>
 </div>
 
@@ -115,4 +118,3 @@
             border-color: #218838;
         }
 </style>
-

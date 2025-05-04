@@ -1,4 +1,5 @@
-﻿using TakeAway.DAL;
+﻿using System.ComponentModel.DataAnnotations;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -25,6 +26,8 @@ namespace TakeAway.Models
             get { return firstName; }
             set { firstName = value; }
         }
+
+        [DataType(DataType.PhoneNumber)]
         public string PhoneNumber
         {
             get { return phoneNumber; }

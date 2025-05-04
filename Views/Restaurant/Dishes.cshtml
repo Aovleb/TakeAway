@@ -1,26 +1,29 @@
 ﻿@model List<Dish>
 
 @{
-    ViewData["Title"] = "Manage dishes";
+    ViewData["Title"] = "Manage Dishes";
 }
 
 <div class="container py-5">
     <div class="header">
-        <h1 class="display-4">Gérer les Plats</h1>
-        <p class="lead">Ajoutez, modifiez ou supprimez les plats de votre restaurant.</p>
+        <h1 class="display-4">Manage Dishes</h1>
+        <p class="lead">Add, edit, or delete dishes for your restaurant.</p>
     </div>
 
     <div class="d-flex justify-content-between mb-4">
-        <a asp-action="Index" class="btn btn-outline-secondary btn-back">Retour</a>
-        <a asp-controller="Dish" asp-action="Create" class="btn btn-outline-success btn-create">Ajouter un plat</a>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-back">Back</a>
+        @if (Model != null && Model.Count > 0)
+        {
+            <a asp-controller="Dish" asp-action="Create" class="btn btn-outline-success btn-create">Add a Dish</a>
+        }
     </div>
 
     @if (Model == null || Model.Count == 0)
     {
         <div class="alert alert-warning text-center" role="alert">
-            <h4 class="alert-heading">Aucun plat disponible</h4>
-            <p>Ce restaurant n'a pas encore de plats. Ajoutez-en un maintenant !</p>
-            <a asp-controller="Dish" asp-action="Create" class="btn btn-success btn-create mt-3">Ajouter un plat</a>
+            <h4 class="alert-heading">No Dishes Available</h4>
+            <p>This restaurant doesn't have any dishes yet. Add one now!</p>
+            <a asp-controller="Dish" asp-action="Create" class="btn btn-success btn-create mt-3">Add a Dish</a>
         </div>
     }
     else
@@ -36,32 +39,32 @@
                             <p class="card-text fw-bold">@dish.Price.ToString("C")</p>
                             <div class="mt-3">
                                 <p class="service-time">
-                                    <strong>Déjeuner :</strong>
+                                    <strong>Lunch:</strong>
                                     @if (dish.LunchService != null)
                                     {
                                         <span>@dish.LunchService.StartTime?.ToString(@"hh\:mm") - @dish.LunchService.EndTime?.ToString(@"hh\:mm")</span>
                                     }
                                     else
                                     {
-                                        <span>Non disponible</span>
+                                        <span>Not available</span>
                                     }
                                 </p>
                                 <p class="service-time">
-                                    <strong>Dîner :</strong>
+                                    <strong>Dinner:</strong>
                                     @if (dish.DinnerService != null)
                                     {
                                         <span>@dish.DinnerService.StartTime?.ToString(@"hh\:mm") - @dish.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
                                     }
                                     else
                                     {
-                                        <span>Non disponible</span>
+                                        <span>Not available</span>
                                     }
                                 </p>
                             </div>
                             <!--
                             <div class="d-flex gap-2 mt-3">
-                                <a asp-action="Edit" asp-route-id="@dish.Id" class="btn btn-outline-primary btn-action">Modifier</a>
-                                <a asp-action="Delete" asp-route-id="@dish.Id" class="btn btn-outline-danger btn-delete" onclick="return confirm('Voulez-vous vraiment supprimer ce plat ?');">Supprimer</a>
+                                <a asp-action="Edit" asp-route-id="@dish.Id" class="btn btn-outline-primary btn-action">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@dish.Id" class="btn btn-outline-danger btn-delete" onclick="return confirm('Are you sure you want to delete this dish?');">Delete</a>
                             </div>
                             -->
                         </div>
@@ -71,7 +74,6 @@
         </div>
     }
 </div>
-
 
 <style>
     body {

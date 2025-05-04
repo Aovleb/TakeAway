@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using TakeAway.DAL.Interfaces;
+using TakeAway.Validations;
 
 namespace TakeAway.Models
 {
@@ -90,6 +91,7 @@ namespace TakeAway.Models
 
         [Required(ErrorMessage = "Lunch service is required.")]
         [Display(Name = "Lunch Service")]
+        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
         public Service LunchService
         {
             get { return lunchService; }
@@ -98,6 +100,7 @@ namespace TakeAway.Models
 
         [Required(ErrorMessage = "Dinner service is required.")]
         [Display(Name = "Dinner Service")]
+        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
         public Service DinnerService
         {
             get { return dinnerService; }

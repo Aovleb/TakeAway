@@ -12,7 +12,7 @@ namespace TakeAway.Controllers
         private IServiceDAL serviceDAL;
         private IDishDAL dishDAL;
         private IMenuDAL menuDAL;
-        private int userId = 2; // This should be set based on the logged-in user
+        private int userId = 1; // This should be set based on the logged-in user
 
         public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, IMenuDAL menuDAL)
         {
@@ -53,11 +53,14 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Dishes(int id)
         {
+            HttpContext.Session.SetInt32("restaurantId", id);
+            HttpContext.Session.SetInt32("userId", userId);
             List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
             return View(dishes);
         }
         public async Task<IActionResult> Menus(int id)
         {
+            HttpContext.Session.SetInt32("restaurantId", id);
             List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
             return View(menus);
         }

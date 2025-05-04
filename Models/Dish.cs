@@ -19,5 +19,10 @@ namespace TakeAway.Models
         {
             return await dishDAL.GetDishesOfMenuAsync(id);
         }
+
+        public async Task<bool> CreateAsync(IDishDAL dishDAL, IServiceDAL serviceDAL)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
