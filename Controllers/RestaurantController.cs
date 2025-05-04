@@ -11,35 +11,16 @@ namespace TakeAway.Controllers
     {
         private IRestaurantDAL restaurantDAL;
         private IServiceDAL serviceDAL;
-        private IMealDAL mealDAL;
-        private IMenuDAL menuDAL;
-        private IDishDAL dishDAL;
 
-        public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL)
+        public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL)
         {
             this.restaurantDAL = restaurantDAL;
             this.serviceDAL = serviceDAL;
-            this.mealDAL = mealDAL;
-            this.menuDAL = menuDAL;
-            this.dishDAL = dishDAL;
-
         }
+
         public async Task<IActionResult> Index()
         {
-            HttpContext.Session.SetString("UserType", "Restaurateur");
-            HttpContext.Session.SetInt32("UserId", 1);
-            if (HttpContext.Session.GetInt32("UserId") == null)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            if(HttpContext.Session.GetString("UserType") != "Restaurateur")
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            
-            int userId = HttpContext.Session.GetInt32("UserId").Value;
-
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsForRestaurateurAsync(restaurantDAL, serviceDAL, userId);
+            List<Restaurant> restaurants = new List<Restaurant>();
             return View(restaurants);
         }
 
@@ -52,10 +33,9 @@ namespace TakeAway.Controllers
         public async Task<IActionResult> Create(Restaurant r)
         {
             
-            if (ModelState.IsValid && HttpContext.Session.GetInt32("UserId") != null)
+            if (ModelState.IsValid)
             {
-                int userId = HttpContext.Session.GetInt32("UserId").Value;
-                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, userId);
+                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, 1);
                 if (success)
                 {
                     return RedirectToAction(nameof(Index));

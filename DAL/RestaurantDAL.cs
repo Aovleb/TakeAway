@@ -14,7 +14,12 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
-        public async Task<List<Restaurant>> GetRestaurantsForClientAsync(IServiceDAL serviceDAL)
+        public async Task<List<Restaurant>> GetRestaurantsAsync(IServiceDAL serviceDAL, int id_restaurant = -1)
+        {
+            return id_restaurant == -1 ? await GetRestaurantsForClientAsync(serviceDAL) : await GetRestaurantsForRestaurateurAsync(serviceDAL, id_restaurant);
+        }
+
+        private async Task<List<Restaurant>> GetRestaurantsForClientAsync(IServiceDAL serviceDAL)
         {
             List<Restaurant> restaurants = new List<Restaurant>();
 
@@ -44,7 +49,7 @@ namespace TakeAway.DAL
             }
         }
 
-        public async Task<List<Restaurant>> GetRestaurantsForRestaurateurAsync(IServiceDAL serviceDAL, int restaurateurId)
+        private async Task<List<Restaurant>> GetRestaurantsForRestaurateurAsync(IServiceDAL serviceDAL, int restaurateurId)
         {
             List<Restaurant> restaurants = new List<Restaurant>();
 
@@ -76,7 +81,7 @@ namespace TakeAway.DAL
         }
 
 
-        public async Task<Restaurant> GetRestaurantAsync(IServiceDAL serviceDAL, int id)
+        public async Task<Restaurant> GetRestaurantAsync(IServiceDAL serviceDAL,IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, int id)
         {
             Restaurant r = null;
 
@@ -99,6 +104,10 @@ namespace TakeAway.DAL
                         string country = reader.GetString("country");
                         (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, id);
                         r = new Restaurant(id, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
+
+                        List<Meal> meals = await Meal.GetRestaurantMealsAsync(mealDAL, menuDAL, dishDAL, serviceDAL, id);
+
+                        meals.ForEach(m => r.AddMeal(m));
                     }
                 }
                 return r;
@@ -145,7 +154,7 @@ namespace TakeAway.DAL
 
                     int restaurantId = (int)await restaurantCmd.ExecuteScalarAsync();
 
-                    // Insert Services (en utilisant une méthode modifiée pour gérer la transaction)
+                    // Insert Services
                     bool lunchRes = await serviceDAL.InsertService(restaurant.LunchService, restaurantId, conn, transaction);
                     bool dinnerRes = await serviceDAL.InsertService(restaurant.DinnerService, restaurantId, conn, transaction);
 
@@ -162,7 +171,6 @@ namespace TakeAway.DAL
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    Console.WriteLine("Error during transaction: " + ex.Message);
                 }
             }
 

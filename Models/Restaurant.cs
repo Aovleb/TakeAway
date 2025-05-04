@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {
     public class Restaurant
     {
-		private int id;
-		private string name;
-		private string description;
-		private string phoneNumber;
-		private string street_name;
+        private int id;
+        private string name;
+        private string description;
+        private string phoneNumber;
+        private string street_name;
         private string street_number;
         private string postal_code;
         private string city;
@@ -20,10 +19,10 @@ namespace TakeAway.Models
         private List<Meal> meals;
 
         public int Id
-		{
-			get { return id; }
-			set { id = value; }
-		}
+        {
+            get { return id; }
+            set { id = value; }
+        }
 
         [Required(ErrorMessage = "Name is required.")]
         [Display(Name = "Restaurant Name")]
@@ -135,19 +134,15 @@ namespace TakeAway.Models
 
         public Restaurant() { meals = new List<Meal>(); }
 
-        public static async Task<List<Restaurant>> GetRestaurantsForClientAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL)
+        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int id_restaurant = -1)
         {
-            return await restaurantDAL.GetRestaurantsForClientAsync(serviceDdAL);
+            return await restaurantDAL.GetRestaurantsAsync(serviceDdAL, id_restaurant);
         }
 
-        public static async Task<List<Restaurant>> GetRestaurantsForRestaurateurAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int restauranteurId)
+        public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, int id)
         {
-            return await restaurantDAL.GetRestaurantsForRestaurateurAsync(serviceDdAL, restauranteurId);
-        }
-
-        public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int id)
-        {
-            return await restaurantDAL.GetRestaurantAsync(serviceDdAL, id);
+            Restaurant restaurant = await restaurantDAL.GetRestaurantAsync(serviceDdAL, mealDAL, menuDAL, dishDAL, id);
+            return restaurant;
         }
 
         public async Task<bool> CreateAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, int userid)

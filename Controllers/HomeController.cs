@@ -26,21 +26,17 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index()
         {
-            HttpContext.Session.SetString("UserType", "User");
-            HttpContext.Session.SetInt32("UserId", 1);
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsForClientAsync(restaurantDAL, serviceDAL);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL);
             return View(restaurants);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, serviceDAL, id);
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, serviceDAL, mealDAL, menuDAL, dishDAL, id);
             if (restaurant == null)
             {
                 return NotFound();
             }
-            List<Meal> meals = await Meal.GetRestaurantMealsAsync(mealDAL, menuDAL, dishDAL, serviceDAL, id);
-            meals.ForEach(m => restaurant.AddMeal(m));
             return View(restaurant);
         }
     }
