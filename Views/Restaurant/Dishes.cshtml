@@ -1,47 +1,142 @@
 ﻿@model List<Dish>
 
-<div class="container">
-    <div class="d-flex justify-content-between mb-3">
-        <a asp-action="Index" class="btn btn-secondary">Back</a>
-        <a asp-controller="Dish" asp-action="Create" class="btn btn-primary">Add a new dish</a>
+@{
+    ViewData["Title"] = "Manage dishes";
+}
+
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">Gérer les Plats</h1>
+        <p class="lead">Ajoutez, modifiez ou supprimez les plats de votre restaurant.</p>
     </div>
 
-    <h1 class="text-center mb-4">Manage Dishes</h1>
+    <div class="d-flex justify-content-between mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-back">Retour</a>
+        <a asp-controller="Dish" asp-action="Create" class="btn btn-outline-success btn-create">Ajouter un plat</a>
+    </div>
 
     @if (Model == null || Model.Count == 0)
     {
-        <p class="text-center">No dishes available.</p>
+        <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">Aucun plat disponible</h4>
+            <p>Ce restaurant n'a pas encore de plats. Ajoutez-en un maintenant !</p>
+            <a asp-controller="Dish" asp-action="Create" class="btn btn-success btn-create mt-3">Ajouter un plat</a>
+        </div>
     }
     else
     {
-        @foreach (var dish in Model)
-        {
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h2>@dish.Name</h2>
+        <div class="row">
+            @foreach (var dish in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card dish-card">
+                        <div class="card-body">
+                            <h5 class="card-title">@dish.Name</h5>
+                            <p class="card-text">@dish.Description</p>
+                            <p class="card-text fw-bold">@dish.Price.ToString("C")</p>
+                            <div class="mt-3">
+                                <p class="service-time">
+                                    <strong>Déjeuner :</strong>
+                                    @if (dish.LunchService != null)
+                                    {
+                                        <span>@dish.LunchService.StartTime?.ToString(@"hh\:mm") - @dish.LunchService.EndTime?.ToString(@"hh\:mm")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Non disponible</span>
+                                    }
+                                </p>
+                                <p class="service-time">
+                                    <strong>Dîner :</strong>
+                                    @if (dish.DinnerService != null)
+                                    {
+                                        <span>@dish.DinnerService.StartTime?.ToString(@"hh\:mm") - @dish.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Non disponible</span>
+                                    }
+                                </p>
+                            </div>
+                            <!--
+                            <div class="d-flex gap-2 mt-3">
+                                <a asp-action="Edit" asp-route-id="@dish.Id" class="btn btn-outline-primary btn-action">Modifier</a>
+                                <a asp-action="Delete" asp-route-id="@dish.Id" class="btn btn-outline-danger btn-delete" onclick="return confirm('Voulez-vous vraiment supprimer ce plat ?');">Supprimer</a>
+                            </div>
+                            -->
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p><strong>Description:</strong> @dish.Description</p>
-                    <p><strong>Price:</strong> @dish.Price.ToString("C")</p>
-                    <h4>Services</h4>
-                    @if (dish.LunchService != null)
-                    {
-                        <p><strong>Lunch Service:</strong> @dish.LunchService.StartTime?.ToString(@"hh\:mm") - @dish.LunchService.EndTime?.ToString(@"hh\:mm")</p>
-                    }
-                    else
-                    {
-                        <p><strong>Lunch Service:</strong> Non disponible</p>
-                    }
-                    @if (dish.DinnerService != null)
-                    {
-                        <p><strong>Dinner Service:</strong> @dish.DinnerService.StartTime?.ToString(@"hh\:mm") - @dish.DinnerService.EndTime?.ToString(@"hh\:mm")</p>
-                    }
-                    else
-                    {
-                        <p><strong>Dinner Service:</strong> Non disponible</p>
-                    }
-                </div>
-            </div>
-        }
+            }
+        </div>
     }
 </div>
+
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .dish-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .dish-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .service-time {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .btn-action {
+        transition: background-color 0.2s;
+    }
+
+        .btn-action:hover {
+            background-color: #005cbf;
+            border-color: #005cbf;
+        }
+
+    .btn-create {
+        transition: background-color 0.2s;
+    }
+
+        .btn-create:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+    .btn-back {
+        transition: background-color 0.2s;
+    }
+
+        .btn-back:hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+    .btn-delete {
+        transition: background-color 0.2s;
+    }
+
+        .btn-delete:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+</style>

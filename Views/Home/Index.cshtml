@@ -5,42 +5,114 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Bienvenue sur TakeAway</h1>
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">Bienvenue sur TakeAway</h1>
+        <p class="lead">Découvrez nos restaurants partenaires et leurs délicieux menus.</p>
+    </div>
 
     @if (Model == null || Model.Count == 0)
     {
-        <p class="text-center">Il n'y a pas de restaurant actuellement.</p>
+        <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">Aucun restaurant disponible</h4>
+            <p>Il n'y a pas de restaurant actuellement. Revenez bientôt !</p>
+        </div>
     }
     else
     {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>PhoneNumber</th>
-                    <th>Lunch Service</th>
-                    <th>Dinner Service</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (Restaurant r in Model)
-                {
-                    <tr>
-                        <td>@r.Name</td>
-                        <td>@r.Description</td>
-                        <td>@r.PhoneNumber</td>
-                        <td>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</td>
-                        <td>@r.DinnerService.StartTime?.ToString(@"hh\:mm")-@r.DinnerService.EndTime?.ToString(@"hh\:mm")</td>
-                        <td><a asp-action="Details" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Voir les détails</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-success">aller vers page restaurateur</a>
-    }   
+        <div class="row">
+            @foreach (Restaurant r in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card restaurant-card">
+                        <div class="card-body">
+                            <h5 class="card-title">@r.Name</h5>
+                            <p class="card-text">@r.Description</p>
+                            <p class="card-text">
+                                <strong>Téléphone :</strong> @r.PhoneNumber
+                            </p>
+                            <p class="service-time">
+                                <strong>Déjeuner :</strong>
+                                @if (r.LunchService != null)
+                                {
+                                    <span>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</span>
+                                }
+                                else
+                                {
+                                    <span>Non disponible</span>
+                                }
+                            </p>
+                            <p class="service-time">
+                                <strong>Dîner :</strong>
+                                @if (r.DinnerService != null)
+                                {
+                                    <span>@r.DinnerService.StartTime?.ToString(@"hh\:mm") - @r.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
+                                }
+                                else
+                                {
+                                    <span>Non disponible</span>
+                                }
+                            </p>
+                            <a asp-action="Details" asp-route-id="@r.Id" class="btn btn-outline-primary btn-details">Voir les détails</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="text-center mt-5">
+        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-success btn-nav">Aller vers la page restaurateur</a>
+    </div>
 </div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .restaurant-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .service-time {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .btn-details {
+        transition: background-color 0.2s;
+    }
+
+        .btn-details:hover {
+            background-color: #005cbf;
+            border-color: #005cbf;
+        }
+
+    .btn-nav {
+        transition: background-color 0.2s;
+    }
+
+        .btn-nav:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+</style>
 

@@ -1,80 +1,156 @@
 ﻿@model Restaurant
 
-@if (Model == null)
-{
-    <p>Restaurant inconnu !</p>
-}
-else
-{
-    <h2>@Model.Name</h2>
-    <p>@Model.Description</p>
-
-    <h3>Liste des plats et menus</h3>
-    @if (Model.Meals == null || !Model.Meals.Any())
-    {
-        <p>Ce restaurant ne propose actuellement aucun plat ni menu.</p>
-    }
-    else
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Description</th>
-                    <th>Prix</th>
-                    <th>Type</th>
-                    <th>Lunch Service</th>
-                    <th>Dinner Service</th>
-                    <th>Détails</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (Meal meal in Model.Meals)
-                {
-                    <tr>
-                        <td>@meal.Name</td>
-                        <td>@meal.Description</td>
-                        <td>@meal.Price €</td>
-                        <td>
-                            @if (meal is Menu)
-                            {
-                                <span class="badge bg-info">Menu</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Plat</span>
-                            }
-                        </td>
-                        <td>
-                            @if(meal.LunchService != null)
-                            {
-                                <span>@meal.LunchService.StartTime?.ToString(@"hh\:mm") - @meal.LunchService.EndTime?.ToString(@"hh\:mm")</span>
-                            }
-                            else
-                            {
-                                <span>Non disponible</span>
-                            }
-
-                        </td>
-                        <td>
-                            @if (meal.DinnerService != null)
-                            {
-                                <span>@meal.DinnerService.StartTime?.ToString(@"hh\:mm") - @meal.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
-                            }
-                            else
-                            {
-                                <span>Non disponible</span>
-                            }
-                        </td>
-
-                        <td>
-                            <a asp-action="Index" asp-controller="Meal" asp-route-id="@meal.Id">Voir plus</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+@{
+    ViewData["Title"] = "Menus and dishes";
 }
 
-<a asp-action="Index">Retour à la liste des restaurants</a>
+<div class="container py-5">
+        @if (Model == null)
+        {
+            <div class="alert alert-warning text-center" role="alert">
+                <h4 class="alert-heading">Restaurant inconnu !</h4>
+                <p>Nous n'avons pas pu trouver les informations de ce restaurant.</p>
+                <a asp-action="Index" class="btn btn-primary mt-3">Retour à la liste des restaurants</a>
+            </div>
+        }
+        else
+        {
+            <div class="restaurant-header text-center">
+                <h1 class="display-4">@Model.Name</h1>
+                <p class="lead">@Model.Description</p>
+            </div>
+
+            <h3 class="mb-4">Menus et Plats</h3>
+            @if (Model.Meals == null || !Model.Meals.Any())
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    <p>Ce restaurant ne propose actuellement aucun plat ni menu.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (Meal meal in Model.Meals)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card meal-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        @meal.Name
+                                        @if (meal is Menu)
+                                        {
+                                            <span class="badge bg-info badge-menu">Menu</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary badge-dish">Plat</span>
+                                        }
+                                    </h5>
+                                    <p class="card-text">@meal.Description</p>
+                                    <p class="card-text fw-bold">@meal.Price €</p>
+                                    @if (meal is Menu menu && menu.Dishes != null && menu.Dishes.Any())
+                                    {
+                                        <h6 class="mt-3">Plats inclus :</h6>
+                                        <ul class="dish-list">
+                                            @foreach (Dish dish in menu.Dishes)
+                                            {
+                                                <li>@dish.Name - @dish.Description</li>
+                                            }
+                                        </ul>
+                                    }
+                                    <div class="mt-3">
+                                        <p class="service-time">
+                                            <strong>Lunch :</strong>
+                                            @if (meal.LunchService != null)
+                                            {
+                                                <span>@meal.LunchService.StartTime?.ToString(@"hh\:mm") - @meal.LunchService.EndTime?.ToString(@"hh\:mm")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Non disponible</span>
+                                            }
+                                        </p>
+                                        <p class="service-time">
+                                            <strong>Dîner :</strong>
+                                            @if (meal.DinnerService != null)
+                                            {
+                                                <span>@meal.DinnerService.StartTime?.ToString(@"hh\:mm") - @meal.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Non disponible</span>
+                                            }
+                                        </p>
+                                    </div>
+                                    <a href="#" class="btn btn-outline-success btn-cart mt-3">Ajouter au panier</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <div class="text-center mt-5">
+                <a asp-action="Index" class="btn btn-outline-primary">Retour à la liste des restaurants</a>
+            </div>
+        }
+    </div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .restaurant-header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .meal-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .meal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .dish-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+        .dish-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+            .dish-list li:last-child {
+                border-bottom: none;
+            }
+
+    .badge-menu, .badge-dish {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .service-time {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .btn-cart {
+        transition: background-color 0.2s;
+    }
+
+        .btn-cart:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+</style>

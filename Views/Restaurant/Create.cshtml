@@ -1,109 +1,150 @@
 ﻿@model Restaurant
 
 @{
-    ViewData["Title"] = "Create restaurant";
+    ViewData["Title"] = "Create Restaurant";
 }
 
-<h1 class="text-center mb-4">Create a new restaurant</h1>
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">Créer un Nouveau Restaurant</h1>
+        <p class="lead">Ajoutez un nouveau restaurant à la plateforme TakeAway.</p>
+    </div>
 
-<form asp-action="Create" method="post" class="container mb-5">
+    <form asp-action="Create" method="post" class="mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Informations du Restaurant</h4>
 
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Restaurant Info</h4>
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Name"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="form-group mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <h5 class="mt-4">Service Déjeuner</h5>
+                <div class="form-group mb-3">
+                    <label asp-for="LunchService.StartTime" class="form-label"></label>
+                    <input asp-for="LunchService.StartTime" type="time" class="form-control" step="300" />
+                    <span asp-validation-for="LunchService.StartTime" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="LunchService.EndTime" class="form-label"></label>
+                    <input asp-for="LunchService.EndTime" type="time" class="form-control" step="300" />
+                    <span asp-validation-for="LunchService.EndTime" class="text-danger"></span>
+                </div>
+
+                <h5 class="mt-4">Service Dîner</h5>
+                <div class="form-group mb-3">
+                    <label asp-for="DinnerService.StartTime" class="form-label"></label>
+                    <input asp-for="DinnerService.StartTime" type="time" class="form-control" step="300" />
+                    <span asp-validation-for="DinnerService.StartTime" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="DinnerService.EndTime" class="form-label"></label>
+                    <input asp-for="DinnerService.EndTime" type="time" class="form-control" step="300" />
+                    <span asp-validation-for="DinnerService.EndTime" class="text-danger"></span>
+                </div>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Description"></label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+            <div class="col-md-6">
+                <h4>Adresse</h4>
 
-            <div class="form-group mb-3">
-                <label asp-for="PhoneNumber"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
+                <div class="form-group mb-3">
+                    <label asp-for="StreetName" class="form-label"></label>
+                    <input asp-for="StreetName" class="form-control" />
+                    <span asp-validation-for="StreetName" class="text-danger"></span>
+                </div>
 
-            <h5 class="mt-4">Lunch Service</h5>
-            <div class="form-group mb-3">
-                <label asp-for="LunchService.StartTime"></label>
-                <input asp-for="LunchService.StartTime" type="time" class="form-control" step="300"/>
-                <span asp-validation-for="LunchService.StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="LunchService.EndTime"></label>
-                <input asp-for="LunchService.EndTime" type="time" class="form-control" step="300" />
-                <span asp-validation-for="LunchService.EndTime" class="text-danger"></span>
-            </div>
+                <div class="form-group mb-3">
+                    <label asp-for="StreetNumber" class="form-label"></label>
+                    <input asp-for="StreetNumber" class="form-control" />
+                    <span asp-validation-for="StreetNumber" class="text-danger"></span>
+                </div>
 
-            <h5 class="mt-4">Dinner Service</h5>
-            <div class="form-group mb-3">
-                <label asp-for="DinnerService.StartTime"></label>
-                <input asp-for="DinnerService.StartTime" type="time" class="form-control" step="300" />
-                <span asp-validation-for="DinnerService.StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="DinnerService.EndTime"></label>
-                <input asp-for="DinnerService.EndTime" type="time" class="form-control" step="300"/>
-                <span asp-validation-for="DinnerService.EndTime" class="text-danger"></span>
-            </div>
-        </div>
+                <div class="form-group mb-3">
+                    <label asp-for="PostalCode" class="form-label"></label>
+                    <input asp-for="PostalCode" class="form-control" />
+                    <span asp-validation-for="PostalCode" class="text-danger"></span>
+                </div>
 
-        <div class="col-md-6">
-            <h4>Address</h4>
+                <div class="form-group mb-3">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="StreetName"></label>
-                <input asp-for="StreetName" class="form-control" />
-                <span asp-validation-for="StreetName" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="StreetNumber"></label>
-                <input asp-for="StreetNumber" class="form-control" />
-                <span asp-validation-for="StreetNumber" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="PostalCode"></label>
-                <input asp-for="PostalCode" class="form-control" />
-                <span asp-validation-for="PostalCode" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="City"></label>
-                <input asp-for="City" class="form-control" />
-                <span asp-validation-for="City" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Country"></label>
-                <input asp-for="Country" class="form-control" />
-                <span asp-validation-for="Country" class="text-danger"></span>
-            </div>
-            <div class="row mt-4">
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary px-5">Create</button>
+                <div class="form-group mb-3">
+                    <label asp-for="Country" class="form-label"></label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
                 </div>
             </div>
         </div>
-    </div>
 
-    
-
-</form>
-
-
+        <div class="text-center mt-5">
+            <button type="submit" class="btn btn-outline-success btn-create px-5">Créer</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-back ms-3">Retour</a>
+        </div>
+    </form>
+</div>
 
 <style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .form-control {
+        border-radius: 0.5rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: #005cbf;
+        box-shadow: 0 0 5px rgba(0, 92, 191, 0.3);
+    }
+
     .text-danger {
-        min-height: 1.25rem; /* ≈ 20px */
+        min-height: 1.25rem;
         display: block;
+        font-size: 0.9rem;
+    }
+
+    .btn-create {
+        transition: background-color 0.2s;
+    }
+
+    .btn-create:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+    .btn-back {
+        transition: background-color 0.2s;
+    }
+
+    .btn-back:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
     }
 </style>
