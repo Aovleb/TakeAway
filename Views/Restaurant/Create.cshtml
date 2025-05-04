@@ -33,24 +33,24 @@
             <h5 class="mt-4">Lunch Service</h5>
             <div class="form-group mb-3">
                 <label asp-for="LunchService.StartTime"></label>
-                <input asp-for="LunchService.StartTime" type="time" class="form-control" />
+                <input asp-for="LunchService.StartTime" type="time" class="form-control" step="300"/>
                 <span asp-validation-for="LunchService.StartTime" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="LunchService.EndTime"></label>
-                <input asp-for="LunchService.EndTime" type="time" class="form-control" />
+                <input asp-for="LunchService.EndTime" type="time" class="form-control" step="300" />
                 <span asp-validation-for="LunchService.EndTime" class="text-danger"></span>
             </div>
 
             <h5 class="mt-4">Dinner Service</h5>
             <div class="form-group mb-3">
                 <label asp-for="DinnerService.StartTime"></label>
-                <input asp-for="DinnerService.StartTime" type="time" class="form-control" />
+                <input asp-for="DinnerService.StartTime" type="time" class="form-control" step="300" />
                 <span asp-validation-for="DinnerService.StartTime" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
                 <label asp-for="DinnerService.EndTime"></label>
-                <input asp-for="DinnerService.EndTime" type="time" class="form-control" />
+                <input asp-for="DinnerService.EndTime" type="time" class="form-control" step="300"/>
                 <span asp-validation-for="DinnerService.EndTime" class="text-danger"></span>
             </div>
         </div>

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,16 +10,21 @@ namespace TakeAway.Controllers
     {
         private IRestaurantDAL restaurantDAL;
         private IServiceDAL serviceDAL;
+        private IDishDAL dishDAL;
+        private IMenuDAL menuDAL;
+        private int userId = 2; // This should be set based on the logged-in user
 
-        public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL)
+        public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, IMenuDAL menuDAL)
         {
             this.restaurantDAL = restaurantDAL;
             this.serviceDAL = serviceDAL;
+            this.dishDAL = dishDAL;
+            this.menuDAL = menuDAL;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Restaurant> restaurants = new List<Restaurant>();
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, userId);
             return View(restaurants);
         }
 
@@ -32,10 +36,9 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Restaurant r)
         {
-            
             if (ModelState.IsValid)
             {
-                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, 1);
+                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, userId);
                 if (success)
                 {
                     return RedirectToAction(nameof(Index));
@@ -46,6 +49,17 @@ namespace TakeAway.Controllers
                 }
             }
             return View(r);
+        }
+
+        public async Task<IActionResult> Dishes(int id)
+        {
+            List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
+            return View(dishes);
+        }
+        public async Task<IActionResult> Menus(int id)
+        {
+            List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
+            return View(menus);
         }
 
         public IActionResult Privacy()

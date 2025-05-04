@@ -132,7 +132,12 @@ namespace TakeAway.Models
         }
 
 
-        public Restaurant() { meals = new List<Meal>(); }
+        public Restaurant()
+        {
+            Meals = new List<Meal>();
+            LunchService = new Service();
+            DinnerService = new Service();
+        }
 
         public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int id_restaurant = -1)
         {

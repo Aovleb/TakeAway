@@ -7,8 +7,8 @@ namespace TakeAway.Models
     public class Service
     {
         private int id;
-        private TimeSpan startTime;
-        private TimeSpan endTime;
+        private TimeSpan? startTime;
+        private TimeSpan? endTime;
 
         public int Id
         {
@@ -19,7 +19,7 @@ namespace TakeAway.Models
         [Required(ErrorMessage = "Start time is required.")]
         [DataType(DataType.Time)]
         [Display(Name = "Start Time")]
-        public TimeSpan StartTime
+        public TimeSpan? StartTime
         {
             get { return startTime; }
             set { startTime = value; }
@@ -28,7 +28,7 @@ namespace TakeAway.Models
         [Required(ErrorMessage = "End time is required.")]
         [DataType(DataType.Time)]
         [Display(Name = "End Time")]
-        public TimeSpan EndTime
+        public TimeSpan? EndTime
         {
             get { return endTime; }
             set { endTime = value; }

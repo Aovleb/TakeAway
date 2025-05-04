@@ -11,8 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Menu\" />
-    <Folder Include="Views\Dish\" />
     <Folder Include="Views\Order\" />
   </ItemGroup>
 

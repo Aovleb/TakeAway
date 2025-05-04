@@ -1,0 +1,63 @@
+﻿@model List<Menu>
+
+<div class="container">
+    <div class="d-flex justify-content-between mb-3">
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+        <a asp-controller="Menu" asp-action="Create" class="btn btn-primary">Add a new menu</a>
+    </div>
+
+    <h1 class="text-center mb-4">Manage Menus</h1>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <p class="text-center">No menus available.</p>
+    }
+    else
+    {
+        @foreach (var menu in Model)
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>@menu.Name</h2>
+                </div>
+                <div class="card-body">
+                    <p><strong>Description:</strong> @menu.Description</p>
+                    <p><strong>Price:</strong> @menu.Price.ToString("C")</p>
+                    <h4>Services</h4>
+                    @if (menu.LunchService != null)
+                    {
+                        <p><strong>Lunch Service:</strong> @menu.LunchService.StartTime?.ToString(@"hh\:mm") - @menu.LunchService.EndTime?.ToString(@"hh\:mm")</p>
+                    }
+                    else
+                    {
+                        <p><strong>Lunch Service:</strong> Non disponible</p>
+                    }
+                    @if (menu.DinnerService != null)
+                    {
+                        <p><strong>Dinner Service:</strong> @menu.DinnerService.StartTime?.ToString(@"hh\:mm") - @menu.DinnerService.EndTime?.ToString(@"hh\:mm")</p>
+                    }
+                    else
+                    {
+                        <p><strong>Dinner Service:</strong> Non disponible</p>
+                    }
+                    <h4>Dishes</h4>
+                    @if (menu.Dishes == null || menu.Dishes.Count == 0)
+                    {
+                        <p>No dishes in this menu.</p>
+                    }
+                    else
+                    {
+                        <ul>
+                            @foreach (var dish in menu.Dishes)
+                            {
+                                <li>
+                                    <strong>@dish.Name</strong> - @dish.Description
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

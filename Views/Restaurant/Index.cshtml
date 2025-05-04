@@ -32,13 +32,13 @@
                         <td>@r.Name</td>
                         <td>@r.Description</td>
                         <td>@r.PhoneNumber</td>
-                        <td>@r.LunchService.StartTime.ToString(@"hh\:mm") - @r.LunchService.EndTime.ToString(@"hh\:mm")</td>
-                        <td>@r.DinnerService.StartTime.ToString(@"hh\:mm")-@r.DinnerService.EndTime.ToString(@"hh\:mm")</td>
+                        <td>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</td>
+                        <td>@r.DinnerService.StartTime?.ToString(@"hh\:mm")-@r.DinnerService.EndTime?.ToString(@"hh\:mm")</td>
                         <td>
-                            <a asp-controller="Meal" asp-action="Menu" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Menus</a>
+                            <a asp-action="Menus" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Menus</a>
                         </td>
                         <td>
-                            <a asp-controller="Meal" asp-action="Dish" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Dishes</a>
+                            <a asp-action="Dishes" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Dishes</a>
                         </td>
                     </tr>
                 }

@@ -32,8 +32,8 @@
                         <td>@r.Name</td>
                         <td>@r.Description</td>
                         <td>@r.PhoneNumber</td>
-                        <td>@r.LunchService.StartTime.ToString(@"hh\:mm") - @r.LunchService.EndTime.ToString(@"hh\:mm")</td>
-                        <td>@r.DinnerService.StartTime.ToString(@"hh\:mm")-@r.DinnerService.EndTime.ToString(@"hh\:mm")</td>
+                        <td>@r.LunchService.StartTime?.ToString(@"hh\:mm") - @r.LunchService.EndTime?.ToString(@"hh\:mm")</td>
+                        <td>@r.DinnerService.StartTime?.ToString(@"hh\:mm")-@r.DinnerService.EndTime?.ToString(@"hh\:mm")</td>
                         <td><a asp-action="Details" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Voir les détails</a>
                         </td>
                     </tr>
