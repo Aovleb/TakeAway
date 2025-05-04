@@ -1,4 +1,5 @@
-﻿using TakeAway.DAL;
+﻿using System.ComponentModel.DataAnnotations;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -14,11 +15,19 @@ namespace TakeAway.Models
             get { return id; }
             set { id = value; }
         }
+
+        [Required(ErrorMessage = "Start time is required.")]
+        [DataType(DataType.Time)]
+        [Display(Name = "Start Time")]
         public TimeSpan StartTime
         {
             get { return startTime; }
             set { startTime = value; }
         }
+
+        [Required(ErrorMessage = "End time is required.")]
+        [DataType(DataType.Time)]
+        [Display(Name = "End Time")]
         public TimeSpan EndTime
         {
             get { return endTime; }

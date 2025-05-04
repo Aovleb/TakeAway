@@ -17,6 +17,13 @@ builder.Services.AddScoped<IUserDAL>(x => new UserDAL(connectionString));
 builder.Services.AddScoped<IRestaurantDAL>(x => new RestaurantDAL(connectionString));
 builder.Services.AddScoped<IServiceDAL>(x => new ServiceDAL(connectionString));
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 
 var app = builder.Build();
 
@@ -35,8 +42,10 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseSession();
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Restaurant}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

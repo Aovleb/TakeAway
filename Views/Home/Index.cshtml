@@ -2,7 +2,7 @@
 @using System.Globalization
 
 @{
-    ViewData["Title"] = "Restaurateur Page";
+    ViewData["Title"] = "Home Page";
 }
 
 <div class="container mt-5">
@@ -22,7 +22,7 @@
                     <th>PhoneNumber</th>
                     <th>Lunch Service</th>
                     <th>Dinner Service</th>
-                    <th colspan="2" class="text-center">Actions</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,20 +34,13 @@
                         <td>@r.PhoneNumber</td>
                         <td>@r.LunchService.StartTime.ToString(@"hh\:mm") - @r.LunchService.EndTime.ToString(@"hh\:mm")</td>
                         <td>@r.DinnerService.StartTime.ToString(@"hh\:mm")-@r.DinnerService.EndTime.ToString(@"hh\:mm")</td>
-                        <td>
-                            <a asp-controller="Meal" asp-action="Menu" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Menus</a>
-                        </td>
-                        <td>
-                            <a asp-controller="Meal" asp-action="Dish" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Manage Dishes</a>
+                        <td><a asp-action="Details" asp-route-id="@r.Id" class="btn btn-primary btn-sm">Voir les détails</a>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-        <a asp-action="Create" class="btn btn-success">Add a restaurant</a>
-    }
+        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-success">aller vers page restaurateur</a>
+    }   
 </div>
 
-<!-- Inclure Bootstrap pour un style amélioré
-
- -->

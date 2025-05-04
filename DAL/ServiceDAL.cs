@@ -29,12 +29,10 @@ namespace TakeAway.DAL
                     int cpt = 0;
                     while (await reader.ReadAsync())
                     {
-                        Service s = new Service();
-                        s.Id = reader.GetInt32("id_service");
+                        int service_id = reader.GetInt32("id_service");
                         TimeSpan startTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("startTime"));
                         TimeSpan endTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("endTime"));
-                        s.StartTime = startTimeSpan;
-                        s.EndTime = endTimeSpan;
+                        Service s = new Service(service_id, startTimeSpan, endTimeSpan);
                         if (cpt == 0)
                             lunchService = s;
                         else
@@ -79,6 +77,21 @@ namespace TakeAway.DAL
         public async Task<(Service lunchService, Service dinnerService)> GetOrderServicesAsync(int id)
         {
             throw new NotImplementedException();
+        }
+        public async Task<bool> InsertService(Service service, int restaurantId, SqlConnection conn, SqlTransaction transaction)
+        {
+            string query = @"INSERT INTO Service (startTime, endTime, id_restaurant)
+                            VALUES (@StartTime, @EndTime, @RestaurantId)";
+
+            using (SqlCommand cmd = new SqlCommand(query, conn, transaction))
+            {
+                cmd.Parameters.AddWithValue("@StartTime", service.StartTime);
+                cmd.Parameters.AddWithValue("@EndTime", service.EndTime);
+                cmd.Parameters.AddWithValue("@RestaurantId", restaurantId);
+
+                int rows = await cmd.ExecuteNonQueryAsync();
+                return rows == 1;
+            }
         }
     }
 }

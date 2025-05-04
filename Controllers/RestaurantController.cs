@@ -3,6 +3,7 @@ using System.Diagnostics;
 using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace TakeAway.Controllers
 {
@@ -21,24 +22,50 @@ namespace TakeAway.Controllers
             this.mealDAL = mealDAL;
             this.menuDAL = menuDAL;
             this.dishDAL = dishDAL;
-        }
 
+        }
         public async Task<IActionResult> Index()
         {
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL);
+            HttpContext.Session.SetString("UserType", "Restaurateur");
+            HttpContext.Session.SetInt32("UserId", 1);
+            if (HttpContext.Session.GetInt32("UserId") == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if(HttpContext.Session.GetString("UserType") != "Restaurateur")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            
+            int userId = HttpContext.Session.GetInt32("UserId").Value;
+
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsForRestaurateurAsync(restaurantDAL, serviceDAL, userId);
             return View(restaurants);
         }
 
-        public async Task<IActionResult> Details(int id)
+        public IActionResult Create()
         {
-            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, serviceDAL, id);
-            if (restaurant == null)
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Restaurant r)
+        {
+            
+            if (ModelState.IsValid && HttpContext.Session.GetInt32("UserId") != null)
             {
-                return NotFound();
+                int userId = HttpContext.Session.GetInt32("UserId").Value;
+                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, userId);
+                if (success)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return View(r);
+                }
             }
-            List<Meal> meals = await Meal.GetRestaurantMealsAsync(mealDAL, menuDAL, dishDAL, serviceDAL, id);
-            meals.ForEach(m => restaurant.AddMeal(m));
-            return View(restaurant);
+            return View(r);
         }
 
         public IActionResult Privacy()
