@@ -19,12 +19,18 @@ namespace TakeAway.Models
             set { restaurants = value; }
         }
 
-        public RestaurantOwner(int id, string email, string password, string name, List<Restaurant> restaurants)
+        public RestaurantOwner(int id, string email, string password, string name)
             : base(id, email, password)
         {
             Name = name;
             Restaurants = restaurants;
+            Restaurants = new List<Restaurant>();
         }
         public RestaurantOwner() { }
+
+        public async Task<bool> CreateAsync(IUserDAL userDAL)
+        {
+            return await userDAL.CreateAsync(this);
+        }
     }
 }

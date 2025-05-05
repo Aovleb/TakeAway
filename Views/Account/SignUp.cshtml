@@ -1,1 +1,150 @@
-﻿
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">Create Your Account</h1>
+        <p class="lead">Join TakeAway as a Client or Restaurant Owner.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card signup-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center gap-3 mb-4">
+                        <button id="clientBtn" class="btn btn-outline-primary btn-manage active">Register as Client</button>
+                        <button id="restaurantBtn" class="btn btn-outline-primary btn-manage">Register as Restaurant Owner</button>
+                    </div>
+
+                    <!-- Client -->
+                    <form id="clientForm" asp-action="RegisterClient" method="post" class="registration-form">
+                        <div class="mb-3">
+                            <label for="clientLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="clientLastName" name="LastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientFirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="clientFirstName" name="FirstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientAddress" class="form-label">Address</label>
+                            <input type="text" class="form-control" id="clientAddress" name="Address" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="clientEmail" name="Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="clientPassword" name="Password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="clientConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="clientConfirmPassword" name="ConfirmPassword" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="restaurantConditions" name="Conditions" required>
+                            <label class="form-check-label" for="restaurantConditions">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-create w-100">Create Client Account</button>
+                    </form>
+
+                    <!-- Restaurant Owner -->
+                    <form id="restaurantForm" asp-action="RegisterRestaurantOwner" method="post" class="registration-form" style="display: none">
+                        <div class="mb-3">
+                            <label for="restaurantName" class="form-label">Restaurant owner name</label>
+                            <input type="text" class="form-control" id="restaurantName" name="Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="restaurantEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="restaurantEmail" name="Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="restaurantPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="restaurantPassword" name="Password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="restaurantConfirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="restaurantConfirmPassword" name="ConfirmPassword" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="restaurantConditions" name="Conditions" required>
+                            <label class="form-check-label" for="restaurantConditions">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-create w-100">Create Restaurant Owner Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .signup-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-manage {
+        transition: background-color 0.2s;
+    }
+
+    .btn-manage:hover {
+        background-color: #005cbf;
+        border-color: #005cbf;
+        color: white;
+    }
+
+    .btn-manage.active {
+        background-color: #005cbf;
+        border-color: #005cbf;
+        color: white;
+    }
+
+    .btn-create {
+        transition: background-color 0.2s;
+    }
+
+    .btn-create:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+    .registration-form {
+        transition: opacity 0.3s ease-in-out;
+    }
+</style>
+
+<script>
+    document.getElementById('clientBtn').addEventListener('click', function () {
+        document.getElementById('clientForm').style.display = 'block';
+        document.getElementById('restaurantForm').style.display = 'none';
+        this.classList.add('active');
+        document.getElementById('restaurantBtn').classList.remove('active');
+    });
+
+    document.getElementById('restaurantBtn').addEventListener('click', function () {
+        document.getElementById('restaurantForm').style.display = 'block';
+        document.getElementById('clientForm').style.display = 'none';
+        this.classList.add('active');
+        document.getElementById('clientBtn').classList.remove('active');
+    });
+</script>

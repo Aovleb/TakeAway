@@ -12,7 +12,6 @@ namespace TakeAway.Controllers
         private IServiceDAL serviceDAL;
         private IDishDAL dishDAL;
         private IMenuDAL menuDAL;
-        private int userId = 1; // This should be set based on the logged-in user
 
         public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, IMenuDAL menuDAL)
         {
@@ -24,7 +23,8 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, userId);
+            int? userId = CheckRestaurateurIdInSession();
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
             return View(restaurants);
         }
 
@@ -36,9 +36,10 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Restaurant r)
         {
+            int? userId = CheckRestaurateurIdInSession();
             if (ModelState.IsValid)
             {
-                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, userId);
+                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, (int)userId);
                 if (success)
                 {
                     return RedirectToAction(nameof(Index));
@@ -53,14 +54,14 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Dishes(int id)
         {
+            CheckRestaurateurIdInSession();
             HttpContext.Session.SetInt32("restaurantId", id);
-            HttpContext.Session.SetInt32("userId", userId);
             List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
             return View(dishes);
         }
         public async Task<IActionResult> Menus(int id)
         {
-            HttpContext.Session.SetInt32("restaurantId", id);
+            CheckRestaurateurIdInSession();
             List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
             return View(menus);
         }
@@ -74,6 +75,15 @@ namespace TakeAway.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private int? CheckRestaurateurIdInSession()
+        {
+            int? userId = HttpContext.Session.GetInt32("userId");
+            string? userType = HttpContext.Session.GetString("userType");
+            if (userId == null || userType == null || userType != "Restaurateur")
+                RedirectToAction("SignIn", "Account");
+            return userId;
         }
     }
 }

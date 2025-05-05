@@ -78,6 +78,7 @@ namespace TakeAway.DAL
         {
             throw new NotImplementedException();
         }
+
         public async Task<bool> InsertService(Service service, int restaurantId, SqlConnection conn, SqlTransaction transaction)
         {
             string query = @"INSERT INTO Service (startTime, endTime, id_restaurant)

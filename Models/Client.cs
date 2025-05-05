@@ -27,7 +27,7 @@ namespace TakeAway.Models
             set { firstName = value; }
         }
 
-        [DataType(DataType.PhoneNumber)]
+        //[DataType(DataType.PhoneNumber)]
         public string PhoneNumber
         {
             get { return phoneNumber; }
@@ -77,11 +77,13 @@ namespace TakeAway.Models
             Country = country;
             MealsInBasket = new List<Meal>();
         }
-        public Client() { }
+        public Client() { MealsInBasket = new List<Meal>(); }
 
         public static async Task<Client> GetClientOfOrderAsync(IClientDAL clientDAL, Order order)
         {
             return await clientDAL.GetOrderAsync(order);
         }
+
+
     }
 }
