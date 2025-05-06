@@ -27,7 +27,7 @@ namespace TakeAway.Controllers
                 return View();
             }
 
-            User user = await Client.GetUserAsync(userDAL, email, password);
+            User user = await TakeAway.Models.User.GetUserAsync(userDAL, email, password);
 
             if (user != null)
             {
@@ -125,6 +125,7 @@ namespace TakeAway.Controllers
                 ModelState.AddModelError("", "The email address is already used.");
             return View("SignUp", owner);
         }
+
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
