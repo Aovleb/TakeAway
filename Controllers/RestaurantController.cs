@@ -23,20 +23,33 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index()
         {
-            int? userId = CheckRestaurateurIdInSession();
+            IActionResult? checkResult = CheckIsRestaurateur();
+            if (checkResult != null)
+                return checkResult;
+
+            int? userId = GetUserIdInSession();
             List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
             return View(restaurants);
         }
 
         public IActionResult Create()
         {
+            IActionResult? checkResult = CheckIsRestaurateur();
+            if (checkResult != null)
+                return checkResult;
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(Restaurant r)
         {
-            int? userId = CheckRestaurateurIdInSession();
+            IActionResult? checkResult = CheckIsRestaurateur();
+            if (checkResult != null)
+                return checkResult;
+
+            int? userId = GetUserIdInSession();
+
             if (ModelState.IsValid)
             {
                 bool success = await r.CreateAsync(restaurantDAL, serviceDAL, (int)userId);
@@ -54,36 +67,48 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Dishes(int id)
         {
-            CheckRestaurateurIdInSession();
+            IActionResult? checkResult = CheckIsRestaurateur();
+            if (checkResult != null)
+                return checkResult;
+
             HttpContext.Session.SetInt32("restaurantId", id);
             List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
             return View(dishes);
         }
+
         public async Task<IActionResult> Menus(int id)
         {
-            CheckRestaurateurIdInSession();
+            IActionResult? checkResult = CheckIsRestaurateur();
+            if (checkResult != null)
+                return checkResult;
+
+            HttpContext.Session.SetInt32("restaurantId", id);
             List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
             return View(menus);
         }
 
-        public IActionResult Privacy()
+        public IActionResult UnFound()
         {
-            return View();
+            return RedirectToAction("SignIn", "Account");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        private int? GetUserIdInSession()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return HttpContext.Session.GetInt32("userId");
         }
 
-        private int? CheckRestaurateurIdInSession()
+        private string? GetUserTypeInSession()
         {
-            int? userId = HttpContext.Session.GetInt32("userId");
-            string? userType = HttpContext.Session.GetString("userType");
+            return HttpContext.Session.GetString("userType");
+        }
+
+        private IActionResult? CheckIsRestaurateur()
+        {
+            int? userId = GetUserIdInSession();
+            string? userType = GetUserTypeInSession();
             if (userId == null || userType == null || userType != "Restaurateur")
-                RedirectToAction("SignIn", "Account");
-            return userId;
+                return RedirectToAction("UnFound");
+            return null;
         }
     }
 }

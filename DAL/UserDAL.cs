@@ -71,14 +71,22 @@ namespace TakeAway.DAL
 
         public async Task<bool> CreateAsync(RestaurantOwner r)
         {
-
             bool success = false;
+            string checkEmailQuery = @"SELECT COUNT(*) FROM person WHERE email = @email";
             string personQuery = @"INSERT INTO person(email,password) OUTPUT INSERTED.id_person VALUES (@email, @password)";
             string restaurantOwnerQuery = @"INSERT INTO restaurantOwner(id_person,name) VALUES (@id_person, @name)";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
+
+                SqlCommand checkEmailCmd = new SqlCommand(checkEmailQuery, conn);
+                checkEmailCmd.Parameters.AddWithValue("@email", r.Email);
+                int emailCount = (int)await checkEmailCmd.ExecuteScalarAsync();
+                if (emailCount > 0)
+                {
+                    return false; 
+                }
 
                 SqlTransaction transaction = conn.BeginTransaction();
                 try
@@ -111,9 +119,71 @@ namespace TakeAway.DAL
             }
             return success;
         }
-        public async Task<bool> CreateAsync(User u)
+        public async Task<bool> CreateAsync(Client c)
         {
-            throw new Exception("Method not implemented.");
+            bool success = false;
+            string checkEmailQuery = @"SELECT COUNT(*) FROM person WHERE email = @email";
+            string personQuery = @"INSERT INTO person(email,password) OUTPUT INSERTED.id_person 
+                                               VALUES(@email, @password)";
+            string addressQuery = @"INSERT INTO address(street_name, street_number, postal_code, city, country) OUTPUT INSERTED.id_address
+                                                VALUES(@street_name, @street_number, @postal_code, @city, @country)";
+            string clientQuery = @"INSERT INTO client(id_person, id_address, lastName, firstName, phoneNumber) 
+                                               VALUES(@id_person, @id_address, @lastName, @firstName, @phoneNumber)";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                SqlCommand checkEmailCmd = new SqlCommand(checkEmailQuery, conn);
+                checkEmailCmd.Parameters.AddWithValue("@email", c.Email);
+                int emailCount = (int)await checkEmailCmd.ExecuteScalarAsync();
+                if (emailCount > 0)
+                {
+                    return false;
+                }
+
+                SqlTransaction transaction = conn.BeginTransaction();
+                try
+                {
+                    SqlCommand cmd = new SqlCommand(personQuery, conn, transaction);
+
+                    cmd.Parameters.AddWithValue("@email", c.Email);
+                    cmd.Parameters.AddWithValue("@password", c.Password);
+
+                    int personId = (int)await cmd.ExecuteScalarAsync();
+
+                    cmd = new SqlCommand(addressQuery, conn, transaction);
+                    cmd.Parameters.AddWithValue("@street_name", c.StreetName);
+                    cmd.Parameters.AddWithValue("@street_number", c.StreetNumber);
+                    cmd.Parameters.AddWithValue("@postal_code", c.PostalCode);
+                    cmd.Parameters.AddWithValue("@city", c.City);
+                    cmd.Parameters.AddWithValue("@country", c.Country);
+
+                    int addressId = (int)await cmd.ExecuteScalarAsync();
+
+                    cmd = new SqlCommand(clientQuery, conn, transaction);
+                    cmd.Parameters.AddWithValue("@id_person", personId);
+                    cmd.Parameters.AddWithValue("@id_address", addressId);
+                    cmd.Parameters.AddWithValue("@lastName", c.LastName);
+                    cmd.Parameters.AddWithValue("@firstName", c.FirstName);
+                    cmd.Parameters.AddWithValue("@phoneNumber", c.PhoneNumber);
+
+                    int rows = await cmd.ExecuteNonQueryAsync();
+
+                    if (rows > 0)
+                    {
+                        transaction.Commit();
+                        success = true;
+                    }
+                    else
+                        transaction.Rollback();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                }
+            }
+            return success;
         }
     }
 }

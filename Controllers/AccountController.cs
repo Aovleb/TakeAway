@@ -19,67 +19,102 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SignIn(Client u)
+        public async Task<IActionResult> SignIn(string email, string password)
         {
-            User user = await Client.GetUserAsync(userDAL, u.Email, u.Password);
-            if (user is Client) {
-                HttpContext.Session.SetInt32("userId", user.Id);
-                HttpContext.Session.SetString("userType", "Client");
-                return RedirectToAction("Index", "Home");
-            }
-            else if (user is RestaurantOwner) {
-                HttpContext.Session.SetInt32("userId", user.Id);
-                HttpContext.Session.SetString("userType", "Restaurateur");
-                return RedirectToAction("Index", "Restaurant");
-            }
-            else
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
-                ViewData["ErrorMessage"] = "Invalid e-mail address or password.";
-                return View(u);
+                ViewData["ErrorMessage"] = "Email and password are required.";
+                return View();
             }
+
+            User user = await Client.GetUserAsync(userDAL, email, password);
+
+            if (user != null)
+            {
+                HttpContext.Session.SetInt32("userId", user.Id);
+                if (user is Client)
+                {
+                    HttpContext.Session.SetString("userType", "Client");
+                    return RedirectToAction("Index", "Home");
+                }
+                else if (user is RestaurantOwner)
+                {
+                    HttpContext.Session.SetString("userType", "Restaurateur");
+                    return RedirectToAction("Index", "Restaurant");
+                }
+            }
+
+            ViewData["ErrorMessage"] = "Adresse email ou mot de passe invalide.";
+            return View();
         }
 
         public IActionResult SignUp()
         {
+            ViewData["ActiveForm"] = "Client";
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterClient(Client client)
+        public async Task<IActionResult> RegisterClient(Client client, string confirmPassword, bool conditions)
         {
-            if (client.Password != client.ConfirmPassword)
+            ViewData["ActiveForm"] = "Client";
+            bool successForm = true;
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("ConfirmPassword", "Passwords do not match.");
+                successForm = false;
+            }
+
+            if (client.Password != confirmPassword)
+            {
+                ModelState.AddModelError("", "The passwords do not match.");
+                successForm = false;
+            }
+
+            if (!conditions)
+            {
+                ModelState.AddModelError("", "You must accept the terms and conditions.");
+                successForm = false;
+            }
+            if (!successForm)
+            {
                 return View("SignUp", client);
             }
 
-            if (!client.Conditions)
-            {
-                ModelState.AddModelError("Conditions", "You must agree to the Terms and Conditions.");
-                return View("SignUp", client);
-            }
-
-            //bool success = await client.CreateAsync(userDAL);
+            bool success = await client.CreateAsync(userDAL);
             if (success)
+            {
                 return RedirectToAction("SignIn");
-            else
-                return View("SignUp", owner);
+            }
+
+            ModelState.AddModelError("", "The email address is already in use.");
+            return View("SignUp", client);
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> RegisterRestaurantOwner(RestaurantOwner owner)
+        public async Task<IActionResult> RegisterRestaurantOwner(RestaurantOwner owner, string confirmPassword, bool conditions)
         {
-
-            if (owner.Password != owner.ConfirmPassword)
+            ViewData["ActiveForm"] = "RestaurantOwner";
+            bool successForm = true;
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("ConfirmPassword", "Passwords do not match.");
-                return View("SignUp", owner);
+                successForm = false;
             }
 
-            if (!owner.Conditions)
+            if (owner.Password != confirmPassword)
             {
-                ModelState.AddModelError("Conditions", "You must agree to the Terms and Conditions.");
+                ModelState.AddModelError("", "The passwords do not match.");
+                successForm = false;
+            }
+
+            if (!conditions)
+            {
+                ModelState.AddModelError("", "You must accept the terms and conditions.");
+                successForm = false;
+            }
+
+            if (!successForm)
+            {
                 return View("SignUp", owner);
             }
 
@@ -87,7 +122,13 @@ namespace TakeAway.Controllers
             if(success)
                 return RedirectToAction("SignIn");
             else
-                return View("SignUp", owner);
+                ModelState.AddModelError("", "The email address is already in use.");
+            return View("SignUp", owner);
+        }
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

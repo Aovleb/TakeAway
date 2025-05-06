@@ -16,48 +16,76 @@ namespace TakeAway.Models
         private string country;
         private List<Meal> mealsInBasket;
 
+        [Required(ErrorMessage = "Last name is required.")]
+        [Display(Name = "Last Name")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Last name can only contain letters.")]
         public string LastName
         {
             get { return lastName; }
             set { lastName = value; }
         }
+        [Required(ErrorMessage = "First name is required.")]
+        [Display(Name = "First Name")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name can only contain letters.")]
         public string FirstName
         {
             get { return firstName; }
             set { firstName = value; }
         }
 
-        //[DataType(DataType.PhoneNumber)]
+        [Required(ErrorMessage = "Phone number is required.")]
+        [DataType(DataType.PhoneNumber)]
+        [Display(Name = "Phone Number")]
         public string PhoneNumber
         {
             get { return phoneNumber; }
             set { phoneNumber = value; }
         }
+
+        [Required(ErrorMessage = "Street name is required.")]
+        [Display(Name = "Street Name")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Street name can only contain letters, and spaces.")]
         public string StreetName
         {
             get { return street_name; }
             set { street_name = value; }
         }
+
+        [Required(ErrorMessage = "Street number is required.")]
+        [Display(Name = "Street Number")]
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Street number can only contain digits and letters.")]
         public string StreetNumber
         {
             get { return street_number; }
             set { street_number = value; }
         }
+
+        [Required(ErrorMessage = "Postal code is required.")]
+        [Display(Name = "Postal Code")]
         public string PostalCode
         {
             get { return postal_code; }
             set { postal_code = value; }
         }
+
+        [Required(ErrorMessage = "City is required.")]
+        [Display(Name = "City")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "City can only contain letters and spaces.")]
         public string City
         {
             get { return city; }
             set { city = value; }
         }
+
+        [Required(ErrorMessage = "Country is required.")]
+        [Display(Name = "Country")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Country can only contain letters and spaces.")]
         public string Country
         {
             get { return country; }
             set { country = value; }
         }
+
         public List<Meal> MealsInBasket
         {
             get { return mealsInBasket; }
@@ -82,6 +110,11 @@ namespace TakeAway.Models
         public static async Task<Client> GetClientOfOrderAsync(IClientDAL clientDAL, Order order)
         {
             return await clientDAL.GetOrderAsync(order);
+        }
+
+        public async Task<bool> CreateAsync(IUserDAL userDAL)
+        {
+            return await userDAL.CreateAsync(this);
         }
 
 

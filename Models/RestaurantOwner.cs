@@ -1,4 +1,5 @@
-﻿using TakeAway.DAL;
+﻿using System.ComponentModel.DataAnnotations;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -8,11 +9,16 @@ namespace TakeAway.Models
         private string name;
         private List<Restaurant> restaurants;
 
+
+        [Required(ErrorMessage = "Name is required.")]
+        [Display(Name = "Restaurant Owner Name")]
+        [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can only contain letters and spaces.")]
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
+
         public List<Restaurant> Restaurants
         {
             get { return restaurants; }
@@ -23,10 +29,9 @@ namespace TakeAway.Models
             : base(id, email, password)
         {
             Name = name;
-            Restaurants = restaurants;
             Restaurants = new List<Restaurant>();
         }
-        public RestaurantOwner() { }
+        public RestaurantOwner() { Restaurants = new List<Restaurant>(); }
 
         public async Task<bool> CreateAsync(IUserDAL userDAL)
         {
