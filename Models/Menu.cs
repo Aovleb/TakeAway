@@ -11,12 +11,13 @@ namespace TakeAway.Models
             get { return dishes; }
             set { dishes = value; }
         }
-        public Menu(int id, string name, string description, decimal price, List<Dish> dishes, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
+        public Menu(int id, string name, string description, decimal price, List<Dish> dishes,Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
         {
             Dishes = dishes;
         }
-        public Menu()
+        public Menu() : base()
         {
+            Dishes = new List<Dish>();
         }
 
         public async static Task<List<Menu>> GetRestaurantMenusAsync(IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)

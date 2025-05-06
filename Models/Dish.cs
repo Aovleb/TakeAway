@@ -8,7 +8,7 @@ namespace TakeAway.Models
         public Dish(int id, string name, string description, decimal price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService) { }
         public Dish(int id, string name, string description, decimal price) : base(id, name, description, price, null,null) { }
 
-        public Dish() { }
+        public Dish() : base() { }
 
         public async static Task<List<Dish>> GetRestaurantDishesAsync(IDishDAL dishDAL, IServiceDAL serviceDAL,int id)
         {

@@ -43,11 +43,6 @@ namespace TakeAway.Controllers
 
             ViewData["RestaurantId"] = restaurantId;
 
-            if (dish.LunchService == null && dish.DinnerService == null)
-            {
-                ModelState.AddModelError("Services", "At least one service is required.");
-            }
-
             if (ModelState.IsValid)
             {
                 bool success = await dish.CreateAsync(dishDAL, serviceDAL);

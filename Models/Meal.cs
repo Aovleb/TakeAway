@@ -53,6 +53,7 @@ namespace TakeAway.Models
         }
 
         [Display(Name = "Dinner Service")]
+        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
         public Service DinnerService
         {
             get { return dinnerService; }
@@ -68,7 +69,10 @@ namespace TakeAway.Models
             LunchService = lunchService;
             DinnerService = dinnerService;
         }
-        public Meal() { }
+        public Meal() {
+            LunchService = new Service();
+            DinnerService = new Service();
+        }
         public async static Task<List<Meal>> GetRestaurantMealsAsync(IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
         {
             return await mealDAL.GetRestaurantMealsAsync(menuDAL, dishDAL, serviceDAL, id);

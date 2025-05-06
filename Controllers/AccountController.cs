@@ -44,7 +44,7 @@ namespace TakeAway.Controllers
                 }
             }
 
-            ViewData["ErrorMessage"] = "Adresse email ou mot de passe invalide.";
+            ViewData["ErrorMessage"] = "Invalid email address or password.";
             return View();
         }
 
@@ -86,7 +86,7 @@ namespace TakeAway.Controllers
                 return RedirectToAction("SignIn");
             }
 
-            ModelState.AddModelError("", "The email address is already in use.");
+            ModelState.AddModelError("", "The email address is already used.");
             return View("SignUp", client);
         }
 
@@ -122,7 +122,7 @@ namespace TakeAway.Controllers
             if(success)
                 return RedirectToAction("SignIn");
             else
-                ModelState.AddModelError("", "The email address is already in use.");
+                ModelState.AddModelError("", "The email address is already used.");
             return View("SignUp", owner);
         }
         public IActionResult Logout()

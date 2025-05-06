@@ -45,6 +45,7 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
 
             ViewData["RestaurantId"] = restaurantId;
+
             if (menu.Dishes == null || menu.Dishes.Count == 0)
             {
                 ModelState.AddModelError("Dishes", "At least one dish is required.");
@@ -65,7 +66,7 @@ namespace TakeAway.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Failed to create dish.");
+                    ModelState.AddModelError("", "Failed to create menu.");
                 }
                 return View(menu);
             }
