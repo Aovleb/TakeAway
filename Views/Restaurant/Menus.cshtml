@@ -42,7 +42,7 @@
                                     <strong>Lunch:</strong>
                                     @if (menu.LunchService != null)
                                     {
-                                        <span>@menu.LunchService.StartTime?.ToString(@"hh\:mm") - @menu.LunchService.EndTime?.ToString(@"hh\:mm")</span>
+                                        <span>@menu.LunchService</span>
                                     }
                                     else
                                     {
@@ -53,7 +53,7 @@
                                     <strong>Dinner:</strong>
                                     @if (menu.DinnerService != null)
                                     {
-                                        <span>@menu.DinnerService.StartTime?.ToString(@"hh\:mm") - @menu.DinnerService.EndTime?.ToString(@"hh\:mm")</span>
+                                        <span>@menu.DinnerService</span>
                                     }
                                     else
                                     {
