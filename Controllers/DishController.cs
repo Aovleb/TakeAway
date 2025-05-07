@@ -34,11 +34,16 @@ namespace TakeAway.Controllers
 
             ViewData["RestaurantId"] = restaurantId;
 
+            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
+
+            ViewData["LunchService"] = lunchService;
+            ViewData["DinnerService"] = dinnerService;
+
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Dish dish)
+        public async Task<IActionResult> Create(Dish dish, bool LunchService, bool DinnerService)
         {
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
@@ -52,11 +57,26 @@ namespace TakeAway.Controllers
             if (checkOwnedByUser != null)
                 return checkOwnedByUser;
 
+
+            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
+
+            dish.LunchService = LunchService ? lunchService : null;
+            dish.DinnerService = DinnerService ? dinnerService : null;
+
             ViewData["RestaurantId"] = restaurantId;
+            ViewData["LunchService"] = lunchService;
+            ViewData["DinnerService"] = dinnerService;
+
+            ModelState.Remove("LunchService");
+            ModelState.Remove("DinnerService");
+            ModelState.Remove("LunchService.StartTime");
+            ModelState.Remove("LunchService.EndTime");
+            ModelState.Remove("DinnerService.StartTime");
+            ModelState.Remove("DinnerService.EndTime");
 
             if (ModelState.IsValid)
             {
-                bool success = await dish.CreateAsync(dishDAL, serviceDAL);
+                bool success = await dish.CreateAsync(dishDAL, (int)restaurantId);
                 if (success)
                 {
                     return RedirectToAction("Index", "Restaurant");

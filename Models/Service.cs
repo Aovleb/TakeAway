@@ -50,5 +50,12 @@ namespace TakeAway.Models
         {
             return await serviceDAL.GetMealServicesAsync(id);
         }
+
+        public override string ToString()
+        {
+            string start =$"{startTime.Value.Hours:D2}:{startTime.Value.Minutes:D2}";
+            string end = $"{endTime.Value.Hours:D2}:{endTime.Value.Minutes:D2}";
+            return $"{start} - {end}";
+        }
     }
 }

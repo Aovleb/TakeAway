@@ -6,5 +6,6 @@ namespace TakeAway.DAL.Interfaces
     {
         Task<List<Dish>> GetRestaurantDishesAsync(IServiceDAL serviceDAL, int id);
         Task<List<Dish>> GetDishesOfMenuAsync(int id);
+        Task<bool> CreateAsync(Dish dish, int restaurantId);
     }
 }

@@ -11,8 +11,8 @@ namespace TakeAway.Models
         private string name;
         private string description;
         private decimal price;
-        private Service lunchService;
-        private Service dinnerService;
+        private Service? lunchService;
+        private Service? dinnerService;
 
         public int Id
         {
@@ -45,16 +45,14 @@ namespace TakeAway.Models
         }
 
         [Display(Name = "Lunch Service")]
-        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
-        public Service LunchService
+        public Service? LunchService
         {
             get { return lunchService; }
             set { lunchService = value; }
         }
 
         [Display(Name = "Dinner Service")]
-        [ServiceTime(ErrorMessage = "Start time must be before end time.")]
-        public Service DinnerService
+        public Service? DinnerService
         {
             get { return dinnerService; }
             set { dinnerService = value; }

@@ -33,30 +33,16 @@
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
 
-                <h5 class="mt-4"><label asp-for="LunchService"></label></h5>
-                <span asp-validation-for="LunchService" class="text-danger"></span>
+                <h5 class="mt-4">Services</h5>
                 <div class="form-group mb-3">
-                    <label asp-for="LunchService.StartTime" class="form-label"></label>
-                    <input asp-for="LunchService.StartTime" type="time" class="form-control" step="300" />
-                    <span asp-validation-for="LunchService.StartTime" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="LunchService.EndTime" class="form-label"></label>
-                    <input asp-for="LunchService.EndTime" type="time" class="form-control" step="300" />
-                    <span asp-validation-for="LunchService.EndTime" class="text-danger"></span>
-                </div>
-
-                <h5 class="mt-4"><label asp-for="DinnerService"></label></h5>
-                <span asp-validation-for="DinnerService" class="text-danger"></span>
-                <div class="form-group mb-3">
-                    <label asp-for="DinnerService.StartTime" class="form-label"></label>
-                    <input asp-for="DinnerService.StartTime" type="time" class="form-control" step="300" />
-                    <span asp-validation-for="DinnerService.StartTime" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="DinnerService.EndTime" class="form-label"></label>
-                    <input asp-for="DinnerService.EndTime" type="time" class="form-control" step="300" />
-                    <span asp-validation-for="DinnerService.EndTime" class="text-danger"></span>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" value="true" id="lunchService" name="LunchService" @(ViewData.ModelState["LunchService"]?.AttemptedValue == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="lunchService">@ViewData["LunchService"]</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" value="true" id="dinnerService" name="DinnerService" @(ViewData.ModelState["DinnerService"]?.AttemptedValue == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="dinnerService">@ViewData["DinnerService"]</label>
+                    </div>
                 </div>
             </div>
         </div>
