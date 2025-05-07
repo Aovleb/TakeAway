@@ -82,7 +82,9 @@ namespace TakeAway.DAL
 
                 SqlCommand checkEmailCmd = new SqlCommand(checkEmailQuery, conn);
                 checkEmailCmd.Parameters.AddWithValue("@email", r.Email);
+
                 int emailCount = (int)await checkEmailCmd.ExecuteScalarAsync();
+
                 if (emailCount > 0)
                 {
                     return false; 
@@ -136,7 +138,9 @@ namespace TakeAway.DAL
 
                 SqlCommand checkEmailCmd = new SqlCommand(checkEmailQuery, conn);
                 checkEmailCmd.Parameters.AddWithValue("@email", c.Email);
+
                 int emailCount = (int)await checkEmailCmd.ExecuteScalarAsync();
+
                 if (emailCount > 0)
                 {
                     return false;

@@ -27,6 +27,8 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
+            HttpContext.Session.Remove("restaurantId");
+
             int? userId = GetUserIdInSession();
             List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
             return View(restaurants);
@@ -71,7 +73,12 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
+            IActionResult? checkOwnedByUser = await CheckIsOwnedByUser(id);
+            if (checkOwnedByUser != null)
+                return checkOwnedByUser;
+
             HttpContext.Session.SetInt32("restaurantId", id);
+
             List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
             return View(dishes);
         }
@@ -82,6 +89,10 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
+            IActionResult? checkOwnedByUser = await CheckIsOwnedByUser(id);
+            if (checkOwnedByUser != null)
+                return checkOwnedByUser;
+
             HttpContext.Session.SetInt32("restaurantId", id);
             List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
             return View(menus);
@@ -89,7 +100,7 @@ namespace TakeAway.Controllers
 
         public IActionResult UnFound()
         {
-            return RedirectToAction("SignIn", "Account");
+            return RedirectToAction("Logout", "Account");
         }
 
         private int? GetUserIdInSession()
@@ -108,6 +119,18 @@ namespace TakeAway.Controllers
             string? userType = GetUserTypeInSession();
             if (userId == null || userType == null || userType != "Restaurateur")
                 return RedirectToAction("UnFound");
+            return null;
+        }
+
+        private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
+        {
+            int? userId = GetUserIdInSession();
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
+            bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
+            if (!isOwnedByUser)
+            {
+                return RedirectToAction("UnFound");
+            }
             return null;
         }
     }
