@@ -43,7 +43,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Dish dish, bool LunchService, bool DinnerService)
+        public async Task<IActionResult> Create(Dish dish, bool chooseLunchService, bool chooseDinnerService)
         {
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
@@ -60,8 +60,8 @@ namespace TakeAway.Controllers
 
             (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
 
-            dish.LunchService = LunchService ? lunchService : null;
-            dish.DinnerService = DinnerService ? dinnerService : null;
+            dish.LunchService = chooseLunchService ? lunchService : null;
+            dish.DinnerService = chooseDinnerService ? dinnerService : null;
 
             ViewData["RestaurantId"] = restaurantId;
             ViewData["LunchService"] = lunchService;
@@ -79,7 +79,7 @@ namespace TakeAway.Controllers
                 bool success = await dish.CreateAsync(dishDAL, (int)restaurantId);
                 if (success)
                 {
-                    return RedirectToAction("Index", "Restaurant");
+                    return RedirectToAction("Dishes", "Restaurant", new { id = restaurantId });
                 }
                 else
                 {

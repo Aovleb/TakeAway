@@ -36,11 +36,11 @@
                 <h5 class="mt-4">Services</h5>
                 <div class="form-group mb-3">
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" value="true" id="lunchService" name="LunchService" @(ViewData.ModelState["LunchService"]?.AttemptedValue == "true" ? "checked" : "") />
+                        <input type="checkbox" class="form-check-input" value="true" id="lunchService" name="chooseLunchService" @(ViewData.ModelState["LunchService"]?.AttemptedValue == "true" ? "checked" : "") />
                         <label class="form-check-label" for="lunchService">@ViewData["LunchService"]</label>
                     </div>
                     <div class="form-check">
-                        <input type="checkbox" class="form-check-input" value="true" id="dinnerService" name="DinnerService" @(ViewData.ModelState["DinnerService"]?.AttemptedValue == "true" ? "checked" : "") />
+                        <input type="checkbox" class="form-check-input" value="true" id="dinnerService" name="chooseDinnerService" @(ViewData.ModelState["DinnerService"]?.AttemptedValue == "true" ? "checked" : "") />
                         <label class="form-check-label" for="dinnerService">@ViewData["DinnerService"]</label>
                     </div>
                 </div>

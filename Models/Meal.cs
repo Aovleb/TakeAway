@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
-using TakeAway.Validations;
 
 namespace TakeAway.Models
 {
@@ -58,7 +56,7 @@ namespace TakeAway.Models
             set { dinnerService = value; }
         }
 
-        public Meal(int id, string name, string description, decimal price, Service lunchService, Service dinnerService)
+        public Meal(int id, string name, string description, decimal price, Service? lunchService, Service? dinnerService)
         {
             Id = id;
             Name = name;
@@ -67,10 +65,13 @@ namespace TakeAway.Models
             LunchService = lunchService;
             DinnerService = dinnerService;
         }
-        public Meal() {
+
+        public Meal()
+        {
             LunchService = new Service();
             DinnerService = new Service();
         }
+
         public async static Task<List<Meal>> GetRestaurantMealsAsync(IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
         {
             return await mealDAL.GetRestaurantMealsAsync(menuDAL, dishDAL, serviceDAL, id);

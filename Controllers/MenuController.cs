@@ -7,7 +7,6 @@ namespace TakeAway.Controllers
 {
     public class MenuController : Controller
     {
-
         private IServiceDAL serviceDAL;
         private IDishDAL dishDAL;
         private IMenuDAL menuDAL;
@@ -35,13 +34,20 @@ namespace TakeAway.Controllers
             if (checkOwnedByUser != null)
                 return checkOwnedByUser;
 
+            // Récupérer les plats et services disponibles pour le restaurant
+            var dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, (int)restaurantId);
+            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
+
+            ViewData["LunchService"] = lunchService;
+            ViewData["DinnerService"] = dinnerService;
+            ViewData["Dishes"] = dishes;
             ViewData["RestaurantId"] = restaurantId;
 
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Menu menu)
+        public async Task<IActionResult> Create(Menu menu, List<int> selectedDishIds, bool chooseLunchService, bool chooseDinnerService)
         {
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
@@ -56,24 +62,47 @@ namespace TakeAway.Controllers
                 return checkOwnedByUser;
 
             ViewData["RestaurantId"] = restaurantId;
+            // Reload dishes and services for view in case of error
+            var dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, (int)restaurantId);
+            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
 
-            if (menu.Dishes == null || menu.Dishes.Count == 0)
+            ViewData["LunchService"] = lunchService;
+            ViewData["DinnerService"] = dinnerService;
+            ViewData["Dishes"] = dishes;
+            ViewData["SelectedDishIds"] = selectedDishIds; // Passer les plats sélectionnés pour préserver les sélections
+
+            if (selectedDishIds == null || selectedDishIds.Count == 0)
             {
                 ModelState.AddModelError("Dishes", "At least one dish is required.");
             }
-
-            if (menu.LunchService == null && menu.DinnerService == null)
+            else
             {
-                ModelState.AddModelError("Services", "At least one service is required.");
+                // Add selected dishes to the menu
+                dishes.ForEach(dish =>
+                {
+                    if (selectedDishIds.Contains(dish.Id))
+                    {
+                        menu.AddDish(dish);
+                    }
+                });
+            }
+
+            if (!chooseLunchService && !chooseDinnerService)
+            {
+                ModelState.AddModelError("LunchService", "At least one service is required.");
+            }
+            else
+            {
+                menu.LunchService = chooseLunchService ? lunchService : null;
+                menu.DinnerService = chooseDinnerService ? dinnerService : null;
             }
 
             if (ModelState.IsValid)
             {
-                //bool success = await menu.CreateAsync(menuDAL, dishDAL, serviceDAL);
-                bool success = false;
+                bool success = await menu.CreateAsync(menuDAL, (int)restaurantId);
                 if (success)
                 {
-                    return RedirectToAction("Index", "Restaurant");
+                    return RedirectToAction("Menus", "Restaurant", new { id = restaurantId });
                 }
                 else
                 {
