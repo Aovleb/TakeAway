@@ -8,14 +8,14 @@
     <!-- Display Success or Error Messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible flash-message" role="alert">
             @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
             @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -98,7 +98,7 @@
                                         }
                                     </p>
                                 </div>
-                                <a asp-controller="Basket" asp-action="Add" asp-route-mealId="@meal.Id" class="btn btn-outline-success btn-cart mt-3">Add to Cart</a>
+                                <a asp-controller="Basket" asp-action="Add" asp-route-mealId="@meal.Id" asp-route-restaurantId="@Model.Id" class="btn btn-outline-success btn-cart mt-3 add-to-cart">Add to Cart</a>
                             </div>
                         </div>
                     </div>
@@ -110,6 +110,38 @@
             <a asp-action="Index" class="btn btn-outline-primary">Back to Restaurant List</a>
         </div>
     }
+
+    <!-- Script pour gérer les messages flash et la position de scroll -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Gestion des messages flash
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transform = 'translateY(-100%)';
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                }, 2000);
+            });
+
+            // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                });
+            });
+
+            // Restaurer la position de scroll après le chargement de la page
+            const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+            if (savedScrollPosition) {
+                window.scrollTo(0, parseInt(savedScrollPosition));
+                sessionStorage.removeItem('scrollPosition');
+            }
+        });
+    </script>
 </div>
 
 <style>
@@ -169,4 +201,16 @@
             background-color: #28a745;
             border-color: #28a745;
         }
+
+    .flash-message {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        z-index: 1050;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
 </style>
