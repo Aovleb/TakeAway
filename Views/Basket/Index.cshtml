@@ -1,0 +1,159 @@
+﻿@model List<Meal>
+
+@{
+    ViewData["Title"] = "Your Basket";
+}
+
+<div class="container py-5">
+    <div class="basket-header text-center">
+        <h1 class="display-4">Your Basket</h1>
+        <p class="lead">Review the items in your basket before proceeding to checkout.</p>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading">Your Basket is Empty!</h4>
+            <p>It looks like you haven't added any items yet.</p>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-primary mt-3">Browse Restaurants</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Item</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+
+                    @{
+                        // Liste pour suivre les meals déjà affichés
+                        var displayedMeals = new List<string>();
+                    }
+                    <tbody>
+                        @foreach (Meal meal in Model)
+                        {
+                            // Si le meal n'a pas encore été affiché
+                            if (!displayedMeals.Contains(meal.Name))
+                            {
+                                // Compter combien de fois ce meal apparaît dans la liste
+                                int quantity = Model.Count(m => m.Name == meal.Name);
+
+                                <tr>
+                                    <td>@meal.Name</td>
+                                    <td>@meal.Description</td>
+                                    <td>@meal.Price.ToString("C")</td>
+                                    <td>@quantity</td>
+                                    <td>
+                                        @if (meal is Menu)
+                                        {
+                                            <span class="badge bg-info badge-menu">Menu</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary badge-dish">Dish</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-outline-danger btn-sm">Remove</a>
+                                    </td>
+                                </tr>
+                                @if (meal is Menu menu && menu.Dishes != null && menu.Dishes.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6">
+                                            <h6>Included Dishes:</h6>
+                                            <ul class="dish-list">
+                                                @foreach (Dish dish in menu.Dishes)
+                                                {
+                                                    <li>@dish.Name - @dish.Description</li>
+                                                }
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                }
+
+                                // Ajouter le meal à la liste des affichés
+                                displayedMeals.Add(meal.Name);
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12 text-end">
+                <h4>Total: @Model.Sum(m => m.Price).ToString("C")</h4>
+                <a asp-action="Checkout" asp-controller="Basket" class="btn btn-success mt-3">Proceed to Checkout</a>
+            </div>
+        </div>
+    }
+    @if (Model != null && Model.Any())
+    {
+        <div class="text-center mt-5">
+            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary">Continue Shopping</a>
+        </div>
+    }
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .basket-header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .table {
+        background-color: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    .dish-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+        .dish-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+            .dish-list li:last-child {
+                border-bottom: none;
+            }
+
+    .badge-menu, .badge-dish {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-danger {
+        transition: background-color 0.2s;
+    }
+
+        .btn-danger:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+</style>

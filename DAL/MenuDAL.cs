@@ -27,7 +27,6 @@ namespace TakeAway.DAL
                 {
                     while (await reader.ReadAsync())
                     {
-
                         int menuId = reader.GetInt32("id_meal");
                         string name = reader.GetString("name");
                         string description = reader.GetString("description");

@@ -45,6 +45,7 @@ namespace TakeAway.Controllers
             {
                 return RedirectToAction("Index");
             }
+            HttpContext.Session.SetInt32("restaurantId", id);
             return View(restaurant);
         }
 

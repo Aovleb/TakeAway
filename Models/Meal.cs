@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -75,6 +76,30 @@ namespace TakeAway.Models
         public async static Task<List<Meal>> GetRestaurantMealsAsync(IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
         {
             return await mealDAL.GetRestaurantMealsAsync(menuDAL, dishDAL, serviceDAL, id);
+        }
+
+        public async static Task<Meal> GetMealAsync(IMealDAL mealDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, int mealId)
+        {
+            return await mealDAL.GetMealAsync(serviceDAL, dishDAL, mealId);
+        }
+
+        public async Task<bool> AddInBasket(IMealDAL mealDAL, int clientId)
+        {
+            return await mealDAL.AddInBasket(this, clientId);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            Meal other = (Meal)obj;
+            return Id == other.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

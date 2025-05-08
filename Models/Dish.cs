@@ -24,19 +24,5 @@ namespace TakeAway.Models
         {
             return await dishDAL.CreateAsync(this, restaurantId);
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-                return false;
-
-            Dish other = (Dish)obj;
-            return Id == other.Id;
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
     }
 }

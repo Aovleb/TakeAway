@@ -5,6 +5,22 @@
 }
 
 <div class="container py-5">
+    <!-- Display Success or Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     @if (Model == null)
     {
         <div class="alert alert-warning text-center" role="alert">
@@ -82,7 +98,7 @@
                                         }
                                     </p>
                                 </div>
-                                <a href="#" class="btn btn-outline-success btn-cart mt-3">Add to Cart</a>
+                                <a asp-controller="Basket" asp-action="Add" asp-route-mealId="@meal.Id" class="btn btn-outline-success btn-cart mt-3">Add to Cart</a>
                             </div>
                         </div>
                     </div>

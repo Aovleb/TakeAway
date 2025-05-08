@@ -112,11 +112,14 @@ namespace TakeAway.Models
             return await clientDAL.GetOrderAsync(order);
         }
 
+        public static async Task<List<Meal>> GetBasketAsync(IClientDAL clientDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, int clientId)
+        {
+            return await clientDAL.GetBasketAsync(serviceDAL, dishDAL, clientId);
+        }
+
         public async Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
         }
-
-
     }
 }
