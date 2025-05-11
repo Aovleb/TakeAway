@@ -56,7 +56,7 @@ namespace TakeAway.Controllers
 
             Meal m = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
 
-            bool success = await m.AddInBasket(mealDAL, (int)userId);
+            bool success = m != null && await m.AddInBasket(mealDAL, (int)userId);
 
             if (success)
             {
@@ -82,7 +82,7 @@ namespace TakeAway.Controllers
 
             Meal m = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
 
-            bool success = await m.RemoveFromBasket(mealDAL, (int)userId);
+            bool success = m != null && await m.RemoveFromBasket(mealDAL, (int)userId);
 
             if (success)
             {
