@@ -67,7 +67,32 @@ namespace TakeAway.Controllers
                 TempData["ErrorMessage"] = "Failed to add item to the cart. Please try again.";
             }
             return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
+        }
 
+        public async Task<IActionResult> Remove(int mealId)
+        {
+            IActionResult? checkResult = CheckIsClient();
+            if (checkResult != null)
+            {
+                TempData["ErrorMessage"] = "You must be signed in to add to cart.";
+                return checkResult;
+            }
+
+            int? userId = GetUserIdInSession();
+
+            Meal m = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
+
+            bool success = await m.RemoveFromBasket(mealDAL, (int)userId);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Item successfully remove to the basket!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to remove item to the cart. Please try again.";
+            }
+            return RedirectToAction("Index");
         }
 
         public IActionResult UnFound()

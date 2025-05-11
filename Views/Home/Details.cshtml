@@ -98,7 +98,10 @@
                                         }
                                     </p>
                                 </div>
-                                <a asp-controller="Basket" asp-action="Add" asp-route-mealId="@meal.Id" asp-route-restaurantId="@Model.Id" class="btn btn-outline-success btn-cart mt-3 add-to-cart">Add to Cart</a>
+                                <form asp-action="Add" asp-controller="Basket" method="post">
+                                    <input type="hidden" value="@meal.Id" name="mealId" />
+                                    <input type="submit" value="Add to Cart" class="btn btn-outline-success btn-cart mt-3 add-to-cart" />
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -110,38 +113,6 @@
             <a asp-action="Index" class="btn btn-outline-primary">Back to Restaurant List</a>
         </div>
     }
-
-    <!-- Script pour gérer les messages flash et la position de scroll -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Gestion des messages flash
-            const flashMessages = document.querySelectorAll('.flash-message');
-            flashMessages.forEach(message => {
-                setTimeout(() => {
-                    message.style.transform = 'translateY(-100%)';
-                    message.style.opacity = '0';
-                    setTimeout(() => {
-                        message.remove();
-                    }, 300);
-                }, 2000);
-            });
-
-            // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
-            const addToCartButtons = document.querySelectorAll('.add-to-cart');
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    sessionStorage.setItem('scrollPosition', window.scrollY);
-                });
-            });
-
-            // Restaurer la position de scroll après le chargement de la page
-            const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-            if (savedScrollPosition) {
-                window.scrollTo(0, parseInt(savedScrollPosition));
-                sessionStorage.removeItem('scrollPosition');
-            }
-        });
-    </script>
 </div>
 
 <style>
@@ -214,3 +185,36 @@
         transition: transform 0.3s ease-out, opacity 0.3s ease-out;
     }
 </style>
+
+
+<!-- Script pour gérer les messages flash et la position de scroll -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gestion des messages flash
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            setTimeout(() => {
+                message.style.transform = 'translateY(-100%)';
+                message.style.opacity = '0';
+                setTimeout(() => {
+                    message.remove();
+                }, 300);
+            }, 2000);
+        });
+
+        // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            });
+        });
+
+        // Restaurer la position de scroll après le chargement de la page
+        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        if (savedScrollPosition) {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
+</script>

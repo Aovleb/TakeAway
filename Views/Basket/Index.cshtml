@@ -5,6 +5,22 @@
 }
 
 <div class="container py-5">
+    <!-- Display Success or Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible flash-message" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="basket-header text-center">
         <h1 class="display-4">Your Basket</h1>
         <p class="lead">Review the items in your basket before proceeding to checkout.</p>
@@ -63,7 +79,10 @@
                                         }
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-outline-danger btn-sm">Remove</a>
+                                        <form asp-action="Remove" method="post">
+                                            <input type="hidden" name="mealId" value="@meal.Id" />
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @if (meal is Menu menu && menu.Dishes != null && menu.Dishes.Any())
@@ -156,4 +175,48 @@
             background-color: #dc3545;
             border-color: #dc3545;
         }
+
+    .flash-message {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        z-index: 1050;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
 </style>
+
+<!-- Script pour gérer les messages flash et la position de scroll -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gestion des messages flash
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            setTimeout(() => {
+                message.style.transform = 'translateY(-100%)';
+                message.style.opacity = '0';
+                setTimeout(() => {
+                    message.remove();
+                }, 300);
+            }, 2000);
+        });
+
+        // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            });
+        });
+
+        // Restaurer la position de scroll après le chargement de la page
+        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+        if (savedScrollPosition) {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
+</script>

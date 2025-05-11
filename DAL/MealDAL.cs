@@ -137,6 +137,73 @@ namespace TakeAway.DAL
             }
             return success;
         }
+
+        public async Task<bool> RemoveFromBasket(Meal m, int clientId)
+        {
+            bool success = false;
+            string verifyMealQuery = @"SELECT * FROM client_meal WHERE id_person = @id_person AND id_meal = @id_meal";
+            string RemoveClientMealQuery = @"DELETE FROM client_meal WHERE id_person = @id_person AND id_meal = @id_meal";
+            string decrementQuantityQuery = @"UPDATE client_meal SET quantity = quantity - 1 WHERE id_person = @id_person AND id_meal = @id_meal";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                SqlTransaction transaction = conn.BeginTransaction();
+                try
+                {
+                    //verify if the meal is in the basket
+                    SqlCommand cmd = new SqlCommand(verifyMealQuery, conn, transaction);
+                    cmd.Parameters.AddWithValue("@id_person", clientId);
+                    cmd.Parameters.AddWithValue("@id_meal", m.Id);
+                    int cpt = 0;
+                    int quantity = 0;
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            cpt++;
+                            quantity = reader.GetInt32("quantity");
+                        }
+                    }
+                    int rows;
+
+                    //if the meal is in the basket
+                    if (cpt > 0)
+                    {
+                        if(quantity <=1)
+                        {
+                            //remove the meal
+                            cmd = new SqlCommand(RemoveClientMealQuery, conn, transaction);
+                            cmd.Parameters.AddWithValue("@id_person", clientId);
+                            cmd.Parameters.AddWithValue("@id_meal", m.Id);
+                            rows = await cmd.ExecuteNonQueryAsync();
+                        }
+                        else
+                        {
+                            //decrement the quantity
+                            cmd = new SqlCommand(decrementQuantityQuery, conn, transaction);
+                            cmd.Parameters.AddWithValue("@id_person", clientId);
+                            cmd.Parameters.AddWithValue("@id_meal", m.Id);
+                            rows = await cmd.ExecuteNonQueryAsync();
+                        }
+                        if (rows > 0)
+                        {
+                            transaction.Commit();
+                            success = true;
+                        }
+                        else
+                            transaction.Rollback();
+                    }
+                    else
+                        transaction.Rollback();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                }
+            }
+            return success;
+        }
     }
 }
     
