@@ -3,6 +3,8 @@ using System.Diagnostics;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using Microsoft.AspNetCore.Http;
+using TakeAway.DAL;
+using TakeAway.ViewModels;
 
 namespace TakeAway.Controllers
 {
@@ -31,13 +33,44 @@ namespace TakeAway.Controllers
                 return checkResult;
             }
 
-            int? userId = GetUserIdInSession();
+            BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
+            List<MealViewModel> mealDetails = new List<MealViewModel>();
 
-            List<Meal> meals = await Client.GetBasketAsync(clientDAL, serviceDAL, dishDAL, (int)userId);
+            foreach ((int id, int quantity) in basket.Items)
+            {
+                Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, id);
+                if (meal != null)
+                {
+                    MealViewModel mealViewModel = new MealViewModel
+                    {
+                        Id = meal.Id,
+                        Name = meal.Name,
+                        Price = meal.Price,
+                        Type = meal is Menu ? "Menu" : "Dish"
+                    };
 
-            return View(meals);
+                    // Si c'est un menu, récupérer les plats associés
+                    if (meal is Menu menu)
+                    {
+                        foreach (Dish dish in menu.Dishes)
+                        {
+                            mealViewModel.Dishes.Add(new MealViewModel
+                            {
+                                Id = dish.Id,
+                                Name = dish.Name,
+                                Price = dish.Price,
+                                Type = "Dish"
+                            });
+                        }
+                    }
+
+                    mealDetails.Add(mealViewModel);
+                }
+            }
+
+            ViewBag.MealDetails = mealDetails;
+            return View(basket);
         }
-
         public async Task<IActionResult> Add(int mealId)
         {
             IActionResult? checkResult = CheckIsClient();
@@ -52,24 +85,20 @@ namespace TakeAway.Controllers
             {
                 return UnFound();
             }
-            int? userId = GetUserIdInSession();
 
-            Meal m = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
-
-            bool success = m != null && await m.AddInBasket(mealDAL, (int)userId);
-
-            if (success)
+            BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
+            Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
+            if (meal != null)
             {
-                TempData["SuccessMessage"] = "Item successfully added to the cart!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Failed to add item to the cart. Please try again.";
+                basket.Items[mealId] = basket.Items.TryGetValue(mealId, out int qty) ? qty + 1 : 1;
+                basket.Total += meal.Price;
+                CookieHelper.SetBasketCookie(Response, basket);
+                TempData["SuccessMessage"] = "Article ajouté !";
             }
             return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
         }
 
-        public async Task<IActionResult> Remove(int mealId)
+        public async Task<IActionResult> Remove(int id)
         {
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
@@ -78,19 +107,15 @@ namespace TakeAway.Controllers
                 return checkResult;
             }
 
-            int? userId = GetUserIdInSession();
-
-            Meal m = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
-
-            bool success = m != null && await m.RemoveFromBasket(mealDAL, (int)userId);
-
-            if (success)
+            Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, id);
+            BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
+            if (basket.Items.ContainsKey(id) && meal != null)
             {
-                TempData["SuccessMessage"] = "Item successfully remove to the basket!";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Failed to remove item to the cart. Please try again.";
+                if (basket.Items[id] > 1) basket.Items[id]--;
+                else basket.Items.Remove(id);
+                basket.Total -= meal.Price;
+                CookieHelper.SetBasketCookie(Response, basket);
+                TempData["Message"] = "Article retiré !";
             }
             return RedirectToAction("Index");
         }

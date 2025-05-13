@@ -1,125 +1,94 @@
-﻿@model List<Meal>
+﻿@model TakeAway.ViewModels.BasketViewModel
+@using System.Globalization
+@using TakeAway.ViewModels
 
 @{
-    ViewData["Title"] = "Your Basket";
+    ViewData["Title"] = "Votre Panier";
+    List<MealViewModel> mealDetails = ViewBag.MealDetails as List<MealViewModel> ?? new List<MealViewModel>();
 }
 
 <div class="container py-5">
-    <!-- Display Success or Error Messages -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible flash-message" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="basket-header text-center">
-        <h1 class="display-4">Your Basket</h1>
-        <p class="lead">Review the items in your basket before proceeding to checkout.</p>
+    <div class="header">
+        <h1 class="display-4">Votre Panier</h1>
+        <p class="lead">Consultez les articles ajoutés et finalisez votre commande.</p>
     </div>
-
-    @if (Model == null || !Model.Any())
+    @if (Model == null || Model.Items.Count == 0)
     {
-        <div class="alert alert-info text-center" role="alert">
-            <h4 class="alert-heading">Your Basket is Empty!</h4>
-            <p>It looks like you haven't added any items yet.</p>
-            <a asp-action="Index" asp-controller="Home" class="btn btn-primary mt-3">Browse Restaurants</a>
+        <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">Panier Vide</h4>
+            <p>Votre panier est actuellement vide. Ajoutez des articles depuis les restaurants !</p>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary btn-details">Découvrir les restaurants</a>
         </div>
     }
     else
     {
         <div class="row">
             <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Item</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                    </thead>
-
-                    @{
-                        // Liste pour suivre les meals déjà affichés
-                        var displayedMeals = new List<string>();
-                    }
-                    <tbody>
-                        @foreach (Meal meal in Model)
-                        {
-                            // Si le meal n'a pas encore été affiché
-                            if (!displayedMeals.Contains(meal.Name))
-                            {
-                                // Compter combien de fois ce meal apparaît dans la liste
-                                int quantity = Model.Count(m => m.Name == meal.Name);
-
+                <div class="card restaurant-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Articles dans le panier</h5>
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td>@meal.Name</td>
-                                    <td>@meal.Description</td>
-                                    <td>@meal.Price.ToString("C")</td>
-                                    <td>@quantity</td>
-                                    <td>
-                                        @if (meal is Menu)
-                                        {
-                                            <span class="badge bg-info badge-menu">Menu</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary badge-dish">Dish</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <form asp-action="Remove" method="post">
-                                            <input type="hidden" name="mealId" value="@meal.Id" />
-                                            <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
-                                        </form>
-                                    </td>
+                                    <th>Article</th>
+                                    <th>Type</th>
+                                    <th>Quantité</th>
+                                    <th>Prix unitaire</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
                                 </tr>
-                                @if (meal is Menu menu && menu.Dishes != null && menu.Dishes.Any())
+                            </thead>
+                            <tbody>
+                                @foreach ((int id, int quantity) in Model.Items)
                                 {
-                                    <tr>
-                                        <td colspan="6">
-                                            <h6>Included Dishes:</h6>
-                                            <ul class="dish-list">
-                                                @foreach (Dish dish in menu.Dishes)
+                                    MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
+                                    if (meal != null)
+                                    {
+                                        <tr>
+                                            <td>@meal.Name</td>
+                                            <td>
+                                                @if (meal.Type == "Menu")
                                                 {
-                                                    <li>@dish.Name - @dish.Description</li>
+                                                    <span class="badge bg-info badge-menu">Menu</span>
                                                 }
-                                            </ul>
-                                        </td>
-                                    </tr>
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary badge-dish">Dish</span>
+                                                }
+                                            </td>
+                                            <td>@quantity</td>
+                                            <td>@meal.Price.ToString("C", CultureInfo.CurrentCulture)</td>
+                                            <td>@((meal.Price * quantity).ToString("C", CultureInfo.CurrentCulture))</td>
+                                            <td>
+                                                <a asp-action="Remove" asp-route-id="@id" class="btn btn-outline-danger btn-sm">Retirer</a>
+                                            </td>
+                                        </tr>
+                                        @if (meal.Type == "Menu" && meal.Dishes != null && meal.Dishes.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="6">
+                                                    <h6 class="mt-3">Plats inclus :</h6>
+                                                    <ul class="dish-list">
+                                                        @foreach (MealViewModel dish in meal.Dishes)
+                                                        {
+                                                            <li>@dish.Name</li>
+                                                        }
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
                                 }
-
-                                // Ajouter le meal à la liste des affichés
-                                displayedMeals.Add(meal.Name);
-                            }
-                        }
-                    </tbody>
-                </table>
+                            </tbody>
+                        </table>
+                        <h5 class="text-end">Total : @Model.Total.ToString("C", CultureInfo.CurrentCulture)</h5>
+                        <div class="text-end">
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary btn-details">Continuer les achats</a>
+                            <a href="#" class="btn btn-success btn-nav">Passer la commande</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-12 text-end">
-                <h4>Total: @Model.Sum(m => m.Price).ToString("C")</h4>
-                <a asp-action="Checkout" asp-controller="Basket" class="btn btn-success mt-3">Proceed to Checkout</a>
-            </div>
-        </div>
-    }
-    @if (Model != null && Model.Any())
-    {
-        <div class="text-center mt-5">
-            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary">Continue Shopping</a>
         </div>
     }
 </div>
@@ -129,28 +98,53 @@
         background-color: #f8f9fa;
     }
 
-    .basket-header {
+    .header {
         background: linear-gradient(135deg, #343a40, #495057);
         color: white;
         padding: 2rem;
         border-radius: 0.5rem;
         margin-bottom: 2rem;
+        text-align: center;
     }
 
-    .table {
-        background-color: white;
+    .restaurant-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
         border-radius: 0.5rem;
-        overflow: hidden;
+        margin-bottom: 1.5rem;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: #f1f3f5;
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn-details {
+        transition: background-color 0.2s;
+    }
+
+        .btn-details:hover {
+            background-color: #005cbf;
+            border-color: #005cbf;
+        }
+
+    .btn-nav {
+        transition: background-color 0.2s;
+    }
+
+        .btn-nav:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+    .badge-menu, .badge-dish {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
     }
 
     .dish-list {
         list-style-type: none;
         padding-left: 0;
-        margin-bottom: 0;
     }
 
         .dish-list li {
@@ -161,62 +155,4 @@
             .dish-list li:last-child {
                 border-bottom: none;
             }
-
-    .badge-menu, .badge-dish {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .btn-danger {
-        transition: background-color 0.2s;
-    }
-
-        .btn-danger:hover {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-    .flash-message {
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 600px;
-        z-index: 1050;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-    }
 </style>
-
-<!-- Script pour gérer les messages flash et la position de scroll -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Gestion des messages flash
-        const flashMessages = document.querySelectorAll('.flash-message');
-        flashMessages.forEach(message => {
-            setTimeout(() => {
-                message.style.transform = 'translateY(-100%)';
-                message.style.opacity = '0';
-                setTimeout(() => {
-                    message.remove();
-                }, 300);
-            }, 2000);
-        });
-
-        // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                sessionStorage.setItem('scrollPosition', window.scrollY);
-            });
-        });
-
-        // Restaurer la position de scroll après le chargement de la page
-        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-        if (savedScrollPosition) {
-            window.scrollTo(0, parseInt(savedScrollPosition));
-            sessionStorage.removeItem('scrollPosition');
-        }
-    });
-</script>
