@@ -83,16 +83,6 @@ namespace TakeAway.Models
             return await mealDAL.GetMealAsync(serviceDAL, dishDAL, mealId);
         }
 
-        public async Task<bool> AddInBasket(IMealDAL mealDAL, int clientId)
-        {
-            return await mealDAL.AddInBasket(this, clientId);
-        }
-
-        public async Task<bool> RemoveFromBasket(IMealDAL mealDAL, int clientId)
-        {
-            return await mealDAL.RemoveFromBasket(this, clientId);
-        }
-
         public override bool Equals(object obj)
         {
             if (obj == null)
