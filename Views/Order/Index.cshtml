@@ -1,0 +1,145 @@
+﻿```cshtml
+@model List<TakeAway.Models.Order>
+@using System.Globalization
+@using TakeAway.Models
+
+@{
+    ViewData["Title"] = "Liste des Commandes";
+}
+
+<div class="container py-5">
+    <div class="header">
+        <h1 class="display-4">Liste des Commandes</h1>
+        <p class="lead">Gérez les commandes de votre restaurant.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible flash-message" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            <h4 class="alert-heading">Aucune Commande</h4>
+            <p>Aucune commande n'a été passée pour ce restaurant.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card restaurant-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Commandes</h5>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Client</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Service</th>
+                                    <th>Articles</th>
+                                    <th>Total</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (Order order in Model)
+                                {
+                                    <tr>
+                                        <td>@order.OrderNumber</td>
+                                        <td>@order.Client.FirstName @order.Client.LastName</td>
+                                        <td>@order.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@(order.IsDelivery ? "Delivery" : "Pick Up")</td>
+                                        <td>@(order.Service?.ToString() ?? "Non spécifié")</td>
+                                        <td>
+                                            <ul class="dish-list">
+                                                @foreach (Meal meal in order.Meals)
+                                                {
+                                                    <li>@meal.Name (@meal.Price.ToString("C", CultureInfo.CurrentCulture))</li>
+                                                }
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            @{
+                                                decimal total = order.Meals.Sum(m => m.Price);
+                                                @total.ToString("C", CultureInfo.CurrentCulture)
+                                            }
+                                        </td>
+                                        <td>
+                                            <form asp-action="UpdateStatus" asp-route-orderNumber="@order.OrderNumber" method="post">
+                                                <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                                                    <option value="InPreparation" selected="@(order.Status == StatusOrderEnum.InPreparation)">En préparation</option>
+                                                    <option value="Ready" selected="@(order.Status == StatusOrderEnum.Ready)">Prêt</option>
+                                                    <option value="Delivered" selected="@(order.Status == StatusOrderEnum.Delivered)">Livré</option>
+                                                </select>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-secondary btn-back ms-3">Back to Restaurants</a>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #343a40, #495057);
+        color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .restaurant-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .dish-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+        .dish-list li {
+            padding: 0.2rem 0;
+        }
+
+    .form-select {
+        font-size: 0.9rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+</style>

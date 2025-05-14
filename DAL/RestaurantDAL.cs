@@ -81,7 +81,7 @@ namespace TakeAway.DAL
         }
 
 
-        public async Task<Restaurant> GetRestaurantAsync(IServiceDAL serviceDAL,IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, int id)
+        public async Task<Restaurant> GetRestaurantAsync(int id, IServiceDAL serviceDAL,IMealDAL mealDAL=null, IMenuDAL menuDAL=null, IDishDAL dishDAL=null, bool withMeals = false)
         {
             Restaurant r = null;
 
@@ -105,9 +105,11 @@ namespace TakeAway.DAL
                         (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, id);
                         r = new Restaurant(id, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
 
-                        List<Meal> meals = await Meal.GetRestaurantMealsAsync(mealDAL, menuDAL, dishDAL, serviceDAL, id);
-
-                        meals.ForEach(m => r.AddMeal(m));
+                        if (withMeals)
+                        {
+                            List<Meal> meals = await Meal.GetRestaurantMealsAsync(mealDAL, menuDAL, dishDAL, serviceDAL, id);
+                            meals.ForEach(m => r.AddMeal(m));
+                        }                            
                     }
                 }
                 return r;

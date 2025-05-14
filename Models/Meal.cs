@@ -83,6 +83,11 @@ namespace TakeAway.Models
             return await mealDAL.GetMealAsync(serviceDAL, dishDAL, mealId);
         }
 
+        public async static Task<List<Meal>> GetMealsOfOrderAsync(IMealDAL mealDAL,IServiceDAL serviceDAL, IDishDAL dishDAL, int id)
+        {
+            return await mealDAL.GetOrderMealsAsync(id, dishDAL, serviceDAL);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)

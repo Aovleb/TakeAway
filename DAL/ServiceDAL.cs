@@ -74,9 +74,29 @@ namespace TakeAway.DAL
             }
         }
 
-        public async Task<(Service lunchService, Service dinnerService)> GetOrderServicesAsync(int id)
+        public async Task<Service> GetOrderServiceAsync(int id)
         {
-            throw new NotImplementedException();
+            Service service = null;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand(@"SELECT * FROM Service s 
+                                                  INNER JOIN ClientOrder o ON s.id_service = o.id_service
+                                                  WHERE o.orderNumber = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        int service_id = reader.GetInt32("id_service");
+                        TimeSpan startTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("startTime"));
+                        TimeSpan endTimeSpan = reader.GetTimeSpan(reader.GetOrdinal("endTime"));
+                        service = new Service(service_id, startTimeSpan, endTimeSpan);
+                    }
+                }
+                return service;
+            }
         }
 
         public async Task<bool> InsertService(Service service, int restaurantId, SqlConnection conn, SqlTransaction transaction)

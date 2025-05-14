@@ -73,9 +73,57 @@ namespace TakeAway.DAL
             return meals;
         }
 
-        public async Task<List<Meal>> GetOrderMealsAsync(int id)
+        public async Task<List<Meal>> GetOrderMealsAsync(int id, IDishDAL dishDAL, IServiceDAL serviceDAL)
         {
-            throw new NotImplementedException();
+            List<Meal> meals = new List<Meal>();
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                //Dish
+                SqlCommand cmd = new SqlCommand(@"SELECT * FROM meal m 
+                                                  INNER JOIN dish d ON m.id_meal = d.id_meal 
+                                                  INNER JOIN ClientOrder_Meal co ON m.id_meal = co.id_meal
+                                                  WHERE co.orderNumber = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        int dishId = reader.GetInt32("id_meal");
+                        string name = reader.GetString("name");
+                        string description = reader.GetString("description");
+                        decimal price = reader.GetDecimal("price");
+
+                        Dish d = new Dish(dishId, name, description, price);
+                        meals.Add(d);
+                    }
+                }
+                //menu
+                cmd = new SqlCommand(@"SELECT * FROM meal m 
+                                       INNER JOIN menu me ON m.id_meal = me.id_meal 
+                                       INNER JOIN ClientOrder_Meal co ON m.id_meal = co.id_meal
+                                       WHERE co.orderNumber = @id", conn);
+                cmd.Parameters.AddWithValue("@id", id);
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        int menuId = reader.GetInt32("id_meal");
+                        string name = reader.GetString("name");
+                        string description = reader.GetString("description");
+                        decimal price = reader.GetDecimal("price");
+
+                        List<Dish> dishes = await Dish.GetDishesOfMenuAsync(dishDAL, menuId);
+                        (Service lunchService, Service dinnerService) = await Service.GetMealServicesAsync(serviceDAL, menuId);
+
+                        Menu m = new Menu(menuId, name, description, price, lunchService, dinnerService, dishes);
+                        meals.Add(m);
+                    }
+                }
+            }
+            return meals;
         }
     }
 }

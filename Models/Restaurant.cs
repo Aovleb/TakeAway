@@ -147,9 +147,9 @@ namespace TakeAway.Models
             return await restaurantDAL.GetRestaurantsAsync(serviceDdAL, id_restaurant);
         }
 
-        public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, int id)
+        public static async Task<Restaurant> GetRestaurantAsync(int id, IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, IMealDAL mealDAL=null, IMenuDAL menuDAL=null, IDishDAL dishDAL=null, bool withMeals = false)
         {
-            Restaurant restaurant = await restaurantDAL.GetRestaurantAsync(serviceDdAL, mealDAL, menuDAL, dishDAL, id);
+            Restaurant restaurant = await restaurantDAL.GetRestaurantAsync(id,serviceDdAL, mealDAL, menuDAL, dishDAL, withMeals);
             return restaurant;
         }
 

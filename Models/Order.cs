@@ -1,13 +1,15 @@
-﻿using TakeAway.DAL;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
+using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {
     public enum StatusOrderEnum
     {
-        InPreparation,
-        Ready,
-        Delivered,
+        InPreparation = 0,
+        Ready = 1,
+        Delivered = 2,
     }
     public class Order
     {
@@ -73,6 +75,11 @@ namespace TakeAway.Models
         }
 
         public Order() { }
+
+        public static async Task<List<Order>> GetOrdersAsync(int id,IOrderDAL orderDAL, IClientDAL clientDAL, IServiceDAL serviceDAL, IMealDAL mealDAL, IRestaurantDAL restaurantDAL, IDishDAL dishDAL)
+        {
+            return await orderDAL.GetOrdersAsync(id, clientDAL, serviceDAL, mealDAL, restaurantDAL, dishDAL);
+        }
 
     }
 }

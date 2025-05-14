@@ -40,7 +40,7 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
-            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, serviceDAL, mealDAL, menuDAL, dishDAL, id);
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(id,restaurantDAL, serviceDAL, mealDAL, menuDAL, dishDAL, true);
             if (restaurant == null)
             {
                 return RedirectToAction("Index");

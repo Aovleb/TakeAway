@@ -4,6 +4,6 @@ namespace TakeAway.DAL.Interfaces
 {
     public interface IClientDAL
     {
-        Task<Client> GetOrderAsync(Order o);
+        Task<Client> GetOrderAsync(int id);
     }
 }
