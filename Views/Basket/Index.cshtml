@@ -12,6 +12,18 @@
         <h1 class="display-4">Votre Panier</h1>
         <p class="lead">Consultez les articles ajoutés et finalisez votre commande.</p>
     </div>
+
+    <!-- Sélecteur de service -->
+    <div class="mb-4">
+        <form asp-action="UpdateService" asp-controller="Basket" method="post">
+            <label for="serviceType">Choisir le service :</label>
+            <select id="serviceType" name="serviceType" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+                <option value="Lunch" selected="@(Model.ServiceType == "Lunch")">Service du midi</option>
+                <option value="Dinner" selected="@(Model.ServiceType == "Dinner")">Service du soir</option>
+            </select>
+        </form>
+    </div>
+
     @if (Model == null || Model.Items.Count == 0)
     {
         <div class="alert alert-warning text-center" role="alert">
@@ -44,7 +56,12 @@
                                     MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
                                     if (meal != null)
                                     {
-                                        <tr>
+                                        // Vérifier si le repas est compatible avec le type de service sélectionné
+                                        bool isCompatible = string.IsNullOrEmpty(Model.ServiceType) ||
+                                        (Model.ServiceType == "Lunch" && meal.LunchService != null) ||
+                                        (Model.ServiceType == "Dinner" && meal.DinnerService != null);
+
+                                        <tr class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
                                             <td>@meal.Name</td>
                                             <td>
                                                 @if (meal.Type == "Menu")
@@ -65,13 +82,15 @@
                                         </tr>
                                         @if (meal.Type == "Menu" && meal.Dishes != null && meal.Dishes.Any())
                                         {
-                                            <tr>
+                                            <tr class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
                                                 <td colspan="6">
                                                     <h6 class="mt-3">Plats inclus :</h6>
                                                     <ul class="dish-list">
                                                         @foreach (MealViewModel dish in meal.Dishes)
                                                         {
-                                                            <li>@dish.Name</li>
+                                                            <li class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
+                                                                @dish.Name
+                                                            </li>
                                                         }
                                                     </ul>
                                                 </td>
@@ -155,4 +174,12 @@
             .dish-list li:last-child {
                 border-bottom: none;
             }
+
+    .text-decoration-line-through {
+        text-decoration: line-through;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
 </style>

@@ -10,7 +10,6 @@ namespace TakeAway.Controllers
 {
     public class BasketController : Controller
     {
-
         private IClientDAL clientDAL;
         private IServiceDAL serviceDAL;
         private IDishDAL dishDAL;
@@ -23,7 +22,6 @@ namespace TakeAway.Controllers
             this.dishDAL = dishDAL;
             this.mealDAL = mealDAL;
         }
-
 
         public async Task<IActionResult> Index()
         {
@@ -46,7 +44,9 @@ namespace TakeAway.Controllers
                         Id = meal.Id,
                         Name = meal.Name,
                         Price = meal.Price,
-                        Type = meal is Menu ? "Menu" : "Dish"
+                        Type = meal is Menu ? "Menu" : "Dish",
+                        LunchService = meal.LunchService,
+                        DinnerService = meal.DinnerService
                     };
 
                     // Si c'est un menu, récupérer les plats associés
@@ -59,7 +59,9 @@ namespace TakeAway.Controllers
                                 Id = dish.Id,
                                 Name = dish.Name,
                                 Price = dish.Price,
-                                Type = "Dish"
+                                Type = "Dish",
+                                LunchService = dish.LunchService,
+                                DinnerService = dish.DinnerService
                             });
                         }
                     }
@@ -71,6 +73,24 @@ namespace TakeAway.Controllers
             ViewBag.MealDetails = mealDetails;
             return View(basket);
         }
+
+        [HttpPost]
+        public IActionResult UpdateService(string serviceType)
+        {
+            IActionResult? checkResult = CheckIsClient();
+            if (checkResult != null)
+            {
+                return checkResult;
+            }
+
+            BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
+            basket.ServiceType = serviceType; // "Lunch" ou "Dinner"
+
+            CookieHelper.SetBasketCookie(Response, basket);
+            TempData["Message"] = "Service mis à jour !";
+            return RedirectToAction("Index");
+        }
+
         public async Task<IActionResult> Add(int mealId)
         {
             IActionResult? checkResult = CheckIsClient();
@@ -81,7 +101,7 @@ namespace TakeAway.Controllers
             }
 
             int? restaurantId = HttpContext.Session.GetInt32("restaurantId");
-            if(restaurantId == null)
+            if (restaurantId == null)
             {
                 return UnFound();
             }
