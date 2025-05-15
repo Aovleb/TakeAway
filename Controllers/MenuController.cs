@@ -22,6 +22,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Create()
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -49,6 +50,7 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Menu menu, List<int> selectedDishIds, bool chooseLunchService, bool chooseDinnerService)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -152,6 +154,11 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
             }
             return null;
+        }
+        private void SetUserViewData()
+        {
+            ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
+            ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
     }
 }

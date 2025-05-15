@@ -26,6 +26,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index(int id)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -44,6 +45,7 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int orderNumber, StatusOrderEnum status)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -105,6 +107,12 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
             }
             return null;
+        }
+
+        private void SetUserViewData()
+        {
+            ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
+            ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
     }
 }

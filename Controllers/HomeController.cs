@@ -26,6 +26,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index()
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsNotRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -36,6 +37,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsNotRestaurateur();
             if (checkResult != null)
                 return checkResult;
@@ -72,6 +74,11 @@ namespace TakeAway.Controllers
             if (userId != null && userType != null && userType == "Restaurateur")
                 return RedirectToAction("Logout", "Account");
             return null;
+        }
+        private void SetUserViewData()
+        {
+            ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
+            ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
     }
 }

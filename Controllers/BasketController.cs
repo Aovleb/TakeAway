@@ -25,6 +25,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Index()
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
@@ -77,6 +78,7 @@ namespace TakeAway.Controllers
         [HttpPost]
         public IActionResult UpdateService(string serviceType)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
@@ -93,6 +95,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Add(int mealId)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
@@ -120,6 +123,7 @@ namespace TakeAway.Controllers
 
         public async Task<IActionResult> Remove(int id)
         {
+            SetUserViewData();
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
@@ -162,6 +166,12 @@ namespace TakeAway.Controllers
             if (userId == null || userType == null || userType != "Client")
                 return RedirectToAction("UnFound");
             return null;
+        }
+
+        private void SetUserViewData()
+        {
+            ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
+            ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
     }
 }

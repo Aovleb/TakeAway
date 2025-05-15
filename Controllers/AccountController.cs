@@ -15,12 +15,14 @@ namespace TakeAway.Controllers
         
         public IActionResult SignIn()
         {
+            SetUserViewData();
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> SignIn(string email, string password)
         {
+            SetUserViewData();
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
                 ViewData["ErrorMessage"] = "Email and password are required.";
@@ -50,6 +52,7 @@ namespace TakeAway.Controllers
 
         public IActionResult SignUp()
         {
+            SetUserViewData();
             ViewData["ActiveForm"] = "Client";
             return View();
         }
@@ -57,6 +60,7 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterClient(Client client, string confirmPassword, bool conditions)
         {
+            SetUserViewData();
             ViewData["ActiveForm"] = "Client";
             bool successForm = true;
             if (!ModelState.IsValid)
@@ -94,6 +98,7 @@ namespace TakeAway.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterRestaurantOwner(RestaurantOwner owner, string confirmPassword, bool conditions)
         {
+            SetUserViewData();
             ViewData["ActiveForm"] = "RestaurantOwner";
             bool successForm = true;
             if (!ModelState.IsValid)
@@ -130,6 +135,12 @@ namespace TakeAway.Controllers
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Home");
+        }
+
+        private void SetUserViewData()
+        {
+            ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
+            ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
     }
 }
