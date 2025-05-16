@@ -33,7 +33,15 @@ namespace TakeAway.Models
         }
         public RestaurantOwner() { Restaurants = new List<Restaurant>(); }
 
-        public async Task<bool> CreateAsync(IUserDAL userDAL)
+        public void AddRestaurant(Restaurant restaurant)
+        {
+            if (restaurant != null && !Restaurants.Contains(restaurant))
+            {
+                Restaurants.Add(restaurant);
+            }
+        }
+
+        public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
         }

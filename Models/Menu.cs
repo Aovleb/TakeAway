@@ -11,9 +11,13 @@ namespace TakeAway.Models
             get { return dishes; }
             set { dishes = value; }
         }
-        public Menu(int id, string name, string description, decimal price,Service lunchService, Service dinnerService, List<Dish> dishes) : base(id, name, description, price, lunchService, dinnerService)
+        public Menu(int id, string name, string description, decimal price,Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
         {
-            Dishes = dishes;
+            Dishes = new List<Dish>();
+        }
+        public Menu(int id, string name, string description, decimal price) : base(id, name, description, price)
+        {
+            Dishes = new List<Dish>();
         }
         public Menu() : base()
         {
@@ -28,14 +32,9 @@ namespace TakeAway.Models
             }
         }
 
-        public async static Task<List<Menu>> GetRestaurantMenusAsync(IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
+        public async override Task<bool> CreateAsync(IMealDAL mealDAL, int restaurantId)
         {
-            return await menuDAL.GetRestaurantMenusAsync(dishDAL, serviceDAL, id);
-        }
-
-        public async Task<bool> CreateAsync(IMenuDAL menuDAL, int restaurantId)
-        {
-            return await menuDAL.CreateAsync(this, restaurantId);
+            return await mealDAL.CreateAsync(this, restaurantId);
         }
     }
 }

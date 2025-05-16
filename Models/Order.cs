@@ -17,10 +17,10 @@ namespace TakeAway.Models
         private StatusOrderEnum status;
         private bool isDelivery;
         private DateTime date;
-        private Restaurant restaurant;
         private Service service;
+        private Restaurant restaurant;
         private Client client;
-        private List<Meal> meals;
+        private Dictionary<Meal, int> meals;
 
         public int OrderNumber
         {
@@ -42,43 +42,59 @@ namespace TakeAway.Models
             get { return date; }
             set { date = value; }
         }
-        public Restaurant Restaurant
-        {
-            get { return restaurant; }
-            set { restaurant = value; }
-        }
         public Service Service
         {
             get { return service; }
             set { service = value; }
+        }
+        public Restaurant Restaurant
+        {
+            get { return restaurant; }
+            set { restaurant = value; }
         }
         public Client Client
         {
             get { return client; }
             set { client = value; }
         }
-        public List<Meal> Meals
+        public Dictionary<Meal, int> Meals
         {
             get { return meals; }
             set { meals = value; }
         }
-        public Order(int orderNumber, StatusOrderEnum status, bool isDelivery, DateTime date, Restaurant restaurant, Service service, Client client, List<Meal> meals)
+        public Order(int orderNumber, StatusOrderEnum status, bool isDelivery, DateTime date, Service service, Restaurant restaurant, Client client)
         {
             OrderNumber = orderNumber;
             Status = status;
             IsDelivery = isDelivery;
             Date = date;
-            Restaurant = restaurant;
             Service = service;
+            Restaurant = restaurant;
             Client = client;
-            Meals = meals;
+            Meals = new Dictionary<Meal, int>();
+        }
+
+        public void AddMeal(Meal meal, int quantity)
+        {
+            Meals.Add(meal, quantity);
         }
 
         public Order() { }
 
-        public static async Task<List<Order>> GetOrdersAsync(int id,IOrderDAL orderDAL, IClientDAL clientDAL, IServiceDAL serviceDAL, IMealDAL mealDAL, IRestaurantDAL restaurantDAL, IDishDAL dishDAL)
+
+        public decimal GetTotalPrice()
         {
-            return await orderDAL.GetOrdersAsync(id, clientDAL, serviceDAL, mealDAL, restaurantDAL, dishDAL);
+            decimal totalPrice = 0;
+            foreach (var meal in Meals)
+            {
+                totalPrice += meal.Key.Price * meal.Value;
+            }
+            return totalPrice;
+        }
+
+        public static async Task<List<Order>> GetOrdersAsync(Restaurant restaurant,IOrderDAL orderDAL)
+        {
+            return await orderDAL.GetOrdersAsync(restaurant);
         }
 
     }

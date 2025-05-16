@@ -10,16 +10,10 @@ namespace TakeAway.Controllers
 {
     public class BasketController : Controller
     {
-        private IClientDAL clientDAL;
-        private IServiceDAL serviceDAL;
-        private IDishDAL dishDAL;
         private IMealDAL mealDAL;
 
-        public BasketController(IClientDAL clientDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, IMealDAL mealDAL)
+        public BasketController(IMealDAL mealDAL)
         {
-            this.clientDAL = clientDAL;
-            this.serviceDAL = serviceDAL;
-            this.dishDAL = dishDAL;
             this.mealDAL = mealDAL;
         }
 
@@ -37,7 +31,7 @@ namespace TakeAway.Controllers
 
             foreach ((int id, int quantity) in basket.Items)
             {
-                Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, id);
+                Meal meal = await Meal.GetMealAsync(mealDAL, id);
                 if (meal != null)
                 {
                     MealViewModel mealViewModel = new MealViewModel
@@ -76,6 +70,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult UpdateService(string serviceType)
         {
             SetUserViewData();
@@ -110,7 +105,7 @@ namespace TakeAway.Controllers
             }
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
-            Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, mealId);
+            Meal meal = await Meal.GetMealAsync(mealDAL, mealId);
             if (meal != null)
             {
                 basket.Items[mealId] = basket.Items.TryGetValue(mealId, out int qty) ? qty + 1 : 1;
@@ -131,7 +126,7 @@ namespace TakeAway.Controllers
                 return checkResult;
             }
 
-            Meal meal = await Meal.GetMealAsync(mealDAL, serviceDAL, dishDAL, id);
+            Meal meal = await Meal.GetMealAsync(mealDAL, id);
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
             if (basket.Items.ContainsKey(id) && meal != null)
             {

@@ -8,14 +8,10 @@ string connectionString = builder.Configuration.GetConnectionString("local");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<IClientDAL>(x => new ClientDAL(connectionString));
-builder.Services.AddScoped<IDishDAL>(x => new DishDAL(connectionString));
 builder.Services.AddScoped<IMealDAL>(x => new MealDAL(connectionString));
-builder.Services.AddScoped<IMenuDAL>(x => new MenuDAL(connectionString));
 builder.Services.AddScoped<IOrderDAL>(x => new OrderDAL(connectionString));
 builder.Services.AddScoped<IUserDAL>(x => new UserDAL(connectionString));
 builder.Services.AddScoped<IRestaurantDAL>(x => new RestaurantDAL(connectionString));
-builder.Services.AddScoped<IServiceDAL>(x => new ServiceDAL(connectionString));
 
 builder.Services.AddSession(options =>
 {

@@ -107,12 +107,12 @@ namespace TakeAway.Models
         }
         public Client() { MealsInBasket = new List<Meal>(); }
 
-        public static async Task<Client> GetClientOfOrderAsync(IClientDAL clientDAL, int id)
+        public void AddMealToBasket(Meal meal)
         {
-            return await clientDAL.GetOrderAsync(id);
+            MealsInBasket.Add(meal);
         }
 
-        public async Task<bool> CreateAsync(IUserDAL userDAL)
+        public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
         }

@@ -7,21 +7,13 @@ namespace TakeAway.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly IClientDAL clientDAL;
         private readonly IOrderDAL orderDAL;
         private readonly IRestaurantDAL restaurantDAL;
-        private readonly IServiceDAL serviceDAL;
-        private readonly IMealDAL mealDAL;
-        private readonly IDishDAL dishDAL;
 
-        public OrderController(IClientDAL clientDAL, IOrderDAL orderDAL, IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IMealDAL mealDAL, IDishDAL dishDAL)
+        public OrderController(IOrderDAL orderDAL, IRestaurantDAL restaurantDAL)
         {
-            this.clientDAL = clientDAL;
             this.orderDAL = orderDAL;
             this.restaurantDAL = restaurantDAL;
-            this.serviceDAL = serviceDAL;
-            this.mealDAL = mealDAL;
-            this.dishDAL = dishDAL;
         }
 
         public async Task<IActionResult> Index(int id)
@@ -35,7 +27,9 @@ namespace TakeAway.Controllers
             if (checkOwnedByUser != null)
                 return checkOwnedByUser;
 
-            List<Order> orders = await Order.GetOrdersAsync(id, orderDAL, clientDAL, serviceDAL, mealDAL, restaurantDAL, dishDAL);
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id);
+
+            List<Order> orders = await Order.GetOrdersAsync(restaurant, orderDAL);
 
             HttpContext.Session.SetInt32("restaurantId", id); // Stocker l'ID du restaurant pour les redirections
 
@@ -43,6 +37,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int orderNumber, StatusOrderEnum status)
         {
             SetUserViewData();
@@ -100,7 +95,7 @@ namespace TakeAway.Controllers
             if (userId == null)
                 return RedirectToAction("UnFound");
 
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
             bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
             if (!isOwnedByUser)
             {

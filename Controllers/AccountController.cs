@@ -20,6 +20,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignIn(string email, string password)
         {
             SetUserViewData();
@@ -58,6 +59,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterClient(Client client, string confirmPassword, bool conditions)
         {
             SetUserViewData();
@@ -96,6 +98,7 @@ namespace TakeAway.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterRestaurantOwner(RestaurantOwner owner, string confirmPassword, bool conditions)
         {
             SetUserViewData();

@@ -1,5 +1,4 @@
-﻿```cshtml
-@model List<TakeAway.Models.Order>
+﻿@model List<Order>
 @using System.Globalization
 @using TakeAway.Models
 
@@ -66,16 +65,18 @@
                                         <td>@(order.Service?.ToString() ?? "Non spécifié")</td>
                                         <td>
                                             <ul class="dish-list">
-                                                @foreach (Meal meal in order.Meals)
+                                                @foreach (var mealEntry in order.Meals)
                                                 {
-                                                    <li>@meal.Name (@meal.Price.ToString("C", CultureInfo.CurrentCulture))</li>
+                                                    <li>
+                                                        @mealEntry.Key.Name (x@(mealEntry.Value))
+                                                        (@((mealEntry.Key.Price * mealEntry.Value).ToString("C", CultureInfo.CurrentCulture)))
+                                                    </li>
                                                 }
                                             </ul>
                                         </td>
                                         <td>
                                             @{
-                                                decimal total = order.Meals.Sum(m => m.Price);
-                                                @total.ToString("C", CultureInfo.CurrentCulture)
+                                                @order.GetTotalPrice().ToString("C", CultureInfo.CurrentCulture)
                                             }
                                         </td>
                                         <td>
@@ -98,48 +99,3 @@
     }
     <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-secondary btn-back ms-3">Back to Restaurants</a>
 </div>
-
-<style>
-    body {
-        background-color: #f8f9fa;
-    }
-
-    .header {
-        background: linear-gradient(135deg, #343a40, #495057);
-        color: white;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-
-    .restaurant-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-        .restaurant-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-    .dish-list {
-        list-style-type: none;
-        padding-left: 0;
-        margin-bottom: 0;
-    }
-
-        .dish-list li {
-            padding: 0.2rem 0;
-        }
-
-    .form-select {
-        font-size: 0.9rem;
-    }
-
-    .table-hover tbody tr:hover {
-        background-color: #f1f3f5;
-    }
-</style>

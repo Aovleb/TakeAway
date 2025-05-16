@@ -10,18 +10,10 @@ namespace TakeAway.Controllers
     public class HomeController : Controller
     {
         private IRestaurantDAL restaurantDAL;
-        private IServiceDAL serviceDAL;
-        private IMealDAL mealDAL;
-        private IMenuDAL menuDAL;
-        private IDishDAL dishDAL;
 
-        public HomeController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL)
+        public HomeController(IRestaurantDAL restaurantDAL)
         {
             this.restaurantDAL = restaurantDAL;
-            this.serviceDAL = serviceDAL;
-            this.mealDAL = mealDAL;
-            this.menuDAL = menuDAL;
-            this.dishDAL = dishDAL;
         }
 
         public async Task<IActionResult> Index()
@@ -31,7 +23,7 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL);
             return View(restaurants);
         }
 
@@ -42,7 +34,7 @@ namespace TakeAway.Controllers
             if (checkResult != null)
                 return checkResult;
 
-            Restaurant restaurant = await Restaurant.GetRestaurantAsync(id,restaurantDAL, serviceDAL, mealDAL, menuDAL, dishDAL, true);
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id, true);
             if (restaurant == null)
             {
                 return RedirectToAction("Index");

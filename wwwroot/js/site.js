@@ -1,4 +1,13 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿document.addEventListener('DOMContentLoaded', function () {
+    // Gestion des messages flash
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(message => {
+        setTimeout(() => {
+            message.style.transform = 'translateY(-100%)';
+            message.style.opacity = '0';
+            setTimeout(() => {
+                message.remove();
+            }, 300);
+        }, 2000);
+    });
+});

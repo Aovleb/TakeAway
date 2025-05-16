@@ -9,16 +9,10 @@ namespace TakeAway.Controllers
     public class RestaurantController : Controller
     {
         private IRestaurantDAL restaurantDAL;
-        private IServiceDAL serviceDAL;
-        private IDishDAL dishDAL;
-        private IMenuDAL menuDAL;
 
-        public RestaurantController(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, IMenuDAL menuDAL)
+        public RestaurantController(IRestaurantDAL restaurantDAL)
         {
             this.restaurantDAL = restaurantDAL;
-            this.serviceDAL = serviceDAL;
-            this.dishDAL = dishDAL;
-            this.menuDAL = menuDAL;
         }
 
         public async Task<IActionResult> Index()
@@ -31,7 +25,7 @@ namespace TakeAway.Controllers
             HttpContext.Session.Remove("restaurantId");
 
             int? userId = GetUserIdInSession();
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
             return View(restaurants);
         }
 
@@ -46,6 +40,7 @@ namespace TakeAway.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Restaurant r)
         {
             SetUserViewData();
@@ -57,7 +52,7 @@ namespace TakeAway.Controllers
 
             if (ModelState.IsValid)
             {
-                bool success = await r.CreateAsync(restaurantDAL, serviceDAL, (int)userId);
+                bool success = await r.CreateAsync(restaurantDAL, (int)userId);
                 if (success)
                 {
                     return RedirectToAction(nameof(Index));
@@ -83,7 +78,16 @@ namespace TakeAway.Controllers
 
             HttpContext.Session.SetInt32("restaurantId", id);
 
-            List<Dish> dishes = await Dish.GetRestaurantDishesAsync(dishDAL, serviceDAL, id);
+            
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id, true);
+            List<Dish> dishes = new List<Dish>();
+            restaurant.Meals.ForEach(m =>
+            {
+                if (m is Dish dish)
+                {
+                    dishes.Add(dish);
+                }
+            });
             return View(dishes);
         }
 
@@ -99,7 +103,16 @@ namespace TakeAway.Controllers
                 return checkOwnedByUser;
 
             HttpContext.Session.SetInt32("restaurantId", id);
-            List<Menu> menus = await Menu.GetRestaurantMenusAsync(menuDAL, dishDAL, serviceDAL, id);
+
+            Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id, true);
+            List<Menu> menus = new List<Menu>();
+            restaurant.Meals.ForEach(m =>
+            {
+                if (m is Menu menu)
+                {
+                    menus.Add(menu);
+                }
+            });
             return View(menus);
         }
 
@@ -130,7 +143,7 @@ namespace TakeAway.Controllers
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
             int? userId = GetUserIdInSession();
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
             bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
             if (!isOwnedByUser)
             {

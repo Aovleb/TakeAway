@@ -1,22 +1,218 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
+/* Général */
 body {
-  margin-bottom: 60px;
+    background-color: #f8f9fa;
+}
+
+/* En-tête */
+.header, .restaurant-header {
+    background: linear-gradient(135deg, #343a40, #495057);
+    color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Formulaires */
+.form-control {
+    border-radius: 0.5rem;
+    transition: border-color 0.2s;
+}
+
+    .form-control:focus {
+        border-color: #005cbf;
+        box-shadow: 0 0 5px rgba(0, 92, 191, 0.3);
+    }
+
+.text-danger {
+    min-height: 1.25rem;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.form-select {
+    font-size: 0.9rem;
+}
+
+.registration-form {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Cartes */
+.restaurant-card, .meal-card, .dish-card, .menu-card, .signup-card, .login-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+    .restaurant-card:hover, .meal-card:hover, .dish-card:hover, .menu-card:hover, .signup-card:hover, .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+.login-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Listes */
+.dish-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+    .dish-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .dish-list li:last-child {
+            border-bottom: none;
+        }
+
+    .dish-list.orders li {
+        padding: 0.2rem 0;
+    }
+
+/* Badges */
+.badge-menu, .badge-dish {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Temps de service */
+.service-time {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Boutons */
+.btn-create, .btn-nav, .btn-register {
+    transition: background-color 0.2s;
+}
+
+    .btn-create:hover, .btn-nav:hover, .btn-register:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+.btn-back {
+    transition: background-color 0.2s;
+}
+
+    .btn-back:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+.btn-manage, .btn-details, .btn-action, .btn-cart, .btn-login {
+    transition: background-color 0.2s;
+}
+
+    .btn-manage:hover, .btn-details:hover, .btn-action:hover, .btn-cart:hover, .btn-login:hover {
+        background-color: #005cbf;
+        border-color: #005cbf;
+    }
+
+    .btn-manage.active {
+        background-color: #005cbf;
+        border-color: #005cbf;
+        color: white;
+    }
+
+.btn-delete {
+    transition: background-color 0.2s;
+}
+
+    .btn-delete:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+/* Messages flash */
+.flash-message {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    z-index: 1050;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+/* Pop-up d'erreurs (SignUp) */
+.error-popup {
+    position: fixed;
+    top: 20%;
+    right: 20px;
+    width: 320px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background-color: #ffe6e8;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+    .error-popup .popup-title {
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    .error-popup ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin: 0;
+    }
+
+    .error-popup li {
+        color: #721c24;
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+    }
+
+    .error-popup .close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .error-popup .close-btn:hover {
+            background: #b02a37;
+        }
+
+/* Tables */
+.table-hover tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Styles spécifiques au panier */
+.text-decoration-line-through {
+    text-decoration: line-through;
+}
+
+.text-muted {
+    color: #6c757d !important;
 }

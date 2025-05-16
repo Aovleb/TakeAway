@@ -41,20 +41,6 @@ namespace TakeAway.Models
         }
         public Service() { }
 
-        public async static Task<(Service lunchService, Service dinnerService)> GetRestaurantServicesAsync(IServiceDAL serviceDAL, int id)
-        {
-            return await serviceDAL.GetRestaurantServicesAsync(id);
-        }
-
-        public async static Task<(Service lunchService, Service dinnerService)> GetMealServicesAsync(IServiceDAL serviceDAL, int id)
-        {
-            return await serviceDAL.GetMealServicesAsync(id);
-        }
-
-        public async static Task<Service> GetOrderServiceAsync(IServiceDAL serviceDAL, int id)
-        {
-            return await serviceDAL.GetOrderServiceAsync(id);
-        }
         public override string ToString()
         {
             string start =$"{startTime.Hours:D2}:{startTime.Minutes:D2}";

@@ -1,28 +1,17 @@
-﻿using TakeAway.DAL;
-using TakeAway.DAL.Interfaces;
+﻿using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {
     public class Dish : Meal
     {
         public Dish(int id, string name, string description, decimal price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService) { }
-        public Dish(int id, string name, string description, decimal price) : base(id, name, description, price, null,null) { }
+        public Dish(int id, string name, string description, decimal price) : base(id, name, description, price) { }
 
         public Dish() : base() { }
 
-        public async static Task<List<Dish>> GetRestaurantDishesAsync(IDishDAL dishDAL, IServiceDAL serviceDAL,int id)
+        public async override Task<bool> CreateAsync(IMealDAL mealDAL, int restaurantId)
         {
-            return await dishDAL.GetRestaurantDishesAsync(serviceDAL, id);
-        }
-
-        public async static Task<List<Dish>> GetDishesOfMenuAsync(IDishDAL dishDAL, int id)
-        {
-            return await dishDAL.GetDishesOfMenuAsync(id);
-        }
-
-        public async Task<bool> CreateAsync(IDishDAL dishDAL, int restaurantId)
-        {
-            return await dishDAL.CreateAsync(this, restaurantId);
+            return await mealDAL.CreateAsync(this, restaurantId);
         }
     }
 }

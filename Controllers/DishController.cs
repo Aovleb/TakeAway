@@ -7,14 +7,12 @@ namespace TakeAway.Controllers
 {
     public class DishController : Controller
     {
-        private IServiceDAL serviceDAL;
-        private IDishDAL dishDAL;
+        private IMealDAL mealDAL;
         private IRestaurantDAL restaurantDAL;
 
-        public DishController(IServiceDAL serviceDAL, IDishDAL dishDAL, IRestaurantDAL restaurantDAL)
+        public DishController(IMealDAL mealDAL, IRestaurantDAL restaurantDAL)
         {
-            this.serviceDAL = serviceDAL;
-            this.dishDAL = dishDAL;
+            this.mealDAL = mealDAL;
             this.restaurantDAL = restaurantDAL;
         }
 
@@ -35,15 +33,16 @@ namespace TakeAway.Controllers
 
             ViewData["RestaurantId"] = restaurantId;
 
-            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
+            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId);
 
-            ViewData["LunchService"] = lunchService;
-            ViewData["DinnerService"] = dinnerService;
+            ViewData["LunchService"] = r.LunchService;
+            ViewData["DinnerService"] = r.DinnerService;
 
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Dish dish, bool chooseLunchService, bool chooseDinnerService)
         {
             SetUserViewData();
@@ -60,14 +59,14 @@ namespace TakeAway.Controllers
                 return checkOwnedByUser;
 
 
-            (Service lunchService, Service dinnerService) = await Service.GetRestaurantServicesAsync(serviceDAL, (int)restaurantId);
+            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId);
 
-            dish.LunchService = chooseLunchService ? lunchService : null;
-            dish.DinnerService = chooseDinnerService ? dinnerService : null;
+            dish.LunchService = chooseLunchService ? r.LunchService : null;
+            dish.DinnerService = chooseDinnerService ? r.DinnerService : null;
 
             ViewData["RestaurantId"] = restaurantId;
-            ViewData["LunchService"] = lunchService;
-            ViewData["DinnerService"] = dinnerService;
+            ViewData["LunchService"] = r.LunchService;
+            ViewData["DinnerService"] = r.DinnerService;
 
             ModelState.Remove("LunchService");
             ModelState.Remove("DinnerService");
@@ -78,7 +77,7 @@ namespace TakeAway.Controllers
 
             if (ModelState.IsValid)
             {
-                bool success = await dish.CreateAsync(dishDAL, (int)restaurantId);
+                bool success = await dish.CreateAsync(mealDAL, (int)restaurantId);
                 if (success)
                 {
                     return RedirectToAction("Dishes", "Restaurant", new { id = restaurantId });
@@ -124,7 +123,7 @@ namespace TakeAway.Controllers
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
             int? userId = GetUserIdInSession();
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, serviceDAL, (int)userId);
+            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
             bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
             if (!isOwnedByUser)
             {

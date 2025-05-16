@@ -131,7 +131,8 @@ namespace TakeAway.Models
 
         public void AddMeal(Meal meal)
         {
-            Meals.Add(meal);
+            if (meal != null && !Meals.Contains(meal))
+                Meals.Add(meal);
         }
 
 
@@ -142,20 +143,20 @@ namespace TakeAway.Models
             DinnerService = new Service();
         }
 
-        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, int id_restaurant = -1)
+        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, int id_restaurant = -1)
         {
-            return await restaurantDAL.GetRestaurantsAsync(serviceDdAL, id_restaurant);
+            return await restaurantDAL.GetRestaurantsAsync(id_restaurant);
         }
 
-        public static async Task<Restaurant> GetRestaurantAsync(int id, IRestaurantDAL restaurantDAL, IServiceDAL serviceDdAL, IMealDAL mealDAL=null, IMenuDAL menuDAL=null, IDishDAL dishDAL=null, bool withMeals = false)
+        public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, int id, bool withMeals = false)
         {
-            Restaurant restaurant = await restaurantDAL.GetRestaurantAsync(id,serviceDdAL, mealDAL, menuDAL, dishDAL, withMeals);
+            Restaurant restaurant = await restaurantDAL.GetRestaurantAsync(id, withMeals);
             return restaurant;
         }
 
-        public async Task<bool> CreateAsync(IRestaurantDAL restaurantDAL, IServiceDAL serviceDAL, int userid)
+        public async Task<bool> CreateAsync(IRestaurantDAL restaurantDAL, int userid)
         {
-            return await restaurantDAL.InsertRestaurantAsync(serviceDAL, this, userid);
+            return await restaurantDAL.InsertRestaurantAsync(this, userid);
         }
     }
 }

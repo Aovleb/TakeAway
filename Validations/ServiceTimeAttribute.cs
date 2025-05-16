@@ -6,7 +6,7 @@ namespace TakeAway.Validations
     public class ServiceTimeAttribute : ValidationAttribute
     {
 
-        public ServiceTimeAttribute() : base("The{0} is not valid!") { }
+        public ServiceTimeAttribute() : base() { }
         public override bool IsValid(object? value)
         {
             if (value == null)

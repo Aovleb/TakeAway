@@ -67,26 +67,27 @@ namespace TakeAway.Models
             DinnerService = dinnerService;
         }
 
+        public Meal(int id, string name, string description, decimal price)
+        {
+            Id = id;
+            Name = name;
+            Description = description;
+            Price = price;
+            LunchService = null;
+            DinnerService = null;
+        }
+
         public Meal()
         {
             LunchService = new Service();
             DinnerService = new Service();
         }
 
-        public async static Task<List<Meal>> GetRestaurantMealsAsync(IMealDAL mealDAL, IMenuDAL menuDAL, IDishDAL dishDAL, IServiceDAL serviceDAL, int id)
+        public async static Task<Meal> GetMealAsync(IMealDAL mealDAL, int mealId)
         {
-            return await mealDAL.GetRestaurantMealsAsync(menuDAL, dishDAL, serviceDAL, id);
+            return await mealDAL.GetMealAsync(mealId);
         }
-
-        public async static Task<Meal> GetMealAsync(IMealDAL mealDAL, IServiceDAL serviceDAL, IDishDAL dishDAL, int mealId)
-        {
-            return await mealDAL.GetMealAsync(serviceDAL, dishDAL, mealId);
-        }
-
-        public async static Task<List<Meal>> GetMealsOfOrderAsync(IMealDAL mealDAL,IServiceDAL serviceDAL, IDishDAL dishDAL, int id)
-        {
-            return await mealDAL.GetOrderMealsAsync(id, dishDAL, serviceDAL);
-        }
+        public abstract Task<bool> CreateAsync(IMealDAL mealDAL, int restaurantId);
 
         public override bool Equals(object obj)
         {

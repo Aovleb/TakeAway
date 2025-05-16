@@ -48,6 +48,9 @@
             <div class="row">
                 @foreach (Meal meal in Model.Meals)
                 {
+                    @if (meal.LunchService == null && meal.DinnerService == null)
+                        continue;
+
                     <div class="col-md-6 col-lg-4">
                         <div class="card meal-card">
                             <div class="card-body">
@@ -115,106 +118,6 @@
     }
 </div>
 
-<style>
-    body {
-        background-color: #f8f9fa;
-    }
-
-    .restaurant-header {
-        background: linear-gradient(135deg, #343a40, #495057);
-        color: white;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .meal-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-        .meal-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-    .dish-list {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-        .dish-list li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-            .dish-list li:last-child {
-                border-bottom: none;
-            }
-
-    .badge-menu, .badge-dish {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-    }
-
-    .service-time {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .btn-cart {
-        transition: background-color 0.2s;
-    }
-
-        .btn-cart:hover {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-    .flash-message {
-        position: fixed;
-        top: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 600px;
-        z-index: 1050;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-    }
-</style>
-
-
-<!-- Script pour gérer les messages flash et la position de scroll -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Gestion des messages flash
-        const flashMessages = document.querySelectorAll('.flash-message');
-        flashMessages.forEach(message => {
-            setTimeout(() => {
-                message.style.transform = 'translateY(-100%)';
-                message.style.opacity = '0';
-                setTimeout(() => {
-                    message.remove();
-                }, 300);
-            }, 2000);
-        });
-
-        // Sauvegarder la position de scroll avant de cliquer sur "Add to Cart"
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                sessionStorage.setItem('scrollPosition', window.scrollY);
-            });
-        });
-
-        // Restaurer la position de scroll après le chargement de la page
-        const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-        if (savedScrollPosition) {
-            window.scrollTo(0, parseInt(savedScrollPosition));
-            sessionStorage.removeItem('scrollPosition');
-        }
-    });
-</script>
+@section Scripts {
+    <script src="/js/details.js"></script>
+}
