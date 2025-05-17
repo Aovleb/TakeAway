@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
@@ -7,8 +8,11 @@ namespace TakeAway.Models
 {
     public enum StatusOrderEnum
     {
+        [Display(Name ="In Preparation")]
         InPreparation = 0,
+        [Display(Name = "Ready for Delivery")]
         Ready = 1,
+        [Display(Name = "Delivered")]
         Delivered = 2,
     }
     public class Order
@@ -27,6 +31,7 @@ namespace TakeAway.Models
             get { return orderNumber; }
             set { orderNumber = value; }
         }
+
         public StatusOrderEnum Status
         {
             get { return status; }
