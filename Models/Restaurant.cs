@@ -143,9 +143,9 @@ namespace TakeAway.Models
             DinnerService = new Service();
         }
 
-        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL, int id_restaurant = -1)
+        public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL)
         {
-            return await restaurantDAL.GetRestaurantsAsync(id_restaurant);
+            return await restaurantDAL.GetRestaurantsAsync();
         }
 
         public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, int id, bool withMeals = false)

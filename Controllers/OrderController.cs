@@ -9,11 +9,13 @@ namespace TakeAway.Controllers
     {
         private readonly IOrderDAL orderDAL;
         private readonly IRestaurantDAL restaurantDAL;
+        private readonly IUserDAL userDAL;
 
-        public OrderController(IOrderDAL orderDAL, IRestaurantDAL restaurantDAL)
+        public OrderController(IOrderDAL orderDAL, IRestaurantDAL restaurantDAL, IUserDAL userDAL)
         {
             this.orderDAL = orderDAL;
             this.restaurantDAL = restaurantDAL;
+            this.userDAL = userDAL;
         }
 
         public async Task<IActionResult> Index(int id)
@@ -53,8 +55,10 @@ namespace TakeAway.Controllers
                 return checkOwnedByUser;
             }
 
+            Order order = new Order() { OrderNumber = orderNumber };
+
             // Mettre à jour le statut dans la base de données
-            bool updated = await orderDAL.UpdateOrderStatusAsync(orderNumber, status);
+            bool updated = await order.UpdateOrderStatusAsync(orderDAL, status);
             if (!updated)
             {
                 TempData["ErrorMessage"] = "Échec de la mise à jour du statut.";
@@ -95,8 +99,8 @@ namespace TakeAway.Controllers
             if (userId == null)
                 return RedirectToAction("UnFound");
 
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
-            bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
+            RestaurantOwner restaurantOwner = await RestaurantOwner.GetRestaurantOwnerAsync(userDAL, (int)userId);
+            bool isOwnedByUser = restaurantOwner.Restaurants.Any(r => r.Id == id_restaurant);
             if (!isOwnedByUser)
             {
                 return RedirectToAction("UnFound");

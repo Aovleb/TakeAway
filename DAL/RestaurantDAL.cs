@@ -3,7 +3,6 @@ using System.Data;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 
-
 namespace TakeAway.DAL
 {
     public class RestaurantDAL : IRestaurantDAL
@@ -14,12 +13,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
-        public async Task<List<Restaurant>> GetRestaurantsAsync(int id_person = -1)
-        {
-            return id_person == -1 ? await GetRestaurantsForClientAsync() : await GetRestaurantsForRestaurateurAsync(id_person);
-        }
-
-        private async Task<List<Restaurant>> GetRestaurantsForClientAsync()
+        public async Task<List<Restaurant>> GetRestaurantsAsync()
         {
             List<Restaurant> restaurants = new List<Restaurant>();
 
@@ -35,65 +29,6 @@ namespace TakeAway.DAL
                       LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
                       LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)",
                     conn);
-
-                await conn.OpenAsync();
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        int restaurantId = reader.GetInt32("id_restaurant");
-                        string name = reader.GetString("name");
-                        string description = reader.GetString("description");
-                        string phoneNumber = reader.GetString("phoneNumber");
-                        string streetName = reader.GetString("street_name");
-                        string streetNumber = reader.GetString("street_number");
-                        string postalCode = reader.GetString("postal_code");
-                        string city = reader.GetString("city");
-                        string country = reader.GetString("country");
-
-                        Service lunchService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
-                        {
-                            int lunchServiceId = reader.GetInt32("lunch_service_id");
-                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
-                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
-                            lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
-                        }
-
-                        Service dinnerService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
-                        {
-                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
-                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
-                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
-                            dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
-                        }
-
-                        Restaurant r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
-                        restaurants.Add(r);
-                    }
-                }
-            }
-            return restaurants;
-        }
-
-        private async Task<List<Restaurant>> GetRestaurantsForRestaurateurAsync(int restaurateurId)
-        {
-            List<Restaurant> restaurants = new List<Restaurant>();
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                SqlCommand cmd = new SqlCommand(
-                    @"SELECT r.id_restaurant, r.name, r.description, r.phoneNumber, 
-                            a.street_name, a.street_number, a.postal_code, a.city, a.country,
-                            s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
-                            s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
-                      FROM Restaurant r
-                      INNER JOIN Address a ON a.id_address = r.id_address
-                      LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-                      LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-                      WHERE id_person = @id_person",
-                    conn);
-                cmd.Parameters.AddWithValue("@id_person", restaurateurId);
 
                 await conn.OpenAsync();
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())

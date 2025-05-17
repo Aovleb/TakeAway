@@ -8,5 +8,6 @@ namespace TakeAway.DAL.Interfaces
         Task<bool> CreateAsync(Client c);
         Task<bool> CreateAsync(RestaurantOwner r);
         Task<Client> GetClientAsync(int userId);
+        Task<RestaurantOwner> GetRestaurantOwnerAsync(int userId);
     }
 }

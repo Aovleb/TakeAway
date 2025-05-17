@@ -4,6 +4,7 @@ using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using Microsoft.AspNetCore.Http;
 using TakeAway.ViewModels;
+using System.Reflection;
 namespace TakeAway.Controllers
 {
     public class AccountController : Controller
@@ -17,21 +18,25 @@ namespace TakeAway.Controllers
         public IActionResult SignIn()
         {
             SetUserViewData();
+            if (HttpContext.Session.GetInt32("userId") != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignIn(string email, string password)
+        public async Task<IActionResult> SignIn(SignInViewModel model)
         {
             SetUserViewData();
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+
+            if (!ModelState.IsValid)
             {
-                ViewData["ErrorMessage"] = "Email and password are required.";
-                return View();
+                return View(model);
             }
 
-            User user = await TakeAway.Models.User.GetUserAsync(userDAL, email, password);
+            User user = await TakeAway.Models.User.GetUserAsync(userDAL, model.Email, model.Password);
 
             if (user != null)
             {
@@ -67,7 +72,14 @@ namespace TakeAway.Controllers
         public IActionResult SignUp()
         {
             SetUserViewData();
+            if (HttpContext.Session.GetInt32("userId") != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+
             ViewData["ActiveForm"] = "Client";
+            
             return View();
         }
 

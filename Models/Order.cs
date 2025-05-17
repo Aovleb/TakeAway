@@ -108,6 +108,11 @@ namespace TakeAway.Models
             return await orderDAL.GetOrdersAsync(restaurant);
         }
 
+        public async Task<bool> UpdateOrderStatusAsync(IOrderDAL orderDAL, StatusOrderEnum status)
+        {
+            return await orderDAL.UpdateOrderStatusAsync(this.OrderNumber, status);
+        }
+
         public async Task<bool> Create(IOrderDAL orderDAL)
         {
             return await orderDAL.Create(this);

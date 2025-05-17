@@ -69,6 +69,94 @@ namespace TakeAway.DAL
             }
         }
 
+        public async Task<RestaurantOwner> GetRestaurantOwnerAsync(int restaurateurId)
+        {
+            RestaurantOwner restaurantOwner = null;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                // Étape 1 : Récupérer les informations du RestaurantOwner
+                SqlCommand cmdOwner = new SqlCommand(
+                    @"SELECT p.id_person, email, name
+                          FROM Person p
+                          INNER JOIN RestaurantOwner r ON p.id_person = r.id_person   
+                          WHERE p.id_person = @id_person;",
+                    conn);
+                cmdOwner.Parameters.AddWithValue("@id_person", restaurateurId);
+
+                using (SqlDataReader readerOwner = await cmdOwner.ExecuteReaderAsync())
+                {
+                    if (await readerOwner.ReadAsync())
+                    {
+                        int id = readerOwner.GetInt32("id_person");
+                        string email = readerOwner.GetString("email");
+                        string name = readerOwner.GetString("name");
+
+                        // Instancier RestaurantOwner avec le constructeur existant
+                        restaurantOwner = new RestaurantOwner(id, email, null, name); // password est null
+                    }
+                    else
+                    {
+                        // Si aucun RestaurantOwner n'est trouvé, retourner null
+                        return null;
+                    }
+                }
+
+                // Étape 2 : Récupérer les restaurants associés
+                SqlCommand cmdRestaurants = new SqlCommand(
+                    @"SELECT r.id_restaurant, r.name, r.description, r.phoneNumber, 
+                     a.street_name, a.street_number, a.postal_code, a.city, a.country,
+                     s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
+                     s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
+                      FROM Restaurant r
+                      INNER JOIN Address a ON a.id_address = r.id_address
+                      LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                      LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                      WHERE r.id_person = @id_person",
+                    conn);
+                cmdRestaurants.Parameters.AddWithValue("@id_person", restaurateurId);
+
+                using (SqlDataReader reader = await cmdRestaurants.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        int restaurantId = reader.GetInt32("id_restaurant");
+                        string name = reader.GetString("name");
+                        string description = reader.GetString("description");
+                        string phoneNumber = reader.GetString("phoneNumber");
+                        string streetName = reader.GetString("street_name");
+                        string streetNumber = reader.GetString("street_number");
+                        string postalCode = reader.GetString("postal_code");
+                        string city = reader.GetString("city");
+                        string country = reader.GetString("country");
+
+                        Service lunchService = null;
+                        if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
+                        {
+                            int lunchServiceId = reader.GetInt32("lunch_service_id");
+                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
+                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
+                            lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
+                        }
+
+                        Service dinnerService = null;
+                        if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
+                        {
+                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
+                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
+                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
+                            dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
+                        }
+
+                        Restaurant r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
+                        restaurantOwner.AddRestaurant(r);
+                    }
+                }
+            }
+            return restaurantOwner;
+        }
+
         public async Task<bool> CreateAsync(RestaurantOwner r)
         {
             bool success = false;

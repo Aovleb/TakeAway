@@ -9,10 +9,12 @@ namespace TakeAway.Controllers
     public class RestaurantController : Controller
     {
         private IRestaurantDAL restaurantDAL;
+        private IUserDAL userDAL;
 
-        public RestaurantController(IRestaurantDAL restaurantDAL)
+        public RestaurantController(IRestaurantDAL restaurantDAL, IUserDAL userDAL)
         {
             this.restaurantDAL = restaurantDAL;
+            this.userDAL = userDAL;
         }
 
         public async Task<IActionResult> Index()
@@ -25,8 +27,8 @@ namespace TakeAway.Controllers
             HttpContext.Session.Remove("restaurantId");
 
             int? userId = GetUserIdInSession();
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
-            return View(restaurants);
+            RestaurantOwner restaurantOwner = await RestaurantOwner.GetRestaurantOwnerAsync(userDAL, (int)userId);
+            return View(restaurantOwner.Restaurants);
         }
 
         public IActionResult Create()
@@ -143,8 +145,8 @@ namespace TakeAway.Controllers
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
             int? userId = GetUserIdInSession();
-            List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL, (int)userId);
-            bool isOwnedByUser = restaurants.Any(r => r.Id == id_restaurant);
+            RestaurantOwner restaurantOwner = await RestaurantOwner.GetRestaurantOwnerAsync(userDAL, (int)userId);
+            bool isOwnedByUser = restaurantOwner.Restaurants.Any(r => r.Id == id_restaurant);
             if (!isOwnedByUser)
             {
                 return RedirectToAction("UnFound");

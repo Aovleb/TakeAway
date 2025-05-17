@@ -45,5 +45,10 @@ namespace TakeAway.Models
         {
             return await userDAL.CreateAsync(this);
         }
+
+        public static async Task<RestaurantOwner> GetRestaurantOwnerAsync(IUserDAL userDAL, int userId)
+        {
+            return await userDAL.GetRestaurantOwnerAsync(userId);
+        }
     }
 }

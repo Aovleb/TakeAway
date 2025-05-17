@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -14,7 +13,6 @@ namespace TakeAway.Models
         private string postal_code;
         private string city;
         private string country;
-        private List<Meal> mealsInBasket;
 
         [Required(ErrorMessage = "Last name is required.")]
         [Display(Name = "Last Name")]
@@ -86,12 +84,6 @@ namespace TakeAway.Models
             set { country = value; }
         }
 
-        public List<Meal> MealsInBasket
-        {
-            get { return mealsInBasket; }
-            set { mealsInBasket = value; }
-        }
-
         public Client(int id, string email, string password, string lastName, string firstName, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country)
             : base(id, email, password)
         {
@@ -103,18 +95,18 @@ namespace TakeAway.Models
             PostalCode = postal_code;
             City = city;
             Country = country;
-            MealsInBasket = new List<Meal>();
         }
-        public Client() { MealsInBasket = new List<Meal>(); }
+        public Client() { }
 
-        public void AddMealToBasket(Meal meal)
-        {
-            MealsInBasket.Add(meal);
-        }
 
         public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
+        }
+
+        public async static Task<Client> GetClientAsync(IUserDAL userDAL, int id)
+        {
+            return await userDAL.GetClientAsync(id);
         }
     }
 }
