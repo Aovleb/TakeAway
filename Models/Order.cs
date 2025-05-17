@@ -96,6 +96,10 @@ namespace TakeAway.Models
             {
                 totalPrice += meal.Key.Price * meal.Value;
             }
+            if (IsDelivery)
+            {
+                totalPrice += 5;
+            }
             return totalPrice;
         }
 

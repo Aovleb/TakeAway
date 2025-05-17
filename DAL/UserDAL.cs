@@ -189,5 +189,38 @@ namespace TakeAway.DAL
             }
             return success;
         }
+
+        public async Task<Client> GetClientAsync(int userId)
+        {
+            Client client = null;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"SELECT * FROM Client c
+                                 INNER JOIN person p ON c.id_person = p.id_person
+                                 INNER JOIN address a ON c.id_address = a.id_address
+                                 WHERE c.id_person = @userId";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@userId", userId);
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        string email = reader.GetString("email");
+                        string password = reader.GetString("password");
+                        string lastname = reader.GetString("lastName");
+                        string firstname = reader.GetString("firstName");
+                        string phoneNumber = reader.GetString("phoneNumber");
+                        string street_name = reader.GetString("street_name");
+                        string street_number = reader.GetString("street_number");
+                        string postal_code = reader.GetString("postal_code");
+                        string city = reader.GetString("city");
+                        string country = reader.GetString("country");
+                        client = new Client(userId, email, password, lastname, firstname, phoneNumber, street_name, street_number, postal_code, city, country);
+                    }
+                }
+            }
+            return client;
+        }
     }
 }

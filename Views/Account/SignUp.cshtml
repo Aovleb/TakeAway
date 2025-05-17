@@ -1,12 +1,8 @@
-﻿@model dynamic
+﻿@model TakeAway.ViewModels.SignUpViewModel
 
 @{
     ViewData["Title"] = "Sign Up";
     string activeForm = ViewData["ActiveForm"]?.ToString() ?? "Client";
-    bool isClient = Model is TakeAway.Models.Client;
-    bool isRestaurantOwner = Model is TakeAway.Models.RestaurantOwner;
-    string[] clientFieldOrder = new[] { "LastName", "FirstName", "PhoneNumber", "StreetName", "StreetNumber", "PostalCode", "City", "Country", "Email", "Password", "ConfirmPassword", "Conditions" };
-    string[] restaurantFieldOrder = new[] { "Name", "Email", "Password", "ConfirmPassword", "Conditions" };
 }
 
 <div class="container py-5">
@@ -24,133 +20,99 @@
                         <button id="restaurantBtn" class="btn btn-outline-primary btn-manage @(activeForm == "RestaurantOwner" ? "active" : "")">Register as Restaurant Owner</button>
                     </div>
 
-                    <!-- Pop-up pour les erreurs (statique, erreurs triées, affichage amélioré) -->
-                    @if (ViewData.ModelState.Any(x => x.Value.Errors.Any()))
-                    {
-                        <div class="error-popup" id="errorPopup">
-                            <button type="button" class="close-btn" onclick="document.getElementById('errorPopup').style.display='none'">×</button>
-                            <h5 class="popup-title">Submission Errors</h5>
-                            <ul>
-                                @if (activeForm == "Client")
-                                {
-                                    foreach (string field in clientFieldOrder)
-                                    {
-                                        if (ViewData.ModelState[field]?.Errors.Any() == true)
-                                        {
-                                            foreach (var error in ViewData.ModelState[field].Errors)
-                                            {
-                                                <li>@error.ErrorMessage</li>
-                                            }
-                                        }
-                                    }
-                                    // Erreurs générales (non associées à un champ spécifique)
-                                    if (ViewData.ModelState[""]?.Errors.Any() == true)
-                                    {
-                                        foreach (var error in ViewData.ModelState[""].Errors)
-                                        {
-                                            <li>@error.ErrorMessage</li>
-                                        }
-                                    }
-                                }
-                                else if (activeForm == "RestaurantOwner")
-                                {
-                                    foreach (string field in restaurantFieldOrder)
-                                    {
-                                        if (ViewData.ModelState[field]?.Errors.Any() == true)
-                                        {
-                                            foreach (var error in ViewData.ModelState[field].Errors)
-                                            {
-                                                <li>@error.ErrorMessage</li>
-                                            }
-                                        }
-                                    }
-                                    // Erreurs générales (non associées à un champ spécifique)
-                                    if (ViewData.ModelState[""]?.Errors.Any() == true)
-                                    {
-                                        foreach (var error in ViewData.ModelState[""].Errors)
-                                        {
-                                            <li>@error.ErrorMessage</li>
-                                        }
-                                    }
-                                }
-                            </ul>
-                        </div>
-                    }
-
                     <!-- Client -->
                     <form id="clientForm" asp-action="RegisterClient" method="post" class="registration-form" style="@(activeForm == "Client" ? "" : "display: none")">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="mb-3">
-                            <label for="clientLastName" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="clientLastName" name="LastName" value="@(ViewData.ModelState["LastName"]?.AttemptedValue ?? (isClient ? Model?.LastName : ""))">
+                            <label asp-for="Client.LastName" class="form-label"></label>
+                            <input asp-for="Client.LastName" class="form-control" id="clientLastName" />
+                            <span asp-validation-for="Client.LastName" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientFirstName" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="clientFirstName" name="FirstName" value="@(ViewData.ModelState["FirstName"]?.AttemptedValue ?? (isClient ? Model?.FirstName : ""))">
+                            <label asp-for="Client.FirstName" class="form-label"></label>
+                            <input asp-for="Client.FirstName" class="form-control" id="clientFirstName" />
+                            <span asp-validation-for="Client.FirstName" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientPhoneNumber" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="clientPhoneNumber" name="PhoneNumber" value="@(ViewData.ModelState["PhoneNumber"]?.AttemptedValue ?? (isClient ? Model?.PhoneNumber : ""))">
+                            <label asp-for="Client.PhoneNumber" class="form-label"></label>
+                            <input asp-for="Client.PhoneNumber" class="form-control" id="clientPhoneNumber" />
+                            <span asp-validation-for="Client.PhoneNumber" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientStreetName" class="form-label">Street Name</label>
-                            <input type="text" class="form-control" id="clientStreetName" name="StreetName" value="@(ViewData.ModelState["StreetName"]?.AttemptedValue ?? (isClient ? Model?.StreetName : ""))">
+                            <label asp-for="Client.StreetName" class="form-label"></label>
+                            <input asp-for="Client.StreetName" class="form-control" id="clientStreetName" />
+                            <span asp-validation-for="Client.StreetName" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientStreetNumber" class="form-label">Street Number</label>
-                            <input type="text" class="form-control" id="clientStreetNumber" name="StreetNumber" value="@(ViewData.ModelState["StreetNumber"]?.AttemptedValue ?? (isClient ? Model?.StreetNumber : ""))">
+                            <label asp-for="Client.StreetNumber" class="form-label"></label>
+                            <input asp-for="Client.StreetNumber" class="form-control" id="clientStreetNumber" />
+                            <span asp-validation-for="Client.StreetNumber" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientPostalCode" class="form-label">Postal Code</label>
-                            <input type="text" class="form-control" id="clientPostalCode" name="PostalCode" value="@(ViewData.ModelState["PostalCode"]?.AttemptedValue ?? (isClient ? Model?.PostalCode : ""))">
+                            <label asp-for="Client.PostalCode" class="form-label"></label>
+                            <input asp-for="Client.PostalCode" class="form-control" id="clientPostalCode" />
+                            <span asp-validation-for="Client.PostalCode" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientCity" class="form-label">City</label>
-                            <input type="text" class="form-control" id="clientCity" name="City" value="@(ViewData.ModelState["City"]?.AttemptedValue ?? (isClient ? Model?.City : ""))">
+                            <label asp-for="Client.City" class="form-label"></label>
+                            <input asp-for="Client.City" class="form-control" id="clientCity" />
+                            <span asp-validation-for="Client.City" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientCountry" class="form-label">Country</label>
-                            <input type="text" class="form-control" id="clientCountry" name="Country" value="@(ViewData.ModelState["Country"]?.AttemptedValue ?? (isClient ? Model?.Country : ""))">
+                            <label asp-for="Client.Country" class="form-label"></label>
+                            <input asp-for="Client.Country" class="form-control" id="clientCountry" />
+                            <span asp-validation-for="Client.Country" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientEmail" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="clientEmail" name="Email" value="@(ViewData.ModelState["Email"]?.AttemptedValue ?? (isClient ? Model?.Email : ""))">
+                            <label asp-for="Client.Email" class="form-label"></label>
+                            <input asp-for="Client.Email" class="form-control" id="clientEmail" />
+                            <span asp-validation-for="Client.Email" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="clientPassword" name="Password" value="@(ViewData.ModelState["Password"]?.AttemptedValue ?? (isClient ? Model?.Password : ""))">
+                            <label asp-for="Client.Password" class="form-label"></label>
+                            <input asp-for="Client.Password" class="form-control" id="clientPassword" />
+                            <span asp-validation-for="Client.Password" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="clientConfirmPassword" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="clientConfirmPassword" name="ConfirmPassword" value="@(ViewData.ModelState["ConfirmPassword"]?.AttemptedValue)">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" id="clientConfirmPassword" data-val="true" data-val-required="La confirmation du mot de passe est requise." data-val-equalto="Les mots de passe ne correspondent pas." data-val-equalto-other="*.Client.Password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="clientConditions" name="Conditions" value="true" @(ViewData.ModelState["Conditions"]?.AttemptedValue == "true" ? "checked" : "")>
-                            <label class="form-check-label" for="clientConditions">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <input asp-for="Conditions" class="form-check-input" id="clientConditions" data-val="true" data-val-required="Vous devez accepter les conditions générales." />
+                            <label asp-for="Conditions" class="form-check-label">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <span asp-validation-for="Conditions" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-success btn-create w-100">Create Client Account</button>
                     </form>
 
                     <!-- Restaurant Owner -->
                     <form id="restaurantForm" asp-action="RegisterRestaurantOwner" method="post" class="registration-form" style="@(activeForm == "RestaurantOwner" ? "" : "display: none")">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="mb-3">
-                            <label for="restaurantName" class="form-label">Restaurant owner name</label>
-                            <input type="text" class="form-control" id="restaurantName" name="Name" value="@(ViewData.ModelState["Name"]?.AttemptedValue ?? (isRestaurantOwner ? Model?.Name : ""))">
+                            <label asp-for="RestaurantOwner.Name" class="form-label"></label>
+                            <input asp-for="RestaurantOwner.Name" class="form-control" id="restaurantName" />
+                            <span asp-validation-for="RestaurantOwner.Name" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="restaurantEmail" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="restaurantEmail" name="Email" value="@(ViewData.ModelState["Email"]?.AttemptedValue ?? (isRestaurantOwner ? Model?.Email : ""))">
+                            <label asp-for="RestaurantOwner.Email" class="form-label"></label>
+                            <input asp-for="RestaurantOwner.Email" class="form-control" id="restaurantEmail" />
+                            <span asp-validation-for="RestaurantOwner.Email" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="restaurantPassword" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="restaurantPassword" name="Password" value="@(ViewData.ModelState["Password"]?.AttemptedValue ?? (isRestaurantOwner ? Model?.Password : ""))">
+                            <label asp-for="RestaurantOwner.Password" class="form-label"></label>
+                            <input asp-for="RestaurantOwner.Password" class="form-control" id="restaurantPassword" />
+                            <span asp-validation-for="RestaurantOwner.Password" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label for="restaurantConfirmPassword" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="restaurantConfirmPassword" name="ConfirmPassword" value="@(ViewData.ModelState["ConfirmPassword"]?.AttemptedValue)">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" id="restaurantConfirmPassword" data-val="true" data-val-required="La confirmation du mot de passe est requise." data-val-equalto="Les mots de passe ne correspondent pas." data-val-equalto-other="*.RestaurantOwner.Password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
                         <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="restaurantConditions" name="Conditions" value="true" @(ViewData.ModelState["Conditions"]?.AttemptedValue == "true" ? "checked" : "")>
-                            <label class="form-check-label" for="restaurantConditions">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <input asp-for="Conditions" class="form-check-input" id="restaurantConditions" data-val="true" data-val-required="Vous devez accepter les conditions générales." />
+                            <label asp-for="Conditions" class="form-check-label">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <span asp-validation-for="Conditions" class="text-danger"></span>
                         </div>
                         <button type="submit" class="btn btn-success btn-create w-100">Create Restaurant Owner Account</button>
                     </form>
@@ -161,115 +123,16 @@
 </div>
 
 <style>
-    body {
-        background-color: #f8f9fa;
+    .text-danger {
+        min-height: 1.25rem;
+        display: block;
+        font-size: 0.9rem;
+        color: #dc3545;
+        margin-top: 0.25rem;
     }
-
-    .header {
-        background: linear-gradient(135deg, #343a40, #495057);
-        color: white;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-
-    .signup-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: none;
-        border-radius: 0.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .btn-manage {
-        transition: background-color 0.2s;
-    }
-
-        .btn-manage:hover {
-            background-color: #005cbf;
-            border-color: #005cbf;
-            color: white;
-        }
-
-        .btn-manage.active {
-            background-color: #005cbf;
-            border-color: #005cbf;
-            color: white;
-        }
-
-    .btn-create {
-        transition: background-color 0.2s;
-    }
-
-        .btn-create:hover {
-            background-color: #218838;
-            border-color: #218838;
-        }
-
-    .registration-form {
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    /* Styles pour la pop-up (statique, affichage amélioré avec puces) */
-    .error-popup {
-        position: fixed;
-        top: 20%;
-        right: 20px;
-        width: 320px;
-        max-height: 70vh;
-        overflow-y: auto;
-        background-color: #ffe6e8;
-        border: 2px solid #dc3545;
-        border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        z-index: 1000;
-    }
-
-        .error-popup .popup-title {
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #dc3545;
-        }
-
-        .error-popup ul {
-            list-style-type: disc;
-            padding-left: 1.5rem;
-            margin: 0;
-        }
-
-        .error-popup li {
-            color: #721c24;
-            font-size: 1rem;
-            line-height: 1.5;
-            margin-bottom: 0.5rem;
-        }
-
-        .error-popup .close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 1rem;
-            line-height: 1;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .error-popup .close-btn:hover {
-                background: #b02a37;
-            }
 </style>
 
 @section Scripts {
     <script src="/js/signup.js"></script>
+
 }

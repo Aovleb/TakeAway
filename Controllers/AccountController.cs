@@ -43,7 +43,7 @@ namespace TakeAway.Controllers
                     ClientId = user.Id,
                     Items = new Dictionary<int, int>(),
                     Total = 0,
-                    ServiceType = null,
+                    ServiceType = "Lunch",
                     RestaurantId = null
                 };
                 CookieHelper.SetBasketCookie(Response, newBasket);
@@ -73,78 +73,80 @@ namespace TakeAway.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterClient(Client client, string confirmPassword, bool conditions)
+        public async Task<IActionResult> RegisterClient(SignUpViewModel model)
         {
             SetUserViewData();
             ViewData["ActiveForm"] = "Client";
             bool successForm = true;
-            if (!ModelState.IsValid)
+
+            // Valider les champs communs via le ViewModel
+            if (!model.IsValid(ModelState, model.Client?.Password))
             {
                 successForm = false;
             }
 
-            if (client.Password != confirmPassword)
+            // Valider le modèle Client
+            if (model.Client == null || !ModelState.IsValid)
             {
-                ModelState.AddModelError("", "The passwords do not match.");
                 successForm = false;
             }
 
-            if (!conditions)
-            {
-                ModelState.AddModelError("", "You must accept the terms and conditions.");
-                successForm = false;
-            }
             if (!successForm)
             {
-                return View("SignUp", client);
+                model.Client ??= new Client();
+                model.RestaurantOwner ??= new RestaurantOwner();
+                return View("SignUp", model);
             }
 
-            bool success = await client.CreateAsync(userDAL);
+            bool success = await model.Client.CreateAsync(userDAL);
             if (success)
             {
                 return RedirectToAction("SignIn");
             }
 
-            ModelState.AddModelError("", "The email address is already used.");
-            return View("SignUp", client);
+            ModelState.AddModelError("", "L'adresse email est déjà utilisée.");
+            model.Client ??= new Client();
+            model.RestaurantOwner ??= new RestaurantOwner();
+            return View("SignUp", model);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterRestaurantOwner(RestaurantOwner owner, string confirmPassword, bool conditions)
+        public async Task<IActionResult> RegisterRestaurantOwner(SignUpViewModel model)
         {
             SetUserViewData();
             ViewData["ActiveForm"] = "RestaurantOwner";
             bool successForm = true;
-            if (!ModelState.IsValid)
+
+            // Valider les champs communs via le ViewModel
+            if (!model.IsValid(ModelState, model.RestaurantOwner?.Password))
             {
                 successForm = false;
             }
 
-            if (owner.Password != confirmPassword)
+            // Valider le modèle RestaurantOwner
+            if (model.RestaurantOwner == null || !ModelState.IsValid)
             {
-                ModelState.AddModelError("", "The passwords do not match.");
-                successForm = false;
-            }
-
-            if (!conditions)
-            {
-                ModelState.AddModelError("", "You must accept the terms and conditions.");
                 successForm = false;
             }
 
             if (!successForm)
             {
-                return View("SignUp", owner);
+                model.Client ??= new Client();
+                model.RestaurantOwner ??= new RestaurantOwner();
+                return View("SignUp", model);
             }
 
-            bool success = await owner.CreateAsync(userDAL);
-            if(success)
+            bool success = await model.RestaurantOwner.CreateAsync(userDAL);
+            if (success)
+            {
                 return RedirectToAction("SignIn");
-            else
-                ModelState.AddModelError("", "The email address is already used.");
-            return View("SignUp", owner);
+            }
+
+            ModelState.AddModelError("", "L'adresse email est déjà utilisée.");
+            model.Client ??= new Client();
+            model.RestaurantOwner ??= new RestaurantOwner();
+            return View("SignUp", model);
         }
 
         public IActionResult Logout()

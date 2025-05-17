@@ -9,6 +9,7 @@ namespace TakeAway.ViewModels
         public decimal Total { get; set; }
         public string ServiceType { get; set; } // "Lunch" ou "Dinner"
         public int? RestaurantId { get; set; } // Bloque l'ajout de plats d'autres restaurants
+        public string OrderType { get; set; } = "Pickup"; // "Delivery" ou "Pickup"
     }
 
     public class MealViewModel

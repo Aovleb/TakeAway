@@ -23,6 +23,20 @@
             </select>
         </form>
     </div>
+    <!-- Sélecteur de type de commande -->
+<div class="mb-4">
+    <form asp-action="UpdateOrderType" asp-controller="Basket" method="post">
+        <label for="orderType">Type de commande :</label>
+        <select id="orderType" name="orderType" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+            <option value="Pickup" selected="@(Model.OrderType == "Pickup")">Retrait sur place</option>
+            <option value="Delivery" selected="@(Model.OrderType == "Delivery")">Livraison</option>
+        </select>
+        @if (ViewBag.IsDeliveryAvailable == false)
+        {
+            <small class="text-muted">Livraison non disponible (distance trop importante).</small>
+        }
+    </form>
+</div>
 
     @if (Model == null || Model.Items.Count == 0)
     {

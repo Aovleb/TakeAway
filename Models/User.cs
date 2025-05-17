@@ -49,5 +49,10 @@ namespace TakeAway.Models
             return await userDAL.GetUserAsync(email, password);
         }
         public abstract Task<bool> CreateAsync(IUserDAL userDAL);
+
+        public async static Task<Client> GetClientAsync(IUserDAL userDAL, int id)
+        {
+            return await userDAL.GetClientAsync(id);
+        }
     }
 }
