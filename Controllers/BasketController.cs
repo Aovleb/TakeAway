@@ -191,7 +191,7 @@ namespace TakeAway.Controllers
             int? clientId = GetUserIdInSession();
             string serviceString = basket.ServiceType;
 
-            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId);
+            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId, true);
 
             Client c = new Client();
             c.Id = (int)clientId;
@@ -200,15 +200,25 @@ namespace TakeAway.Controllers
 
             Order order = new Order(0,0, true, DateTime.Now,s, r,c);
 
+            // ajouter les plats du panier à la commande en recuperant le repas par la liste des meals dans le restaurant
+            foreach ((int mealId, int quantity) in basket.Items)
+            {
+                Meal meal = r.Meals.FirstOrDefault(m => m.Id == mealId);
+                if (meal != null)
+                {
+                    order.AddMeal(meal, quantity);
+                }
+            }
 
             bool success = await order.Create(orderDAL);
             if (success)
-            {
-                TempData["SuccessMessage"] = "";
+            {                
+                TempData["SuccessMessage"] = "Commande passée avec succes !";
+                return RedirectToAction("Clear");
             }
             else
             {
-                TempData["ErrorMessage"] = "";
+                TempData["ErrorMessage"] = "Commande annulé !";
             }
             return RedirectToAction("Index");
         }

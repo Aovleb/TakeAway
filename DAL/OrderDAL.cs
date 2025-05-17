@@ -16,51 +16,68 @@ namespace TakeAway.DAL
 
         public async Task<bool> Create(Order order)
         {
+            bool success = false;
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                // Insertion dans ClientOrder
-                string query = @"
+                await conn.OpenAsync();
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insertion dans ClientOrder
+                        string query = @"
                     INSERT INTO ClientOrder (status, isDelivery, orderDate, id_person, id_service, id_restaurant)
                     VALUES (@status, @isDelivery, @orderDate, @id_person, @id_service, @id_restaurant);
                     SELECT SCOPE_IDENTITY();";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@status", (int)order.Status);
-                cmd.Parameters.AddWithValue("@isDelivery", order.IsDelivery);
-                cmd.Parameters.AddWithValue("@orderDate", order.Date);
-                cmd.Parameters.AddWithValue("@id_person", order.Client.Id);
-                cmd.Parameters.AddWithValue("@id_service", order.Service.Id);
-                cmd.Parameters.AddWithValue("@id_restaurant", order.Restaurant.Id);
-                await conn.OpenAsync();
+                        SqlCommand cmd = new SqlCommand(query, conn, transaction);
+                        cmd.Parameters.AddWithValue("@status", (int)order.Status);
+                        cmd.Parameters.AddWithValue("@isDelivery", order.IsDelivery);
+                        cmd.Parameters.AddWithValue("@orderDate", order.Date);
+                        cmd.Parameters.AddWithValue("@id_person", order.Client.Id);
+                        cmd.Parameters.AddWithValue("@id_service", order.Service.Id);
+                        cmd.Parameters.AddWithValue("@id_restaurant", order.Restaurant.Id);
 
-                decimal newOrderNumber = (decimal)await cmd.ExecuteScalarAsync();
-                int orderNumber = (int)newOrderNumber;
+                        decimal newOrderNumber = (decimal)await cmd.ExecuteScalarAsync();
+                        int orderNumber = (int)newOrderNumber;
 
-                // Mise à jour de l'orderNumber dans l'objet Order (si nécessaire)
-                order.OrderNumber = orderNumber;
+                        // Vérification de la présence de repas
+                        if (order.Meals == null || order.Meals.Count == 0)
+                        {
+                            transaction.Rollback();
+                            return success;
+                        }
 
-                // Insertion des relations repas dans ClientOrder_Meal
-                if (order.Meals != null && order.Meals.Count > 0)
-                {
-                    string insertOrderMealQuery = @"
-                        INSERT INTO ClientOrder_Meal (orderNumber, id_meal, quantity)
-                        VALUES (@orderNumber, @id_meal, @quantity);";
+                        // Insertion des relations repas dans ClientOrder_Meal
+                        string insertOrderMealQuery = @"
+                    INSERT INTO ClientOrder_Meal (orderNumber, id_meal, quantity)
+                    VALUES (@orderNumber, @id_meal, @quantity);";
 
-                    foreach (var mealEntry in order.Meals)
+                        foreach ((Meal meal, int quantity) in order.Meals)
+                        {
+                            SqlCommand mealCmd = new SqlCommand(insertOrderMealQuery, conn, transaction);
+                            mealCmd.Parameters.AddWithValue("@orderNumber", orderNumber);
+                            mealCmd.Parameters.AddWithValue("@id_meal", meal.Id);
+                            mealCmd.Parameters.AddWithValue("@quantity", quantity);
+                            await mealCmd.ExecuteNonQueryAsync();
+                        }
+
+                        // Mise à jour de l'orderNumber dans l'objet Order
+                        order.OrderNumber = orderNumber;
+
+                        // Commit de la transaction
+                        transaction.Commit();
+                        success = true;
+                    }
+                    catch (Exception)
                     {
-                        Meal meal = mealEntry.Key;
-                        int quantity = mealEntry.Value;
-
-                        SqlCommand mealCmd = new SqlCommand(insertOrderMealQuery, conn);
-                        mealCmd.Parameters.AddWithValue("@orderNumber", orderNumber);
-                        mealCmd.Parameters.AddWithValue("@id_meal", meal.Id);
-                        mealCmd.Parameters.AddWithValue("@quantity", quantity);
-                        await mealCmd.ExecuteNonQueryAsync();
+                        // Rollback en cas d'erreur
+                        transaction.Rollback();
+                        success = false;
                     }
                 }
-
-                return true;
             }
+            return success;
         }
 
         public async Task<List<Order>> GetOrdersAsync(Restaurant restaurant)
