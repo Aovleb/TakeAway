@@ -3,6 +3,7 @@ using System.Diagnostics;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using Microsoft.AspNetCore.Http;
+using TakeAway.ViewModels;
 namespace TakeAway.Controllers
 {
     public class AccountController : Controller
@@ -35,6 +36,18 @@ namespace TakeAway.Controllers
             if (user != null)
             {
                 HttpContext.Session.SetInt32("userId", user.Id);
+
+                // Réinitialiser le panier
+                BasketViewModel newBasket = new BasketViewModel
+                {
+                    ClientId = user.Id,
+                    Items = new Dictionary<int, int>(),
+                    Total = 0,
+                    ServiceType = null,
+                    RestaurantId = null
+                };
+                CookieHelper.SetBasketCookie(Response, newBasket);
+
                 if (user is Client)
                 {
                     HttpContext.Session.SetString("userType", "Client");

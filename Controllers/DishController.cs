@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
@@ -67,6 +68,20 @@ namespace TakeAway.Controllers
             ViewData["RestaurantId"] = restaurantId;
             ViewData["LunchService"] = r.LunchService;
             ViewData["DinnerService"] = r.DinnerService;
+
+            //// Créer un nouveau ModelState pour limiter la validation aux champs souhaités
+            //var validFields = new[] { "Name", "Description", "Price" };
+            //var newModelState = new ModelStateDictionary();
+            //foreach (var field in validFields)
+            //{
+            //    var modelStateEntry = ModelState[field];
+            //    if (modelStateEntry != null)
+            //    {
+            //        newModelState.AddModelState(field, modelStateEntry);
+            //    }
+            //}
+            //ModelState.Clear();
+            //ModelState.Merge(newModelState);
 
             ModelState.Remove("LunchService");
             ModelState.Remove("DinnerService");

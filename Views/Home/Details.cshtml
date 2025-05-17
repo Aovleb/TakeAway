@@ -1,7 +1,11 @@
 ﻿@model Restaurant
+@using TakeAway.Models
+@using TakeAway.ViewModels
 
 @{
     ViewData["Title"] = "Menus and Dishes";
+    BasketViewModel basket = CookieHelper.GetBasketFromCookie(Context.Request); // Récupérer le panier depuis le cookie
+    bool basketIsEmpty = !(basket.RestaurantId.HasValue && basket.RestaurantId != Model.Id);
 }
 
 <div class="container py-5">
@@ -20,7 +24,6 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
     @if (Model == null)
     {
         <div class="alert alert-warning text-center" role="alert">
@@ -45,6 +48,12 @@
         }
         else
         {
+            @if (!basketIsEmpty)
+            {
+                <div class="alert alert-warning mt-3" role="alert">
+                    Vous ne pouvez pas ajouter de repas de ce restaurant car votre panier contient des articles d'un autre restaurant. <a asp-action="Clear" asp-controller="Basket" class="alert-link">Videz votre panier</a> pour continuer.
+                </div>
+            }
             <div class="row">
                 @foreach (Meal meal in Model.Meals)
                 {
@@ -101,17 +110,23 @@
                                         }
                                     </p>
                                 </div>
-                                <form asp-action="Add" asp-controller="Basket" method="post">
-                                    <input type="hidden" value="@meal.Id" name="mealId" />
-                                    <input type="submit" value="Add to Cart" class="btn btn-outline-success btn-cart mt-3 add-to-cart" />
-                                </form>
+                                @if(basketIsEmpty)
+                                {
+                                    <form asp-action="Add" asp-controller="Basket" method="post">
+                                        <input type="hidden" value="@meal.Id" name="mealId" />
+                                        <input type="submit" value="Add to Cart" class="btn btn-outline-success btn-cart mt-3 add-to-cart" />
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-success btn-cart mt-3 add-to-cart" >Ajouter au panier</button>
+                                }
                             </div>
                         </div>
                     </div>
                 }
             </div>
         }
-
         <div class="text-center mt-5">
             <a asp-action="Index" class="btn btn-outline-primary">Back to Restaurant List</a>
         </div>

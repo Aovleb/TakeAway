@@ -6,5 +6,6 @@ namespace TakeAway.DAL.Interfaces
     {
         Task<List<Order>> GetOrdersAsync(Restaurant restaurant);
         Task<bool> UpdateOrderStatusAsync(int orderNumber, StatusOrderEnum status);
+        Task<bool> Create(Order order);
     }
 }

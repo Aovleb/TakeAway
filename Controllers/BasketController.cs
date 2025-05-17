@@ -11,10 +11,15 @@ namespace TakeAway.Controllers
     public class BasketController : Controller
     {
         private IMealDAL mealDAL;
+        private IOrderDAL orderDAL;
+        private IRestaurantDAL restaurantDAL;
 
-        public BasketController(IMealDAL mealDAL)
+        public BasketController(IMealDAL mealDAL, IOrderDAL orderDAL, IRestaurantDAL restaurantDAL)
         {
             this.mealDAL = mealDAL;
+            this.orderDAL = orderDAL;
+            this.restaurantDAL = restaurantDAL;
+
         }
 
         public async Task<IActionResult> Index()
@@ -26,6 +31,7 @@ namespace TakeAway.Controllers
                 return checkResult;
             }
 
+            int? userId = GetUserIdInSession();
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
             List<MealViewModel> mealDetails = new List<MealViewModel>();
 
@@ -108,8 +114,15 @@ namespace TakeAway.Controllers
             Meal meal = await Meal.GetMealAsync(mealDAL, mealId);
             if (meal != null)
             {
+                // Vérifier si le panier est vide ou si le repas appartient au même restaurant
+                if (basket.RestaurantId.HasValue && basket.RestaurantId != restaurantId)
+                {
+                    return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
+                }
+
                 basket.Items[mealId] = basket.Items.TryGetValue(mealId, out int qty) ? qty + 1 : 1;
                 basket.Total += meal.Price;
+                basket.RestaurantId = restaurantId; // Définir l'ID du restaurant si ce n'est pas déjà fait
                 CookieHelper.SetBasketCookie(Response, basket);
                 TempData["SuccessMessage"] = "Article ajouté !";
             }
@@ -133,8 +146,69 @@ namespace TakeAway.Controllers
                 if (basket.Items[id] > 1) basket.Items[id]--;
                 else basket.Items.Remove(id);
                 basket.Total -= meal.Price;
+
+                // Si le panier est vide, réinitialiser RestaurantId
+                if (!basket.Items.Any())
+                {
+                    basket.RestaurantId = null;
+                }
+
                 CookieHelper.SetBasketCookie(Response, basket);
                 TempData["Message"] = "Article retiré !";
+            }
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Clear()
+        {
+            int? userId = GetUserIdInSession();
+            BasketViewModel basket = new BasketViewModel
+            {
+                ClientId = userId,
+                Items = new Dictionary<int, int>(),
+                Total = 0,
+                ServiceType = null,
+                RestaurantId = null
+            };
+            CookieHelper.SetBasketCookie(Response, basket);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Pay()
+        {
+            SetUserViewData();
+            IActionResult? checkResult = CheckIsClient();
+            if (checkResult != null)
+            {
+                return checkResult;
+            }
+
+            BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
+
+            
+
+            int? restaurantId = basket.RestaurantId;
+            int? clientId = GetUserIdInSession();
+            string serviceString = basket.ServiceType;
+
+            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId);
+
+            Client c = new Client();
+            c.Id = (int)clientId;
+
+            Service s = serviceString == "Lunch" ? r.LunchService : r.DinnerService;
+
+            Order order = new Order(0,0, true, DateTime.Now,s, r,c);
+
+
+            bool success = await order.Create(orderDAL);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "";
             }
             return RedirectToAction("Index");
         }

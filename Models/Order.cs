@@ -74,13 +74,15 @@ namespace TakeAway.Models
             Meals = new Dictionary<Meal, int>();
         }
 
+        public Order() 
+        {
+            Meals = new Dictionary<Meal, int>();
+        }
+
         public void AddMeal(Meal meal, int quantity)
         {
             Meals.Add(meal, quantity);
         }
-
-        public Order() { }
-
 
         public decimal GetTotalPrice()
         {
@@ -97,5 +99,9 @@ namespace TakeAway.Models
             return await orderDAL.GetOrdersAsync(restaurant);
         }
 
+        public async Task<bool> Create(IOrderDAL orderDAL)
+        {
+            return await orderDAL.Create(this);
+        }
     }
 }
