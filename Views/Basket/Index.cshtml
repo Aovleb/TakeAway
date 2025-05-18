@@ -24,7 +24,7 @@
     decimal adjustedTotal = Model.Total - incompatibleTotal;
 }
 
-<div class="container py-5 mt-5 mb-5">
+<div class="container py-5">
     <div class="header text-center">
         <h1 class="page-title gold-accent">Your basket</h1>
         <p class="page-subtitle">View added meals and place your order.</p>
@@ -87,6 +87,11 @@
             <p class="page-subtitle">Your basket is currently empty. Add meals from restaurants!</p>
             <a asp-action="Index" asp-controller="Home" class="btn btn-signin">Discover the restaurants</a>
         </div>
+        <style>
+        .footer{
+                margin-top: 20px;
+        }
+        </style>
     }
     else
     {

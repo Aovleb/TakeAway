@@ -22,38 +22,51 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
-
-<div class="grid">
-    @foreach (var restaurant in Model)
-    {
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">@restaurant.Name</h2>
-                <div class="card-description">
-                    <span>@restaurant.Description</span>
+@if (Model == null || Model.Count == 0)
+{
+        <div class="alert alert-warning text-center" role="alert">
+        <h4 class="alert-heading">No restaurant</h4>
+        <p>No restaurant has currently been added.</p>
+    </div>
+    <style>
+        .footer {
+            margin-top: 172px;
+        }
+    </style>
+}
+else{
+    <div class="grid">
+        @foreach (var restaurant in Model)
+        {
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">@restaurant.Name</h2>
+                    <div class="card-description">
+                        <span>@restaurant.Description</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="card-info">
+                        <span class="card-info-icon">📍</span>
+                        <span class="card-info-text">@restaurant.Address()</span>
+                    </div>
+                    <div class="card-info">
+                        <span class="card-info-icon">📞</span>
+                        <span class="card-info-text">@restaurant.PhoneNumber</span>
+                    </div>
+                    <div class="card-info">
+                        <span class="card-info-icon">⏰</span>
+                        <span class="card-info-text">@restaurant.LunchService</span>
+                    </div>
+                    <div class="card-info">
+                        <span class="card-info-icon">⏰</span>
+                        <span class="card-info-text">@restaurant.DinnerService</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Details" asp-route-id="@restaurant.Id" class="btn btn-gold btn-full">View Details</a>
                 </div>
             </div>
-            <div class="card-content">
-                <div class="card-info">
-                    <span class="card-info-icon">📍</span>
-                    <span class="card-info-text">@restaurant.Address()</span>
-                </div>
-                <div class="card-info">
-                    <span class="card-info-icon">📞</span>
-                    <span class="card-info-text">@restaurant.PhoneNumber</span>
-                </div>
-                <div class="card-info">
-                    <span class="card-info-icon">⏰</span>
-                    <span class="card-info-text">@restaurant.LunchService</span>
-                </div>
-                <div class="card-info">
-                    <span class="card-info-icon">⏰</span>
-                    <span class="card-info-text">@restaurant.DinnerService</span>
-                </div>
-            </div>
-            <div class="card-footer">
-                <a asp-action="Details" asp-route-id="@restaurant.Id" class="btn btn-gold btn-full">View Details</a>
-            </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
