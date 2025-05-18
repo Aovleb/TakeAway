@@ -3,122 +3,162 @@
 @using TakeAway.ViewModels
 
 @{
-    ViewData["Title"] = "Votre Panier";
+    ViewData["Title"] = "Your basket";
     List<MealViewModel> mealDetails = ViewBag.MealDetails as List<MealViewModel> ?? new List<MealViewModel>();
+
+    decimal incompatibleTotal = 0;
+    foreach ((int id, int quantity) in Model.Items)
+    {
+        MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
+        if (meal != null)
+        {
+            bool isCompatible = string.IsNullOrEmpty(Model.ServiceType) ||
+                               (Model.ServiceType == "Lunch" && meal.LunchService != null) ||
+                               (Model.ServiceType == "Dinner" && meal.DinnerService != null);
+            if (!isCompatible)
+            {
+                incompatibleTotal += meal.Price * quantity;
+            }
+        }
+    }
+    decimal adjustedTotal = Model.Total - incompatibleTotal;
 }
 
-<div class="container py-5">
-    <div class="header">
-        <h1 class="display-4">Votre Panier</h1>
-        <p class="lead">Consultez les articles ajoutés et finalisez votre commande.</p>
+<div class="container py-5 mt-5 mb-5">
+    <div class="header text-center">
+        <h1 class="page-title gold-accent">Your basket</h1>
+        <p class="page-subtitle">View added meals and place your order.</p>
     </div>
-
-    <!-- Sélecteur de service -->
-    <div class="mb-4">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible flash-message" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+   
+    <table class="command-infos-table">
         <form asp-action="UpdateService" asp-controller="Basket" method="post">
-            <label for="serviceType">Choisir le service :</label>
-            <select id="serviceType" name="serviceType" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
-                <option value="Lunch" selected="@(Model.ServiceType == "Lunch")">Service du midi</option>
-                <option value="Dinner" selected="@(Model.ServiceType == "Dinner")">Service du soir</option>
-            </select>
+        <tr>
+            <td>
+                <label for="serviceType" class="form-label">Select service :</label>
+            </td>
+            <td>
+                <select id="serviceType" name="serviceType" class="form-select w-auto d-inline-block" onchange="this.form.submit()" style="padding: 2px">
+                    <option value="Lunch" selected="@(Model.ServiceType == "Lunch")">Lunch service</option>
+                    <option value="Dinner" selected="@(Model.ServiceType == "Dinner")">Dinner service</option>
+                </select>
+            </td>
+        </tr>
         </form>
-    </div>
-    <!-- Sélecteur de type de commande -->
-<div class="mb-4">
-    <form asp-action="UpdateOrderType" asp-controller="Basket" method="post">
-        <label for="orderType">Type de commande :</label>
-        <select id="orderType" name="orderType" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
-            <option value="Pickup" selected="@(Model.OrderType == "Pickup")">Retrait sur place</option>
-            <option value="Delivery" selected="@(Model.OrderType == "Delivery")">Livraison</option>
-        </select>
-        @if (ViewBag.IsDeliveryAvailable == false)
-        {
-            <small class="text-muted">Livraison non disponible (distance trop importante).</small>
-        }
-    </form>
-</div>
+
+        <form asp-action="UpdateOrderType" asp-controller="Basket" method="post">
+        <tr>
+            <td>
+                <label for="orderType" class="form-label">Order type :</label>
+            </td>
+            <td>
+                <select id="orderType" name="orderType" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+                    <option value="Pickup" selected="@(Model.OrderType == "Pickup")">Pick-up</option>
+                    <option value="Delivery" selected="@(Model.OrderType == "Delivery")">Delivery</option>
+                </select>
+                    @if (ViewBag.IsDeliveryAvailable == false)
+                    {
+                    <small class="text-muted">Delivery unavailable (distance too far or empty basket).</small>
+                    }
+            </td>
+        </tr>
+        </form>
+    </table>
+
 
     @if (Model == null || Model.Items.Count == 0)
     {
-        <div class="alert alert-warning text-center" role="alert">
-            <h4 class="alert-heading">Panier Vide</h4>
-            <p>Votre panier est actuellement vide. Ajoutez des articles depuis les restaurants !</p>
-            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary btn-details">Découvrir les restaurants</a>
+        <div class="alert alert-warning text-center m-5" role="alert">
+            <h4 class="page-title ">Empty basket</h4>
+            <p class="page-subtitle">Your basket is currently empty. Add meals from restaurants!</p>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-signin">Discover the restaurants</a>
         </div>
     }
     else
     {
-        <div class="row">
-            <div class="col-12">
-                <div class="card restaurant-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Articles dans le panier</h5>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Article</th>
-                                    <th>Type</th>
-                                    <th>Quantité</th>
-                                    <th>Prix unitaire</th>
-                                    <th>Total</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ((int id, int quantity) in Model.Items)
+        <div>
+            <div class="basket-card card-no-hover">
+                <div class="card-body">
+                    <h5 class="card-title">Items in basket</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Article</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                                <th>Price per unit</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ((int id, int quantity) in Model.Items)
+                            {
+                                MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
+                                if (meal != null)
                                 {
-                                    MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
-                                    if (meal != null)
-                                    {
-                                        // Vérifier si le repas est compatible avec le type de service sélectionné
-                                        bool isCompatible = string.IsNullOrEmpty(Model.ServiceType) ||
-                                        (Model.ServiceType == "Lunch" && meal.LunchService != null) ||
-                                        (Model.ServiceType == "Dinner" && meal.DinnerService != null);
+                                    // Vérifier si le repas est compatible avec le type de service sélectionné
+                                    bool isCompatible = string.IsNullOrEmpty(Model.ServiceType) ||
+                                    (Model.ServiceType == "Lunch" && meal.LunchService != null) ||
+                                    (Model.ServiceType == "Dinner" && meal.DinnerService != null);
 
+                                    <tr class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
+                                        <td>@meal.Name</td>
+                                        <td>
+                                            @if (meal.Type == "Menu")
+                                            {
+                                                <span class="badge-menu">Menu</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge-dish">Dish</span>
+                                            }
+                                        </td>
+                                        <td>@quantity</td>
+                                        <td>@meal.Price.ToString("C", CultureInfo.CurrentCulture)</td>
+                                        <td>@((meal.Price * quantity).ToString("C", CultureInfo.CurrentCulture))</td>
+                                        <td>
+                                            <a asp-action="Remove" asp-route-id="@id" class="btn btn-signin btn-sm">Remove</a>
+                                        </td>
+                                    </tr>
+                                    @if (meal.Type == "Menu" && meal.Dishes != null && meal.Dishes.Any())
+                                    {
                                         <tr class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
-                                            <td>@meal.Name</td>
-                                            <td>
-                                                @if (meal.Type == "Menu")
-                                                {
-                                                    <span class="badge bg-info badge-menu">Menu</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-secondary badge-dish">Dish</span>
-                                                }
-                                            </td>
-                                            <td>@quantity</td>
-                                            <td>@meal.Price.ToString("C", CultureInfo.CurrentCulture)</td>
-                                            <td>@((meal.Price * quantity).ToString("C", CultureInfo.CurrentCulture))</td>
-                                            <td>
-                                                <a asp-action="Remove" asp-route-id="@id" class="btn btn-outline-danger btn-sm">Retirer</a>
+                                            <td colspan="6">
+                                                <h6 class="mt-3">Dishes included :</h6>
+                                                <ul class="dish-list">
+                                                    @foreach (MealViewModel dish in meal.Dishes)
+                                                    {
+                                                        <li class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
+                                                            @dish.Name
+                                                        </li>
+                                                    }
+                                                </ul>
                                             </td>
                                         </tr>
-                                        @if (meal.Type == "Menu" && meal.Dishes != null && meal.Dishes.Any())
-                                        {
-                                            <tr class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
-                                                <td colspan="6">
-                                                    <h6 class="mt-3">Plats inclus :</h6>
-                                                    <ul class="dish-list">
-                                                        @foreach (MealViewModel dish in meal.Dishes)
-                                                        {
-                                                            <li class="@(!isCompatible ? "text-muted text-decoration-line-through" : "")">
-                                                                @dish.Name
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                        }
                                     }
                                 }
-                            </tbody>
-                        </table>
-                        <h5 class="text-end">Total : @Model.Total.ToString("C", CultureInfo.CurrentCulture)</h5>
-                        <div class="text-end">
-                            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-primary btn-details">Continuer les achats</a>
-                            <a asp-action="Pay" class="btn btn-success btn-nav">Passer la commande</a>
-                        </div>
+                            }
+                        </tbody>
+                    </table>
+                    <h5 class="text-end">Total : @adjustedTotal.ToString("C", CultureInfo.CurrentCulture)</h5>
+                    <div class="text-end gap-md">
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-signin">Continue shopping</a>
+                        <a asp-action="Pay" class="btn btn-signup">Place order</a>
                     </div>
                 </div>
             </div>

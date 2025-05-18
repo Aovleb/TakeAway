@@ -135,6 +135,8 @@ namespace TakeAway.Models
                 Meals.Add(meal);
         }
 
+        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
+
 
         public Restaurant()
         {
@@ -157,6 +159,21 @@ namespace TakeAway.Models
         public async Task<bool> CreateAsync(IRestaurantDAL restaurantDAL, int userid)
         {
             return await restaurantDAL.InsertRestaurantAsync(this, userid);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{Id} - {Name} - {Description} - {PhoneNumber} - {Address}";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj?.ToString() == ToString();
         }
     }
 }

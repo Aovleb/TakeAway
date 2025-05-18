@@ -10,7 +10,7 @@ namespace TakeAway.Models
     {
         [Display(Name ="In Preparation")]
         InPreparation = 0,
-        [Display(Name = "Ready for Delivery")]
+        [Display(Name = "Ready")]
         Ready = 1,
         [Display(Name = "Delivered")]
         Delivered = 2,

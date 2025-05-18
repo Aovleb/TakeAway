@@ -145,7 +145,7 @@ namespace TakeAway.DAL
         {
             Restaurant r = null;
             Menu currentMenu = null;
-            int? lastMenuId = null; // Pour suivre le dernier menu traité
+            int? lastMenuId = null;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -174,7 +174,8 @@ namespace TakeAway.DAL
                         LEFT JOIN Menu_Dish md ON md.id_menu = m.id_meal
                         LEFT JOIN Dish d ON d.id_meal = md.id_dish
                         LEFT JOIN Meal dm ON dm.id_meal = d.id_meal
-                        WHERE r.id_restaurant = @id";
+                        WHERE r.id_restaurant = @id
+                        ORDER BY menuId DESC";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", id);
@@ -224,22 +225,20 @@ namespace TakeAway.DAL
                             string mealDescription = reader.GetString("mealDescription");
                             decimal mealPrice = reader.GetDecimal("mealPrice");
 
-                            // Déterminer les services associés au repas
                             Service mealLunchService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("meal_lunch_service_id")))
                             {
-                                mealLunchService = r.LunchService; // Service déjeuner associé via Meal_Service
+                                mealLunchService = r.LunchService;
                             }
 
                             Service mealDinnerService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("meal_dinner_service_id")))
                             {
-                                mealDinnerService = r.DinnerService; // Service dîner associé via Meal_Service
+                                mealDinnerService = r.DinnerService;
                             }
 
                             if (!reader.IsDBNull(reader.GetOrdinal("menuId")))
                             {
-                                // C'est un menu
                                 if (lastMenuId != mealId)
                                 {
                                     currentMenu = new Menu(mealId, mealName, mealDescription, mealPrice, mealLunchService, mealDinnerService);
@@ -247,7 +246,6 @@ namespace TakeAway.DAL
                                     lastMenuId = mealId;
                                 }
 
-                                // Vérifier si un plat est associé au menu via Menu_Dish
                                 if (!reader.IsDBNull(reader.GetOrdinal("dishMealId")))
                                 {
                                     int dishMealId = reader.GetInt32("dishMealId");
@@ -261,7 +259,6 @@ namespace TakeAway.DAL
                             }
                             else if (!reader.IsDBNull(reader.GetOrdinal("dishId")))
                             {
-                                // C'est un plat indépendant
                                 Dish d = new Dish(mealId, mealName, mealDescription, mealPrice, mealLunchService, mealDinnerService);
                                 r.AddMeal(d);
                             }
@@ -283,7 +280,6 @@ namespace TakeAway.DAL
 
                 try
                 {
-                    // Insert Address
                     string addressQuery = @"INSERT INTO Address (street_name, street_number, postal_code, city, country)
                             OUTPUT INSERTED.id_address
                             VALUES (@StreetName, @StreetNumber, @PostalCode, @City, @Country)";
@@ -297,7 +293,6 @@ namespace TakeAway.DAL
 
                     int addressId = (int)await addressCmd.ExecuteScalarAsync();
 
-                    // Insert Restaurant
                     string restaurantQuery = @"INSERT INTO Restaurant (name, description, phoneNumber, id_address, id_person)
                                OUTPUT INSERTED.id_restaurant
                                VALUES (@Name, @Description, @Phone, @AddressId, @PersonId)";
@@ -311,18 +306,15 @@ namespace TakeAway.DAL
 
                     int restaurantId = (int)await restaurantCmd.ExecuteScalarAsync();
 
-                    // Insert Services
                     string serviceQuery = @"INSERT INTO Service (startTime, endTime, id_restaurant)
                                    VALUES (@StartTime, @EndTime, @RestaurantId)";
 
-                    // Insertion du service déjeuner
                     SqlCommand lunchCmd = new SqlCommand(serviceQuery, conn, transaction);
                     lunchCmd.Parameters.AddWithValue("@StartTime", restaurant.LunchService.StartTime);
                     lunchCmd.Parameters.AddWithValue("@EndTime", restaurant.LunchService.EndTime);
                     lunchCmd.Parameters.AddWithValue("@RestaurantId", restaurantId);
                     int lunchRows = await lunchCmd.ExecuteNonQueryAsync();
 
-                    // Insertion du service dîner
                     SqlCommand dinnerCmd = new SqlCommand(serviceQuery, conn, transaction);
                     dinnerCmd.Parameters.AddWithValue("@StartTime", restaurant.DinnerService.StartTime);
                     dinnerCmd.Parameters.AddWithValue("@EndTime", restaurant.DinnerService.EndTime);

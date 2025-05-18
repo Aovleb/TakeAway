@@ -84,7 +84,7 @@ namespace TakeAway.Controllers
             ViewData["LunchService"] = r.LunchService;
             ViewData["DinnerService"] = r.DinnerService;
             ViewData["Dishes"] = dishes;
-            ViewData["SelectedDishIds"] = selectedDishIds; // Passer les plats sélectionnés pour préserver les sélections
+            ViewData["SelectedDishIds"] = selectedDishIds;
 
             if (selectedDishIds == null || selectedDishIds.Count == 0)
             {
@@ -92,7 +92,6 @@ namespace TakeAway.Controllers
             }
             else
             {
-                // Add selected dishes to the menu
                 dishes.ForEach(dish =>
                 {
                     if (selectedDishIds.Contains(dish.Id))

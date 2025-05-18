@@ -4,41 +4,49 @@
     ViewData["Title"] = "Sign In";
 }
 
-<div class="container py-5">
-    <div class="header">
-        <h1 class="display-4">Connection</h1>
-        <p class="lead">Log in to your TakeAway account to manage your restaurants or place orders.</p>
+<div class="container py-5 mb-5 mt-4">
+    <div class="header text-center">
+        <h1 class="page-title gold-accent">Connection</h1>
+        <p class="page-subtitle">Sign in to your DLISH account to manage your restaurants or place orders.</p>
     </div>
 
-    <div class="login-card card">
-        <div class="card-body p-4">
-            @if (ViewData["ErrorMessage"] != null)
-            {
-                <div class="alert alert-danger text-center" role="alert">
-                    @ViewData["ErrorMessage"]
-                </div>
-            }
+    <div class="row justify-content-center">
+        <div class="col-md-8 position-relative">
+            <div class="signin-card card-no-hover">
+                <div class="card-body m-4">
+                    @if (ViewData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+                            @ViewData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible flash-message" role="alert">
+                            @TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
 
-            <form asp-action="SignIn" method="post">
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" placeholder="Enter your email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <form asp-action="SignIn" method="post">
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter your e-mail address" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 gap-md">
+                            <button type="submit" class="btn btn-signin">Sign In</button>
+                            <a asp-action="SignUp" class="btn btn-signup">No account yet? Sign up now!</a>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <button type="submit" class="btn btn-outline-primary btn-login">Sign in</button>
-                    <a asp-action="SignUp" class="btn btn-outline-success btn-register">No account yet ? Sign up !</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

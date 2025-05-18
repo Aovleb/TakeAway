@@ -2,77 +2,79 @@
 @using System.Globalization
 
 @{
-    ViewData["Title"] = "Restaurateur Dashboard";
+    ViewData["Title"] = "Restaurant manager";
 }
 
 <div class="container py-5">
     <div class="header">
-        <h1 class="display-4">Restaurateur Dashboard</h1>
-        <p class="lead">Manage your restaurants, menus, and dishes on TakeAway.</p>
+        <h1 class="page-title gold-accent"><img src="~/img/Logo.png" height="125" width="125" /> Restaurant manager</h1>
+        <p class="page-subtitle">Manage your restaurants, menus and dishes on TakeAway.</p>
     </div>
-
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="text-end m-2">
+            <a asp-action="Create" class="btn btn-outline-success btn-create">Add a restaurant</a>
+        </div>
+    }
     @if (Model == null || Model.Count == 0)
     {
         <div class="alert alert-warning text-center" role="alert">
-            <h4 class="alert-heading">No Restaurants Available</h4>
-            <p>You haven't added any restaurants yet. Start now!</p>
-            <a asp-action="Create" class="btn btn-success btn-create mt-3">Add a Restaurant</a>
+            <h4 class="alert-heading">No restaurants available</h4>
+            <p>You haven't added any restaurants yet. Start now !</p>
+            <a asp-action="Create" class="btn btn-success btn-create mt-3">Add a restaurant</a>
         </div>
     }
     else
     {
-        <div class="row">
+        <div class="grid">
             @foreach (Restaurant r in Model)
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="card restaurant-card">
-                        <div class="card-body">
-                            <h5 class="card-title">@r.Name</h5>
-                            <p class="card-text">@r.Description</p>
-                            <p class="card-text">
-                                <strong>Phone:</strong> @r.PhoneNumber
-                            </p>
-                            <p class="card-text">
-                                <strong>Address:</strong> @r.StreetNumber @r.StreetName, @r.PostalCode @r.City, @r.Country
-                            </p>
-                            <p class="service-time">
-                                <strong>Lunch:</strong>
-                                @if (r.LunchService != null)
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">@r.Name</h2>
+                        <div class="card-description">
+                            <span>@r.Description</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-info">
+                            <span class="card-info-icon">📍</span>
+                            <span class="card-info-text">@r.StreetNumber @r.StreetName, @r.PostalCode @r.City, @r.Country</span>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-info-icon">📞</span>
+                            <span class="card-info-text">@r.PhoneNumber</span>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-info-icon">⏰</span>
+                            <span class="card-info-text"><strong>Lunch :</strong> @if (r.LunchService != null)
                                 {
                                     <span>@r.LunchService</span>
                                 }
                                 else
                                 {
-                                    <span>Not available</span>
-                                }
-                            </p>
-                            <p class="service-time">
-                                <strong>Dinner:</strong>
-                                @if (r.DinnerService != null)
+                                    <span>Non disponible</span>
+                                }</span>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-info-icon">⏰</span>
+                            <span class="card-info-text"><strong>Dinner :</strong> @if (r.DinnerService != null)
                                 {
                                     <span>@r.DinnerService</span>
                                 }
                                 else
                                 {
                                     <span>Not available</span>
-                                }
-                            </p>
-                            <div class="d-flex gap-2">
-                                <a asp-action="Menus" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Manage Menus</a>
-                                <a asp-action="Dishes" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Manage Dishes</a>
-                                <a asp-action="Index" asp-controller="Order" asp-route-id="@r.Id" class="btn btn-outline-primary btn-manage">Gérer les Commandes</a>
-                            </div>
+                                }</span>
                         </div>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="Menus" asp-route-id="@r.Id" class="btn btn-gold btn-full m-1">Manage menus</a>
+                        <a asp-action="Dishes" asp-route-id="@r.Id" class="btn btn-gold btn-full m-1">Manage dishes</a>
+                        <a asp-action="Index" asp-controller="Order" asp-route-id="@r.Id" class="btn btn-gold btn-full m-1">Manage orders</a>
                     </div>
                 </div>
             }
         </div>
     }
-    @if (Model != null && Model.Count > 0)
-    {
-        <div class="text-center mt-5">
-            <a asp-action="Create" class="btn btn-outline-success btn-create">Add a Restaurant</a>
-        </div>
-    }
-    
 </div>

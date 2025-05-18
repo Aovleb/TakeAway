@@ -84,6 +84,10 @@ namespace TakeAway.Models
             set { country = value; }
         }
 
+        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
+
+
+
         public Client(int id, string email, string password, string lastName, string firstName, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country)
             : base(id, email, password)
         {

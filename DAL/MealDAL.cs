@@ -21,7 +21,6 @@ namespace TakeAway.DAL
             {
                 await conn.OpenAsync();
 
-                // Étape 1 : Vérifier si c'est un Dish
                 SqlCommand cmd = new SqlCommand(@"
             SELECT m.id_meal, m.name, m.description, m.price
             FROM Meal m
@@ -38,7 +37,6 @@ namespace TakeAway.DAL
                         string description = reader.GetString("description");
                         decimal price = reader.GetDecimal("price");
 
-                        // Étape 2 : Récupérer les services associés au repas
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
                     SELECT s.id_service, s.startTime, s.endTime
@@ -52,7 +50,6 @@ namespace TakeAway.DAL
                         Service dinnerService = null;
                         using (SqlDataReader serviceReader = await cmd.ExecuteReaderAsync())
                         {
-                            // Premier service (LunchService)
                             if (await serviceReader.ReadAsync())
                             {
                                 int lunchServiceId = serviceReader.GetInt32("id_service");
@@ -61,7 +58,6 @@ namespace TakeAway.DAL
                                 lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
                             }
 
-                            // Dernier service (DinnerService)
                             if (await serviceReader.ReadAsync())
                             {
                                 int dinnerServiceId = serviceReader.GetInt32("id_service");
@@ -77,7 +73,6 @@ namespace TakeAway.DAL
 
                 if (meal != null) return meal;
 
-                // Étape 3 : Vérifier si c'est un Menu
                 cmd = new SqlCommand(@"
             SELECT m.id_meal, m.name, m.description, m.price
             FROM Meal m
@@ -94,7 +89,6 @@ namespace TakeAway.DAL
                         string description = reader.GetString("description");
                         decimal price = reader.GetDecimal("price");
 
-                        // Étape 4 : Récupérer les services associés au menu
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
                     SELECT s.id_service, s.startTime, s.endTime
@@ -108,7 +102,6 @@ namespace TakeAway.DAL
                         Service dinnerService = null;
                         using (SqlDataReader serviceReader = await cmd.ExecuteReaderAsync())
                         {
-                            // Premier service (LunchService)
                             if (await serviceReader.ReadAsync())
                             {
                                 int lunchServiceId = serviceReader.GetInt32("id_service");
@@ -117,7 +110,6 @@ namespace TakeAway.DAL
                                 lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
                             }
 
-                            // Dernier service (DinnerService)
                             if (await serviceReader.ReadAsync())
                             {
                                 int dinnerServiceId = serviceReader.GetInt32("id_service");
@@ -129,7 +121,6 @@ namespace TakeAway.DAL
 
                         Menu menu = new Menu(menuId, name, description, price, lunchService, dinnerService);
 
-                        // Étape 5 : Récupérer tous les plats du menu dans une liste temporaire
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
                     SELECT m.id_meal, m.name, m.description, m.price
@@ -152,7 +143,6 @@ namespace TakeAway.DAL
                             }
                         }
 
-                        // Étape 6 : Récupérer les services pour chaque plat
                         foreach (var tempDish in tempDishes)
                         {
                             int dishId = tempDish.id;
@@ -172,7 +162,6 @@ namespace TakeAway.DAL
                             Service dishDinnerService = null;
                             using (SqlDataReader dishServiceReader = await cmd.ExecuteReaderAsync())
                             {
-                                // Premier service (LunchService)
                                 if (await dishServiceReader.ReadAsync())
                                 {
                                     int dishLunchServiceId = dishServiceReader.GetInt32("id_service");
@@ -181,7 +170,6 @@ namespace TakeAway.DAL
                                     dishLunchService = new Service(dishLunchServiceId, dishLunchStartTime, dishLunchEndTime);
                                 }
 
-                                // Dernier service (DinnerService)
                                 if (await dishServiceReader.ReadAsync())
                                 {
                                     int dishDinnerServiceId = dishServiceReader.GetInt32("id_service");

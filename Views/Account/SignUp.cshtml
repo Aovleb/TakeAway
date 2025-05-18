@@ -5,19 +5,26 @@
     string activeForm = ViewData["ActiveForm"]?.ToString() ?? "Client";
 }
 
-<div class="container py-5">
-    <div class="header">
-        <h1 class="display-4">Create Your Account</h1>
-        <p class="lead">Join TakeAway as a Client or Restaurant Owner.</p>
+<div class="container py-5 mb-5 mt-4">
+    <div class="header text-center">
+        <h1 class="page-title gold-accent">Create your account</h1>
+        <p class="page-subtitle">Join DLISH as a client or restaurant owner.</p>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-8 position-relative">
-            <div class="card signup-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center gap-3 mb-4">
-                        <button id="clientBtn" class="btn btn-outline-primary btn-manage @(activeForm == "Client" ? "active" : "")">Register as Client</button>
-                        <button id="restaurantBtn" class="btn btn-outline-primary btn-manage @(activeForm == "RestaurantOwner" ? "active" : "")">Register as Restaurant Owner</button>
+            <div class="signup-card card-no-hover">
+                <div class="card-body m-4">
+                    @if (ViewData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+                            @ViewData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-center gap-md mb-4">
+                        <button id="clientBtn" class="btn btn-signin @(activeForm == "Client" ? "active" : "")">Sign up as a client</button>
+                        <button id="restaurantBtn" class="btn btn-signin @(activeForm == "RestaurantOwner" ? "active" : "")">Sign up as a restaurateur</button>
                     </div>
 
                     <!-- Client -->
@@ -75,15 +82,15 @@
                         </div>
                         <div class="mb-3">
                             <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" id="clientConfirmPassword" data-val="true" data-val-required="La confirmation du mot de passe est requise." data-val-equalto="Les mots de passe ne correspondent pas." data-val-equalto-other="*.Client.Password" />
+                            <input asp-for="ConfirmPassword" class="form-control" id="clientConfirmPassword" data-val="true" data-val-required="Password confirmation is required." data-val-equalto="The passwords do not match." data-val-equalto-other="*.Client.Password" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
                         <div class="mb-3 form-check">
-                            <input asp-for="Conditions" class="form-check-input" id="clientConditions" data-val="true" data-val-required="Vous devez accepter les conditions générales." />
-                            <label asp-for="Conditions" class="form-check-label">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <input asp-for="Conditions" class="form-check-input" id="clientConditions" data-val="true" data-val-required="You must accept the terms and conditions." />
+                            <label asp-for="Conditions" class="form-check-label">I accept the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" class="a-link-btn">terms & conditions</a></label>
                             <span asp-validation-for="Conditions" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-success btn-create w-100">Create Client Account</button>
+                        <button type="submit" class="btn btn-signup w-100">Create a client account</button>
                     </form>
 
                     <!-- Restaurant Owner -->
@@ -106,15 +113,15 @@
                         </div>
                         <div class="mb-3">
                             <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" id="restaurantConfirmPassword" data-val="true" data-val-required="La confirmation du mot de passe est requise." data-val-equalto="Les mots de passe ne correspondent pas." data-val-equalto-other="*.RestaurantOwner.Password" />
+                            <input asp-for="ConfirmPassword" class="form-control" id="restaurantConfirmPassword" data-val="true" data-val-required="Password confirmation is required." data-val-equalto="The passwords do not match." data-val-equalto-other="*.RestaurantOwner.Password" />
                             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
                         <div class="mb-3 form-check">
-                            <input asp-for="Conditions" class="form-check-input" id="restaurantConditions" data-val="true" data-val-required="Vous devez accepter les conditions générales." />
-                            <label asp-for="Conditions" class="form-check-label">I agree to the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank">Terms and Conditions</a></label>
+                            <input asp-for="Conditions" class="form-check-input" id="restaurantConditions" data-val-required="You must accept the terms and conditions." />
+                            <label asp-for="Conditions" class="form-check-label">I accept the <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" class="a-link-btn">terms & conditions</a></label>
                             <span asp-validation-for="Conditions" class="text-danger"></span>
                         </div>
-                        <button type="submit" class="btn btn-success btn-create w-100">Create Restaurant Owner Account</button>
+                        <button type="submit" class="btn btn-signup w-100">Create a restaurant owner account</button>
                     </form>
                 </div>
             </div>
@@ -122,17 +129,7 @@
     </div>
 </div>
 
-<style>
-    .text-danger {
-        min-height: 1.25rem;
-        display: block;
-        font-size: 0.9rem;
-        color: #dc3545;
-        margin-top: 0.25rem;
-    }
-</style>
 
 @section Scripts {
     <script src="/js/signup.js"></script>
-
 }

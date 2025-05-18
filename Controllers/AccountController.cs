@@ -42,7 +42,6 @@ namespace TakeAway.Controllers
             {
                 HttpContext.Session.SetInt32("userId", user.Id);
 
-                // Réinitialiser le panier
                 BasketViewModel newBasket = new BasketViewModel
                 {
                     ClientId = user.Id,
@@ -91,13 +90,11 @@ namespace TakeAway.Controllers
             ViewData["ActiveForm"] = "Client";
             bool successForm = true;
 
-            // Valider les champs communs via le ViewModel
             if (!model.IsValid(ModelState, model.Client?.Password))
             {
                 successForm = false;
             }
 
-            // Valider le modèle Client
             if (model.Client == null || !ModelState.IsValid)
             {
                 successForm = false;
@@ -113,10 +110,11 @@ namespace TakeAway.Controllers
             bool success = await model.Client.CreateAsync(userDAL);
             if (success)
             {
+                TempData["SuccessMessage"] = "Your account has been created successfully. You can now log in.";
                 return RedirectToAction("SignIn");
             }
 
-            ModelState.AddModelError("", "L'adresse email est déjà utilisée.");
+            ViewData["ErrorMessage"] = "The email address is already taken.";
             model.Client ??= new Client();
             model.RestaurantOwner ??= new RestaurantOwner();
             return View("SignUp", model);
@@ -130,13 +128,11 @@ namespace TakeAway.Controllers
             ViewData["ActiveForm"] = "RestaurantOwner";
             bool successForm = true;
 
-            // Valider les champs communs via le ViewModel
             if (!model.IsValid(ModelState, model.RestaurantOwner?.Password))
             {
                 successForm = false;
             }
 
-            // Valider le modèle RestaurantOwner
             if (model.RestaurantOwner == null || !ModelState.IsValid)
             {
                 successForm = false;
@@ -152,10 +148,11 @@ namespace TakeAway.Controllers
             bool success = await model.RestaurantOwner.CreateAsync(userDAL);
             if (success)
             {
+                TempData["SuccessMessage"] = "Your account has been created successfully. You can now log in.";
                 return RedirectToAction("SignIn");
             }
 
-            ModelState.AddModelError("", "L'adresse email est déjà utilisée.");
+            ViewData["ErrorMessage"] = "The email address is already taken.";
             model.Client ??= new Client();
             model.RestaurantOwner ??= new RestaurantOwner();
             return View("SignUp", model);

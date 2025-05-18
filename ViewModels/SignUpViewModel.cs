@@ -7,13 +7,13 @@ namespace TakeAway.ViewModels
     public class SignUpViewModel
     {
 
-        [Required(ErrorMessage = "Vous devez accepter les conditions générales.")]
-        [Display(Name = "Accepter les conditions générales")]
+        [Required(ErrorMessage = "You must accept the terms and conditions.")]
+        [Display(Name = "Accept terms and conditions")]
         public bool Conditions { get; set; }
 
 
-        [Required(ErrorMessage = "La confirmation du mot de passe est requise.")]
-        [Display(Name = "Confirmer le mot de passe")]
+        [Required(ErrorMessage = "Password confirmation is required.")]
+        [Display(Name = "Confirm password")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
@@ -34,7 +34,7 @@ namespace TakeAway.ViewModels
             if (!Conditions)
             {
                 isValid = false;
-                modelState.AddModelError("Conditions", "Vous devez accepter les conditions générales.");
+                modelState.AddModelError("Conditions", "You must accept the terms and conditions.");
             }
 
 
@@ -42,7 +42,7 @@ namespace TakeAway.ViewModels
             {
                 isValid = false;
 
-                modelState.AddModelError("ConfirmPassword", "Les mots de passe ne correspondent pas.");
+                modelState.AddModelError("ConfirmPassword", "The passwords do not match.");
             }
             return isValid;
         }

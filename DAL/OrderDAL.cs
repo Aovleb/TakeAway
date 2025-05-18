@@ -24,7 +24,6 @@ namespace TakeAway.DAL
                 {
                     try
                     {
-                        // Insertion dans ClientOrder
                         string query = @"
                     INSERT INTO ClientOrder (status, isDelivery, orderDate, id_person, id_service, id_restaurant)
                     VALUES (@status, @isDelivery, @orderDate, @id_person, @id_service, @id_restaurant);
@@ -41,14 +40,12 @@ namespace TakeAway.DAL
                         decimal newOrderNumber = (decimal)await cmd.ExecuteScalarAsync();
                         int orderNumber = (int)newOrderNumber;
 
-                        // Vérification de la présence de repas
                         if (order.Meals == null || order.Meals.Count == 0)
                         {
                             transaction.Rollback();
                             return success;
                         }
 
-                        // Insertion des relations repas dans ClientOrder_Meal
                         string insertOrderMealQuery = @"
                     INSERT INTO ClientOrder_Meal (orderNumber, id_meal, quantity)
                     VALUES (@orderNumber, @id_meal, @quantity);";
@@ -62,16 +59,13 @@ namespace TakeAway.DAL
                             await mealCmd.ExecuteNonQueryAsync();
                         }
 
-                        // Mise à jour de l'orderNumber dans l'objet Order
                         order.OrderNumber = orderNumber;
 
-                        // Commit de la transaction
                         transaction.Commit();
                         success = true;
                     }
                     catch (Exception)
                     {
-                        // Rollback en cas d'erreur
                         transaction.Rollback();
                         success = false;
                     }
@@ -127,14 +121,12 @@ namespace TakeAway.DAL
 
                         if (order == null)
                         {
-                            // Créer une nouvelle commande
                             int status = reader.GetInt32("status");
                             bool isDelivery = reader.GetBoolean("isDelivery");
                             DateTime orderDate = reader.GetDateTime("orderDate");
                             int id_person = reader.GetInt32("id_person");
                             int id_service = reader.GetInt32("id_service");
 
-                            // Récupérer le service associé à la commande
                             Service orderService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("serviceStartTime")))
                             {
@@ -143,7 +135,6 @@ namespace TakeAway.DAL
                                 orderService = new Service(id_service, serviceStartTime, serviceEndTime);
                             }
 
-                            // Récupérer le client
                             Client client = new Client(
                                 id_person,
                                 reader.GetString("lastName"),
@@ -162,7 +153,6 @@ namespace TakeAway.DAL
                             orders.Add(order);
                         }
 
-                        // Ajouter les repas à la commande
                         if (!reader.IsDBNull(reader.GetOrdinal("id_meal")))
                         {
                             int mealId = reader.GetInt32("id_meal");
@@ -171,25 +161,22 @@ namespace TakeAway.DAL
                             decimal mealPrice = reader.GetDecimal("mealPrice");
                             int quantity = reader.GetInt32("quantity");
 
-                            // Déterminer les services associés au repas
                             Service mealLunchService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("meal_lunch_service_id")))
                             {
                                 int lunchServiceId = reader.GetInt32("meal_lunch_service_id");
-                                mealLunchService = new Service(lunchServiceId, TimeSpan.Zero, TimeSpan.Zero); // Placeholder
+                                mealLunchService = new Service(lunchServiceId, TimeSpan.Zero, TimeSpan.Zero);
                             }
 
                             Service mealDinnerService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("meal_dinner_service_id")))
                             {
                                 int dinnerServiceId = reader.GetInt32("meal_dinner_service_id");
-                                mealDinnerService = new Service(dinnerServiceId, TimeSpan.Zero, TimeSpan.Zero); // Placeholder
+                                mealDinnerService = new Service(dinnerServiceId, TimeSpan.Zero, TimeSpan.Zero);
                             }
 
-                            // Vérifier si c'est un menu
                             if (!reader.IsDBNull(reader.GetOrdinal("menuId")))
                             {
-                                // Chercher si le menu existe déjà dans le dictionnaire interne de la commande
                                 Menu menu = order.Meals.Keys.OfType<Menu>().FirstOrDefault(m => m.Id == mealId);
                                 if (menu == null)
                                 {
@@ -197,7 +184,6 @@ namespace TakeAway.DAL
                                     order.AddMeal(menu, quantity);
                                 }
 
-                                // Ajouter les plats associés au menu via Menu_Dish
                                 if (!reader.IsDBNull(reader.GetOrdinal("dishMealId")))
                                 {
                                     int dishMealId = reader.GetInt32("dishMealId");
@@ -205,7 +191,6 @@ namespace TakeAway.DAL
                                     string dishDescription = reader.GetString("dishDescription");
                                     decimal dishPrice = reader.GetDecimal("dishPrice");
 
-                                    // Vérifier si le plat n'est pas déjà ajouté au menu
                                     if (!menu.Dishes.Any(d => d.Id == dishMealId))
                                     {
                                         Dish dish = new Dish(dishMealId, dishName, dishDescription, dishPrice, mealLunchService, mealDinnerService);
@@ -215,7 +200,6 @@ namespace TakeAway.DAL
                             }
                             else if (!reader.IsDBNull(reader.GetOrdinal("dishId")))
                             {
-                                // Vérifier si le plat indépendant n'est pas déjà ajouté dans le dictionnaire interne
                                 if (!order.Meals.Keys.Any(m => m.Id == mealId))
                                 {
                                     Dish dish = new Dish(mealId, mealName, mealDescription, mealPrice, mealLunchService, mealDinnerService);

@@ -33,7 +33,7 @@ namespace TakeAway.Controllers
 
             List<Order> orders = await Order.GetOrdersAsync(restaurant, orderDAL);
 
-            HttpContext.Session.SetInt32("restaurantId", id); // Stocker l'ID du restaurant pour les redirections
+            HttpContext.Session.SetInt32("restaurantId", id);
 
             return View(orders);
         }
@@ -57,7 +57,6 @@ namespace TakeAway.Controllers
 
             Order order = new Order() { OrderNumber = orderNumber };
 
-            // Mettre à jour le statut dans la base de données
             bool updated = await order.UpdateOrderStatusAsync(orderDAL, status);
             if (!updated)
             {

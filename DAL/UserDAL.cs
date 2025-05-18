@@ -20,7 +20,6 @@ namespace TakeAway.DAL
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                //Search client table
                 SqlCommand cmd = new SqlCommand(@"SELECT * FROM Client c
                                                 INNER JOIN person p ON c.id_person = p.id_person
                                                 INNER JOIN address a ON c.id_address = a.id_address
@@ -48,7 +47,6 @@ namespace TakeAway.DAL
 
                 if (u != null) return u;
 
-                //Search the RestaurantOwner table
                 cmd = new SqlCommand(@"SELECT * FROM RestaurantOwner r
                                        INNER JOIN person p ON r.id_person = p.id_person
                                        WHERE email = @email AND password = @password", conn);
@@ -76,7 +74,6 @@ namespace TakeAway.DAL
             {
                 await conn.OpenAsync();
 
-                // Étape 1 : Récupérer les informations du RestaurantOwner
                 SqlCommand cmdOwner = new SqlCommand(
                     @"SELECT p.id_person, email, name
                           FROM Person p
@@ -93,17 +90,14 @@ namespace TakeAway.DAL
                         string email = readerOwner.GetString("email");
                         string name = readerOwner.GetString("name");
 
-                        // Instancier RestaurantOwner avec le constructeur existant
-                        restaurantOwner = new RestaurantOwner(id, email, null, name); // password est null
+                        restaurantOwner = new RestaurantOwner(id, email, null, name);
                     }
                     else
                     {
-                        // Si aucun RestaurantOwner n'est trouvé, retourner null
                         return null;
                     }
                 }
 
-                // Étape 2 : Récupérer les restaurants associés
                 SqlCommand cmdRestaurants = new SqlCommand(
                     @"SELECT r.id_restaurant, r.name, r.description, r.phoneNumber, 
                      a.street_name, a.street_number, a.postal_code, a.city, a.country,

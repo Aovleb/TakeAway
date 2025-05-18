@@ -36,14 +36,13 @@ namespace TakeAway.Controllers
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
             List<MealViewModel> mealDetails = new List<MealViewModel>();
 
-            // Calculer la disponibilité de la livraison
             bool isDeliveryAvailable = false;
             if (basket.RestaurantId.HasValue && userId.HasValue)
             {
                 Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, basket.RestaurantId.Value);
                 Client client = await Client.GetClientAsync(userDAL, (int)userId);
                 double distance = CalculateDistance(restaurant, client);
-                isDeliveryAvailable = distance <= 10; // Livraison disponible si distance <= 10 km
+                isDeliveryAvailable = distance <= 10;
             }
             ViewBag.IsDeliveryAvailable = isDeliveryAvailable;
 
@@ -62,7 +61,6 @@ namespace TakeAway.Controllers
                         DinnerService = meal.DinnerService
                     };
 
-                    // Si c'est un menu, récupérer les plats associés
                     if (meal is Menu menu)
                     {
                         foreach (Dish dish in menu.Dishes)
@@ -101,17 +99,16 @@ namespace TakeAway.Controllers
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
 
-            // Vérifier si le panier est vide
             if (basket.Items.Count == 0)
             {
-                TempData["ErrorMessage"] = "Le panier est vide !";
+                TempData["ErrorMessage"] = "The basket is empty !";
                 return RedirectToAction("Index");
             }
 
-            basket.ServiceType = serviceType; // "Lunch" ou "Dinner"
+            basket.ServiceType = serviceType;
 
             CookieHelper.SetBasketCookie(Response, basket);
-            TempData["Message"] = "Service mis à jour !";
+            TempData["SuccessMessage"] = "Service update !";
             return RedirectToAction("Index");
         }
 
@@ -128,10 +125,9 @@ namespace TakeAway.Controllers
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
 
-            // Vérifier si le panier est vide
             if (basket.Items.Count == 0)
             {
-                TempData["ErrorMessage"] = "Le panier est vide !";
+                TempData["ErrorMessage"] = "The basket is empty !";
                 return RedirectToAction("Index");
             }
 
@@ -144,14 +140,13 @@ namespace TakeAway.Controllers
                 {
                     if (distance > 10)
                     {
-                        TempData["ErrorMessage"] = "Livraison non disponible pour cette distance.";
+                        TempData["ErrorMessage"] = "Delivery not available for this distance.";
                         return RedirectToAction("Index");
                     }
                     else
                     {
                         basket.Total += 5;
                         CookieHelper.SetBasketCookie(Response, basket);
-                        TempData["Message"] = "Frais de livraison ajoutés !";
                     }
                 }
                 else
@@ -160,14 +155,13 @@ namespace TakeAway.Controllers
                     {
                         basket.Total -= 5;
                         CookieHelper.SetBasketCookie(Response, basket);
-                        TempData["Message"] = "Frais de livraison supprimés !";
                     }
                 }
             }
 
-            basket.OrderType = orderType; // "Delivery" ou "Pickup"
+            basket.OrderType = orderType;
             CookieHelper.SetBasketCookie(Response, basket);
-            TempData["Message"] = "Type de commande mis à jour !";
+            TempData["SuccessMessage"] = "Updated order type !";
             return RedirectToAction("Index");
         }
 
@@ -175,23 +169,21 @@ namespace TakeAway.Controllers
         {
             SetUserViewData();
             IActionResult? checkResult = CheckIsClient();
-            if (checkResult != null)
-            {
-                TempData["ErrorMessage"] = "You must be signed in to add to cart.";
-                return checkResult;
-            }
-
             int? restaurantId = HttpContext.Session.GetInt32("restaurantId");
             if (restaurantId == null)
             {
                 return UnFound();
+            }
+            if (checkResult != null)
+            {
+                TempData["ErrorMessage"] = "You must be signed in to add to basket.";
+                return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
             }
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
             Meal meal = await Meal.GetMealAsync(mealDAL, mealId);
             if (meal != null)
             {
-                // Vérifier si le panier est vide ou si le repas appartient au même restaurant
                 if (basket.RestaurantId.HasValue && basket.RestaurantId != restaurantId)
                 {
                     return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
@@ -199,9 +191,9 @@ namespace TakeAway.Controllers
 
                 basket.Items[mealId] = basket.Items.TryGetValue(mealId, out int qty) ? qty + 1 : 1;
                 basket.Total += meal.Price;
-                basket.RestaurantId = restaurantId; // Définir l'ID du restaurant si ce n'est pas déjà fait
+                basket.RestaurantId = restaurantId;
                 CookieHelper.SetBasketCookie(Response, basket);
-                TempData["SuccessMessage"] = "Article ajouté !";
+                TempData["SuccessMessage"] = "Meal added !";
             }
             return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
         }
@@ -212,7 +204,7 @@ namespace TakeAway.Controllers
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
-                TempData["ErrorMessage"] = "You must be signed in to add to cart.";
+                TempData["ErrorMessage"] = "You must be signed in to remove to basket.";
                 return checkResult;
             }
 
@@ -224,20 +216,20 @@ namespace TakeAway.Controllers
                 else basket.Items.Remove(id);
                 basket.Total -= meal.Price;
 
-                // Si le panier est vide, réinitialiser RestaurantId
                 if (!basket.Items.Any())
                 {
                     basket.RestaurantId = null;
                 }
 
                 CookieHelper.SetBasketCookie(Response, basket);
-                TempData["Message"] = "Article retiré !";
+                TempData["SuccessMessage"] = "Meal removed !";
             }
             return RedirectToAction("Index");
         }
 
         public IActionResult Clear()
         {
+            SetUserViewData();
             int? userId = GetUserIdInSession();
             BasketViewModel basket = new BasketViewModel
             {
@@ -248,7 +240,17 @@ namespace TakeAway.Controllers
                 RestaurantId = null
             };
             CookieHelper.SetBasketCookie(Response, basket);
-            return RedirectToAction("Index");
+
+            TempData["SuccessMessage"] = "Basket cleared !";
+            int? restaurantId = GetRestaurantId();
+            if (restaurantId != null)
+            {
+                return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
         }
 
         public async Task<IActionResult> Pay()
@@ -275,17 +277,16 @@ namespace TakeAway.Controllers
 
             if (s.StartTime < DateTime.Now.TimeOfDay.Add(new TimeSpan(2, 0, 0)))
             {
-                TempData["ErrorMessage"] = "Vous ne pouvez pas commander pour le service sélectionné !";
+                TempData["ErrorMessage"] = "You can only order this service two hours before the service is due to start !";
                 return RedirectToAction("Index");
             }
 
-            // Vérifier la distance pour la livraison
             if (basket.OrderType == "Delivery")
             {
                 double distance = CalculateDistance(r, c);
                 if (distance > 10)
                 {
-                    TempData["ErrorMessage"] = "Livraison non disponible pour cette distance.";
+                    TempData["ErrorMessage"] = "Delivery not available for this distance !";
                     return RedirectToAction("Index");
                 }
             }
@@ -306,7 +307,7 @@ namespace TakeAway.Controllers
             bool success = await order.Create(orderDAL);
             if (success)
             {
-                TempData["SuccessMessage"] = "Commande passée avec succes !";
+                TempData["SuccessMessage"] = "Order successfully placed !";
                 Dictionary<int, int> items = basket.Items.ToDictionary(x => x.Key, x => x.Value);
                 foreach ((int mealId, int quantity) in basket.Items)
                 {
@@ -322,7 +323,7 @@ namespace TakeAway.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = "Commande annulé !";
+                TempData["ErrorMessage"] = "Order cancelled !";
             }
             return RedirectToAction("Index");
         }
@@ -342,6 +343,11 @@ namespace TakeAway.Controllers
             return HttpContext.Session.GetString("userType");
         }
 
+        private int? GetRestaurantId()
+        {
+            return HttpContext.Session.GetInt32("restaurantId");
+        }
+
         private IActionResult? CheckIsClient()
         {
             int? userId = GetUserIdInSession();
@@ -359,15 +365,12 @@ namespace TakeAway.Controllers
 
         private double CalculateDistance(Restaurant restaurant, Client client)
         {
-            // Méthode fictive pour calculer la distance
-            // Dans un projet réel, utiliser une API de géocodage (ex. Google Maps)
             string restaurantAddress = $"{restaurant.StreetNumber} {restaurant.StreetName}, {restaurant.City}, {restaurant.PostalCode}, {restaurant.Country}";
             string clientAddress = $"{client.StreetNumber} {client.StreetName}, {client.City}, {client.PostalCode}, {client.Country}";
 
-            // Simulation : retourner une distance fictive basée sur une comparaison simplifiée
             if (restaurant.PostalCode == client.PostalCode)
-                return 5.0; // Même code postal, distance fictive de 5 km
-            return 15.0; // Différent code postal, distance fictive de 15 km
+                return 5.0;
+            return 15.0;
         }
     }
 }

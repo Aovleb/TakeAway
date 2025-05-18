@@ -4,78 +4,73 @@
     ViewData["Title"] = "Create Menu";
 }
 
-<div class="container py-5">
-    <div class="header">
-        <h1 class="display-4">Create a New Menu</h1>
-        <p class="lead">Add a new menu to your restaurant.</p>
+<div class="container py-5 mb-5 mt-4">
+    <div class="header text-center">
+        <h1 class="page-title gold-accent">Create a New Menu</h1>
+        <p class="page-subtitle">Add a new menu to your restaurant.</p>
     </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 position-relative">
+            <form asp-action="Create" method="post" class="mt-4">
+                <div class="card-no-hover">
+                    <div class="card-body m-4">
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
 
-    <form asp-action="Create" method="post" class="mt-4">
-        <div class="row">
-            <div class="col-md-6">
-                <h4>Menu Information</h4>
+                        <div class="form-group mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="Name" class="form-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
+                        <div class="form-group mb-3">
+                            <label asp-for="Price" class="form-label"></label>
+                            <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="Description" class="form-label"></label>
-                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-3">
-                    <label asp-for="Price" class="form-label"></label>
-                    <input asp-for="Price" class="form-control" type="number" step="0.01" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
-                </div>
-
-                <h5 class="mt-4">Services</h5>
-                <div class="form-group mb-3">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" value="true" id="lunchService" name="chooseLunchService" @(ViewData.ModelState["chooseLunchService"]?.AttemptedValue == "true" ? "checked" : "") />
-                        <label class="form-check-label" for="lunchService">@ViewData["LunchService"]</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" value="true" id="dinnerService" name="chooseDinnerService" @(ViewData.ModelState["chooseDinnerService"]?.AttemptedValue == "true" ? "checked" : "") />
-                        <label class="form-check-label" for="dinnerService">@ViewData["DinnerService"]</label>
-                    </div>
-                    <span asp-validation-for="LunchService" class="text-danger"></span>
-                </div>
-
-                <h5 class="mt-4">Select Dishes</h5>
-                <div class="form-group mb-3">
-                    @if (ViewData["Dishes"] != null)
-                    {
-                        List<Dish> dishes = ViewData["Dishes"] as List<Dish>;
-                        List<int> selectedDishIds = ViewData["SelectedDishIds"] as List<int> ?? new List<int>();
-                        foreach (Dish dish in dishes)
-                        {
+                        <h5 class="mt-4">Services</h5>
+                        <div class="form-group mb-3">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" value="@dish.Id" id="dish_@dish.Id" name="selectedDishIds" @(selectedDishIds.Contains(dish.Id) ? "checked" : "") />
-                                <label class="form-check-label" for="dish_@dish.Id">@dish.Name</label>
+                                <input type="checkbox" class="form-check-input" value="true" id="lunchService" name="chooseLunchService" @(ViewData.ModelState["chooseLunchService"]?.AttemptedValue == "true" ? "checked" : "") />
+                                <label class="form-check-label" for="lunchService">Lunch (@ViewData["LunchService"])</label>
                             </div>
-                        }
-                    }
-                    <span asp-validation-for="Dishes" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" value="true" id="dinnerService" name="chooseDinnerService" @(ViewData.ModelState["chooseDinnerService"]?.AttemptedValue == "true" ? "checked" : "") />
+                                <label class="form-check-label" for="dinnerService">Dinner (@ViewData["DinnerService"])</label>
+                            </div>
+                            <span asp-validation-for="LunchService" class="text-danger"></span>
+                        </div>
 
-        <div class="text-center mt-5">
-            <button type="submit" class="btn btn-outline-success btn-create px-5">Create</button>
-            @if (ViewData["RestaurantId"] != null)
-            {
-                <a asp-controller="Restaurant" asp-action="Menus" asp-route-id="@ViewData["RestaurantId"]" class="btn btn-outline-secondary btn-back ms-3">Back</a>
-            }
-            else
-            {
-                <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-secondary btn-back ms-3">Back to Restaurants</a>
-            }
+                        <h5 class="mt-4">Select Dishes</h5>
+                        <div class="form-group mb-3">
+                            @if (ViewData["Dishes"] != null)
+                            {
+                                List<Dish> dishes = ViewData["Dishes"] as List<Dish>;
+                                List<int> selectedDishIds = ViewData["SelectedDishIds"] as List<int> ?? new List<int>();
+                                foreach (Dish dish in dishes)
+                                {
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" value="@dish.Id" id="dish_@dish.Id" name="selectedDishIds" @(selectedDishIds.Contains(dish.Id) ? "checked" : "") />
+                                        <label class="form-check-label" for="dish_@dish.Id">@dish.Name</label>
+                                    </div>
+                                }
+                            }
+                            <span asp-validation-for="Dishes" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a asp-controller="Restaurant" asp-action="Menus" asp-route-id="@ViewData["RestaurantId"]" class="btn btn-signin">Back</a>
+                    <button type="submit" class="btn btn-signup px-5">Create</button>
+                </div>
+            </form>
+
         </div>
-    </form>
+    </div>
 </div>
 
