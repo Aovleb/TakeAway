@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 
@@ -18,6 +16,7 @@ namespace TakeAway.Controllers
             this.restaurantDAL = restaurantDAL;
             this.userDAL = userDAL;
         }
+
 
         public async Task<IActionResult> Create()
         {
@@ -43,6 +42,7 @@ namespace TakeAway.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -78,6 +78,11 @@ namespace TakeAway.Controllers
             ModelState.Remove("DinnerService.StartTime");
             ModelState.Remove("DinnerService.EndTime");
 
+            if(dish.Price < 0)
+            {
+                ModelState.AddModelError("Price", "Price must be a positive number.");
+            }
+
             if (ModelState.IsValid)
             {
                 bool success = await dish.CreateAsync(mealDAL, (int)restaurantId);
@@ -95,25 +100,30 @@ namespace TakeAway.Controllers
             return View(dish);
         }
 
+
         public IActionResult UnFound()
         {
             return RedirectToAction("Logout", "Account");
         }
+
 
         private int? GetUserIdInSession()
         {
             return HttpContext.Session.GetInt32("userId");
         }
 
+
         private string? GetUserTypeInSession()
         {
             return HttpContext.Session.GetString("userType");
         }
 
+
         private int? GetRestaurantIdInSession()
         {
             return HttpContext.Session.GetInt32("restaurantId");
         }
+
 
         private IActionResult? CheckIsRestaurateur()
         {
@@ -123,6 +133,7 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
             return null;
         }
+
 
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
@@ -135,6 +146,7 @@ namespace TakeAway.Controllers
             }
             return null;
         }
+
 
         private void SetUserViewData()
         {

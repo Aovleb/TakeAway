@@ -25,6 +25,7 @@ namespace TakeAway.Models
             set { id = value; }
         }
 
+
         [Required(ErrorMessage = "Name is required.")]
         [Display(Name = "Restaurant Name")]
         public string Name
@@ -32,6 +33,7 @@ namespace TakeAway.Models
             get { return name; }
             set { name = value; }
         }
+
 
         [Required(ErrorMessage = "Description is required.")]
         [Display(Name = "Description")]
@@ -41,6 +43,7 @@ namespace TakeAway.Models
             set { description = value; }
         }
 
+
         [Required(ErrorMessage = "Phone number is required.")]
         [Display(Name = "Phone Number")]
         public string PhoneNumber
@@ -48,6 +51,7 @@ namespace TakeAway.Models
             get { return phoneNumber; }
             set { phoneNumber = value; }
         }
+
 
         [Required(ErrorMessage = "Street name is required.")]
         [Display(Name = "Street Name")]
@@ -57,6 +61,7 @@ namespace TakeAway.Models
             set { street_name = value; }
         }
 
+
         [Required(ErrorMessage = "Street number is required.")]
         [Display(Name = "Street Number")]
         public string StreetNumber
@@ -64,6 +69,7 @@ namespace TakeAway.Models
             get { return street_number; }
             set { street_number = value; }
         }
+
 
         [Required(ErrorMessage = "Postal code is required.")]
         [Display(Name = "Postal Code")]
@@ -73,6 +79,7 @@ namespace TakeAway.Models
             set { postal_code = value; }
         }
 
+
         [Required(ErrorMessage = "City is required.")]
         [Display(Name = "City")]
         public string City
@@ -81,6 +88,7 @@ namespace TakeAway.Models
             set { city = value; }
         }
 
+
         [Required(ErrorMessage = "Country is required.")]
         [Display(Name = "Country")]
         public string Country
@@ -88,6 +96,7 @@ namespace TakeAway.Models
             get { return country; }
             set { country = value; }
         }
+
 
         [Required(ErrorMessage = "Lunch service is required.")]
         [Display(Name = "Lunch Service")]
@@ -98,6 +107,7 @@ namespace TakeAway.Models
             set { lunchService = value; }
         }
 
+
         [Required(ErrorMessage = "Dinner service is required.")]
         [Display(Name = "Dinner Service")]
         [ServiceTime(ErrorMessage = "Start time must be before end time.")]
@@ -107,11 +117,13 @@ namespace TakeAway.Models
             set { dinnerService = value; }
         }
 
+
         public List<Meal> Meals
         {
             get { return meals; }
             set { meals = value; }
         }
+
 
         public Restaurant(int id, string name, string description, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country, Service lunchService, Service dinnerService)
         {
@@ -129,11 +141,13 @@ namespace TakeAway.Models
             Meals = new List<Meal>();
         }
 
+
         public void AddMeal(Meal meal)
         {
             if (meal != null && !Meals.Contains(meal))
                 Meals.Add(meal);
         }
+
 
         public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
 
@@ -145,10 +159,12 @@ namespace TakeAway.Models
             DinnerService = new Service();
         }
 
+
         public static async Task<List<Restaurant>> GetRestaurantsAsync(IRestaurantDAL restaurantDAL)
         {
             return await restaurantDAL.GetRestaurantsAsync();
         }
+
 
         public static async Task<Restaurant> GetRestaurantAsync(IRestaurantDAL restaurantDAL, int id, bool withMeals = false)
         {
@@ -156,20 +172,24 @@ namespace TakeAway.Models
             return restaurant;
         }
 
+
         public async Task<bool> CreateAsync(IRestaurantDAL restaurantDAL, int userid)
         {
             return await restaurantDAL.InsertRestaurantAsync(this, userid);
         }
+
 
         public override int GetHashCode()
         {
             return Id.GetHashCode();
         }
 
+
         public override string ToString()
         {
             return $"{Id} - {Name} - {Description} - {PhoneNumber} - {Address}";
         }
+
 
         public override bool Equals(object? obj)
         {

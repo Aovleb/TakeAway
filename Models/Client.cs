@@ -14,6 +14,7 @@ namespace TakeAway.Models
         private string city;
         private string country;
 
+
         [Required(ErrorMessage = "Last name is required.")]
         [Display(Name = "Last Name")]
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Last name can only contain letters.")]
@@ -22,6 +23,8 @@ namespace TakeAway.Models
             get { return lastName; }
             set { lastName = value; }
         }
+
+
         [Required(ErrorMessage = "First name is required.")]
         [Display(Name = "First Name")]
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "First name can only contain letters.")]
@@ -30,6 +33,7 @@ namespace TakeAway.Models
             get { return firstName; }
             set { firstName = value; }
         }
+
 
         [Required(ErrorMessage = "Phone number is required.")]
         [DataType(DataType.PhoneNumber)]
@@ -40,6 +44,7 @@ namespace TakeAway.Models
             set { phoneNumber = value; }
         }
 
+
         [Required(ErrorMessage = "Street name is required.")]
         [Display(Name = "Street Name")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Street name can only contain letters, and spaces.")]
@@ -48,6 +53,7 @@ namespace TakeAway.Models
             get { return street_name; }
             set { street_name = value; }
         }
+
 
         [Required(ErrorMessage = "Street number is required.")]
         [Display(Name = "Street Number")]
@@ -58,6 +64,7 @@ namespace TakeAway.Models
             set { street_number = value; }
         }
 
+
         [Required(ErrorMessage = "Postal code is required.")]
         [Display(Name = "Postal Code")]
         public string PostalCode
@@ -65,6 +72,7 @@ namespace TakeAway.Models
             get { return postal_code; }
             set { postal_code = value; }
         }
+
 
         [Required(ErrorMessage = "City is required.")]
         [Display(Name = "City")]
@@ -75,6 +83,7 @@ namespace TakeAway.Models
             set { city = value; }
         }
 
+
         [Required(ErrorMessage = "Country is required.")]
         [Display(Name = "Country")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Country can only contain letters and spaces.")]
@@ -84,8 +93,8 @@ namespace TakeAway.Models
             set { country = value; }
         }
 
-        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
 
+        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
 
 
         public Client(int id, string email, string password, string lastName, string firstName, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country)
@@ -100,6 +109,8 @@ namespace TakeAway.Models
             City = city;
             Country = country;
         }
+
+
         public Client() { }
 
 
@@ -107,6 +118,7 @@ namespace TakeAway.Models
         {
             return await userDAL.CreateAsync(this);
         }
+
 
         public async static Task<Client> GetClientAsync(IUserDAL userDAL, int id)
         {

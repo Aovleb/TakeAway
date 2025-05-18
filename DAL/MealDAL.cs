@@ -14,6 +14,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
+
         public async Task<Meal> GetMealAsync(int mealId)
         {
             Meal meal = null;
@@ -22,10 +23,10 @@ namespace TakeAway.DAL
                 await conn.OpenAsync();
 
                 SqlCommand cmd = new SqlCommand(@"
-            SELECT m.id_meal, m.name, m.description, m.price
-            FROM Meal m
-            INNER JOIN Dish d ON m.id_meal = d.id_meal
-            WHERE m.id_meal = @mealId", conn);
+                        SELECT m.id_meal, m.name, m.description, m.price
+                        FROM Meal m
+                        INNER JOIN Dish d ON m.id_meal = d.id_meal
+                        WHERE m.id_meal = @mealId", conn);
                 cmd.Parameters.AddWithValue("@mealId", mealId);
 
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -39,11 +40,11 @@ namespace TakeAway.DAL
 
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
-                    SELECT s.id_service, s.startTime, s.endTime
-                    FROM Meal_Service ms
-                    INNER JOIN Service s ON ms.id_service = s.id_service
-                    WHERE ms.id_meal = @mealId
-                    ORDER BY s.startTime", conn);
+                                SELECT s.id_service, s.startTime, s.endTime
+                                FROM Meal_Service ms
+                                INNER JOIN Service s ON ms.id_service = s.id_service
+                                WHERE ms.id_meal = @mealId
+                                ORDER BY s.startTime", conn);
                         cmd.Parameters.AddWithValue("@mealId", mealId);
 
                         Service lunchService = null;
@@ -74,10 +75,10 @@ namespace TakeAway.DAL
                 if (meal != null) return meal;
 
                 cmd = new SqlCommand(@"
-            SELECT m.id_meal, m.name, m.description, m.price
-            FROM Meal m
-            INNER JOIN Menu me ON m.id_meal = me.id_meal
-            WHERE m.id_meal = @mealId", conn);
+                        SELECT m.id_meal, m.name, m.description, m.price
+                        FROM Meal m
+                        INNER JOIN Menu me ON m.id_meal = me.id_meal
+                        WHERE m.id_meal = @mealId", conn);
                 cmd.Parameters.AddWithValue("@mealId", mealId);
 
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -91,11 +92,11 @@ namespace TakeAway.DAL
 
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
-                    SELECT s.id_service, s.startTime, s.endTime
-                    FROM Meal_Service ms
-                    INNER JOIN Service s ON ms.id_service = s.id_service
-                    WHERE ms.id_meal = @mealId
-                    ORDER BY s.startTime", conn);
+                                SELECT s.id_service, s.startTime, s.endTime
+                                FROM Meal_Service ms
+                                INNER JOIN Service s ON ms.id_service = s.id_service
+                                WHERE ms.id_meal = @mealId
+                                ORDER BY s.startTime", conn);
                         cmd.Parameters.AddWithValue("@mealId", menuId);
 
                         Service lunchService = null;
@@ -123,11 +124,11 @@ namespace TakeAway.DAL
 
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
-                    SELECT m.id_meal, m.name, m.description, m.price
-                    FROM Meal m
-                    INNER JOIN Dish d ON m.id_meal = d.id_meal
-                    INNER JOIN Menu_Dish md ON d.id_meal = md.id_dish
-                    WHERE md.id_menu = @menuId", conn);
+                                SELECT m.id_meal, m.name, m.description, m.price
+                                FROM Meal m
+                                INNER JOIN Dish d ON m.id_meal = d.id_meal
+                                INNER JOIN Menu_Dish md ON d.id_meal = md.id_dish
+                                WHERE md.id_menu = @menuId", conn);
                         cmd.Parameters.AddWithValue("@menuId", menuId);
 
                         List<(int id, string name, string description, decimal price)> tempDishes = new List<(int, string, string, decimal)>();
@@ -151,11 +152,11 @@ namespace TakeAway.DAL
                             decimal dishPrice = tempDish.price;
 
                             cmd = new SqlCommand(@"
-                        SELECT s.id_service, s.startTime, s.endTime
-                        FROM Meal_Service ms
-                        INNER JOIN Service s ON ms.id_service = s.id_service
-                        WHERE ms.id_meal = @dishId
-                        ORDER BY s.startTime", conn);
+                                    SELECT s.id_service, s.startTime, s.endTime
+                                    FROM Meal_Service ms
+                                    INNER JOIN Service s ON ms.id_service = s.id_service
+                                    WHERE ms.id_meal = @dishId
+                                    ORDER BY s.startTime", conn);
                             cmd.Parameters.AddWithValue("@dishId", dishId);
 
                             Service dishLunchService = null;
@@ -189,6 +190,7 @@ namespace TakeAway.DAL
             }
             return meal;
         }
+
 
         public async Task<bool> CreateAsync(Dish dish, int restaurantId)
         {
@@ -249,6 +251,7 @@ namespace TakeAway.DAL
             }
             return success;
         }
+
 
         public async Task<bool> CreateAsync(Menu menu, int restaurantId)
         {

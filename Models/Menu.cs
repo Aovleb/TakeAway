@@ -1,28 +1,30 @@
-﻿using TakeAway.DAL;
-using TakeAway.DAL.Interfaces;
+﻿using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {
     public class Menu : Meal
     {
         private List<Dish> dishes;
+
+
         public List<Dish> Dishes
         {
             get { return dishes; }
             set { dishes = value; }
         }
-        public Menu(int id, string name, string description, decimal price,Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
+
+
+        public Menu(int id, string name, string description, decimal price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
         {
             Dishes = new List<Dish>();
         }
-        public Menu(int id, string name, string description, decimal price) : base(id, name, description, price)
-        {
-            Dishes = new List<Dish>();
-        }
+
+
         public Menu() : base()
         {
             Dishes = new List<Dish>();
         }
+
 
         public void AddDish(Dish dish)
         {
@@ -31,6 +33,7 @@ namespace TakeAway.Models
                 Dishes.Add(dish);
             }
         }
+
 
         public async override Task<bool> CreateAsync(IMealDAL mealDAL, int restaurantId)
         {

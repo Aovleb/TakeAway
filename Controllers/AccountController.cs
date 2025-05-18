@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
-using Microsoft.AspNetCore.Http;
 using TakeAway.ViewModels;
-using System.Reflection;
 namespace TakeAway.Controllers
 {
     public class AccountController : Controller
@@ -14,7 +11,7 @@ namespace TakeAway.Controllers
         {
             this.userDAL = userDAL;
         }
-        
+
         public IActionResult SignIn()
         {
             SetUserViewData();
@@ -24,6 +21,7 @@ namespace TakeAway.Controllers
             }
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -70,6 +68,7 @@ namespace TakeAway.Controllers
             return View();
         }
 
+
         public IActionResult SignUp()
         {
             SetUserViewData();
@@ -80,9 +79,10 @@ namespace TakeAway.Controllers
 
 
             ViewData["ActiveForm"] = "Client";
-            
+
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -122,6 +122,7 @@ namespace TakeAway.Controllers
             return View("SignUp", model);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterRestaurantOwner(SignUpViewModel model)
@@ -160,6 +161,7 @@ namespace TakeAway.Controllers
             return View("SignUp", model);
         }
 
+
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
@@ -174,6 +176,7 @@ namespace TakeAway.Controllers
             CookieHelper.SetBasketCookie(Response, newBasket);
             return RedirectToAction("Index", "Home");
         }
+
 
         private void SetUserViewData()
         {

@@ -1,8 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Data;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
-using System.Data;
-using System.Data.SqlTypes;
 
 namespace TakeAway.DAL
 {
@@ -14,6 +13,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
+
         public async Task<User> GetUserAsync(string email, string password)
         {
             User u = null;
@@ -24,7 +24,7 @@ namespace TakeAway.DAL
                                                 INNER JOIN person p ON c.id_person = p.id_person
                                                 INNER JOIN address a ON c.id_address = a.id_address
                                                 WHERE email = @email AND password = @password", conn);
-                
+
                 cmd.Parameters.AddWithValue("@email", email);
                 cmd.Parameters.AddWithValue("@password", password);
                 await conn.OpenAsync();
@@ -47,6 +47,7 @@ namespace TakeAway.DAL
 
                 if (u != null) return u;
 
+
                 cmd = new SqlCommand(@"SELECT * FROM RestaurantOwner r
                                        INNER JOIN person p ON r.id_person = p.id_person
                                        WHERE email = @email AND password = @password", conn);
@@ -67,19 +68,30 @@ namespace TakeAway.DAL
             }
         }
 
+
         public async Task<RestaurantOwner> GetRestaurantOwnerAsync(int restaurateurId)
         {
             RestaurantOwner restaurantOwner = null;
+            string restaurantOwnerQuery = @"SELECT p.id_person, email, name
+                          FROM Person p
+                          INNER JOIN RestaurantOwner r ON p.id_person = r.id_person   
+                          WHERE p.id_person = @id_person;";
+
+            string restaurantsQuery = @"SELECT r.id_restaurant, r.name, r.description, r.phoneNumber, 
+                     a.street_name, a.street_number, a.postal_code, a.city, a.country,
+                     s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
+                     s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
+                      FROM Restaurant r
+                      INNER JOIN Address a ON a.id_address = r.id_address
+                      LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                      LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                      WHERE r.id_person = @id_person";
+
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
 
-                SqlCommand cmdOwner = new SqlCommand(
-                    @"SELECT p.id_person, email, name
-                          FROM Person p
-                          INNER JOIN RestaurantOwner r ON p.id_person = r.id_person   
-                          WHERE p.id_person = @id_person;",
-                    conn);
+                SqlCommand cmdOwner = new SqlCommand(restaurantOwnerQuery,conn);
                 cmdOwner.Parameters.AddWithValue("@id_person", restaurateurId);
 
                 using (SqlDataReader readerOwner = await cmdOwner.ExecuteReaderAsync())
@@ -98,17 +110,7 @@ namespace TakeAway.DAL
                     }
                 }
 
-                SqlCommand cmdRestaurants = new SqlCommand(
-                    @"SELECT r.id_restaurant, r.name, r.description, r.phoneNumber, 
-                     a.street_name, a.street_number, a.postal_code, a.city, a.country,
-                     s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
-                     s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
-                      FROM Restaurant r
-                      INNER JOIN Address a ON a.id_address = r.id_address
-                      LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-                      LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-                      WHERE r.id_person = @id_person",
-                    conn);
+                SqlCommand cmdRestaurants = new SqlCommand(restaurantsQuery, conn);
                 cmdRestaurants.Parameters.AddWithValue("@id_person", restaurateurId);
 
                 using (SqlDataReader reader = await cmdRestaurants.ExecuteReaderAsync())
@@ -125,23 +127,15 @@ namespace TakeAway.DAL
                         string city = reader.GetString("city");
                         string country = reader.GetString("country");
 
-                        Service lunchService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
-                        {
-                            int lunchServiceId = reader.GetInt32("lunch_service_id");
-                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
-                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
-                            lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
-                        }
-
-                        Service dinnerService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
-                        {
-                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
-                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
-                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
-                            dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
-                        }
+                        int lunchServiceId = reader.GetInt32("lunch_service_id");
+                        TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
+                        TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
+                        Service lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
+                        
+                        int dinnerServiceId = reader.GetInt32("dinner_service_id");
+                        TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
+                        TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
+                        Service dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
 
                         Restaurant r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
                         restaurantOwner.AddRestaurant(r);
@@ -150,6 +144,7 @@ namespace TakeAway.DAL
             }
             return restaurantOwner;
         }
+
 
         public async Task<bool> CreateAsync(RestaurantOwner r)
         {
@@ -169,7 +164,7 @@ namespace TakeAway.DAL
 
                 if (emailCount > 0)
                 {
-                    return false; 
+                    return false;
                 }
 
                 SqlTransaction transaction = conn.BeginTransaction();
@@ -203,6 +198,8 @@ namespace TakeAway.DAL
             }
             return success;
         }
+
+
         public async Task<bool> CreateAsync(Client c)
         {
             bool success = false;
@@ -271,6 +268,7 @@ namespace TakeAway.DAL
             }
             return success;
         }
+
 
         public async Task<Client> GetClientAsync(int userId)
         {

@@ -136,7 +136,7 @@ namespace TakeAway.Controllers
 
         private string? GetUserTypeInSession()
         {
-           
+
             return HttpContext.Session.GetString("userType");
         }
 

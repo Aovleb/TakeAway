@@ -1,20 +1,18 @@
-﻿using System.Collections.Specialized;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using TakeAway.DAL;
+﻿using System.ComponentModel.DataAnnotations;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
 {
     public enum StatusOrderEnum
     {
-        [Display(Name ="In Preparation")]
+        [Display(Name = "In Preparation")]
         InPreparation = 0,
         [Display(Name = "Ready")]
         Ready = 1,
         [Display(Name = "Delivered")]
         Delivered = 2,
     }
+
     public class Order
     {
         private int orderNumber;
@@ -32,41 +30,56 @@ namespace TakeAway.Models
             set { orderNumber = value; }
         }
 
+
         public StatusOrderEnum Status
         {
             get { return status; }
             set { status = value; }
         }
+
+
         public bool IsDelivery
         {
             get { return isDelivery; }
             set { isDelivery = value; }
         }
+
+
         public DateTime Date
         {
             get { return date; }
             set { date = value; }
         }
+
+
         public Service Service
         {
             get { return service; }
             set { service = value; }
         }
+
+
         public Restaurant Restaurant
         {
             get { return restaurant; }
             set { restaurant = value; }
         }
+
+
         public Client Client
         {
             get { return client; }
             set { client = value; }
         }
+
+
         public Dictionary<Meal, int> Meals
         {
             get { return meals; }
             set { meals = value; }
         }
+
+
         public Order(int orderNumber, StatusOrderEnum status, bool isDelivery, DateTime date, Service service, Restaurant restaurant, Client client)
         {
             OrderNumber = orderNumber;
@@ -79,15 +92,18 @@ namespace TakeAway.Models
             Meals = new Dictionary<Meal, int>();
         }
 
-        public Order() 
+
+        public Order()
         {
             Meals = new Dictionary<Meal, int>();
         }
+
 
         public void AddMeal(Meal meal, int quantity)
         {
             Meals.Add(meal, quantity);
         }
+
 
         public decimal GetTotalPrice()
         {
@@ -103,15 +119,18 @@ namespace TakeAway.Models
             return totalPrice;
         }
 
-        public static async Task<List<Order>> GetOrdersAsync(Restaurant restaurant,IOrderDAL orderDAL)
+
+        public static async Task<List<Order>> GetOrdersAsync(Restaurant restaurant, IOrderDAL orderDAL)
         {
             return await orderDAL.GetOrdersAsync(restaurant);
         }
+
 
         public async Task<bool> UpdateOrderStatusAsync(IOrderDAL orderDAL, StatusOrderEnum status)
         {
             return await orderDAL.UpdateOrderStatusAsync(this.OrderNumber, status);
         }
+
 
         public async Task<bool> Create(IOrderDAL orderDAL)
         {

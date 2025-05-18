@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
-using Microsoft.AspNetCore.Http;
-using TakeAway.DAL;
 using TakeAway.ViewModels;
 
 namespace TakeAway.Controllers
@@ -85,6 +82,7 @@ namespace TakeAway.Controllers
             return View(basket);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult UpdateService(string serviceType)
@@ -95,7 +93,6 @@ namespace TakeAway.Controllers
             {
                 return checkResult;
             }
-
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
 
@@ -111,6 +108,7 @@ namespace TakeAway.Controllers
             TempData["SuccessMessage"] = "Service update !";
             return RedirectToAction("Index");
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -134,7 +132,7 @@ namespace TakeAway.Controllers
             if (basket.RestaurantId.HasValue && GetUserIdInSession().HasValue)
             {
                 Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, basket.RestaurantId.Value);
-                Client client = await Client.GetClientAsync(userDAL,(int)GetUserIdInSession());
+                Client client = await Client.GetClientAsync(userDAL, (int)GetUserIdInSession());
                 double distance = CalculateDistance(restaurant, client);
                 if (orderType == "Delivery")
                 {
@@ -164,6 +162,7 @@ namespace TakeAway.Controllers
             TempData["SuccessMessage"] = "Updated order type !";
             return RedirectToAction("Index");
         }
+
 
         public async Task<IActionResult> Add(int mealId)
         {
@@ -198,6 +197,7 @@ namespace TakeAway.Controllers
             return RedirectToAction("Details", "Home", new { id = (int)restaurantId });
         }
 
+
         public async Task<IActionResult> Remove(int id)
         {
             SetUserViewData();
@@ -227,6 +227,7 @@ namespace TakeAway.Controllers
             return RedirectToAction("Index");
         }
 
+
         public IActionResult Clear()
         {
             SetUserViewData();
@@ -253,6 +254,7 @@ namespace TakeAway.Controllers
             }
         }
 
+
         public async Task<IActionResult> Pay()
         {
             SetUserViewData();
@@ -263,7 +265,12 @@ namespace TakeAway.Controllers
             }
 
             BasketViewModel basket = CookieHelper.GetBasketFromCookie(Request);
-                       
+
+            if (basket.Items.Count == 0)
+            {
+                TempData["ErrorMessage"] = "The basket is empty !";
+                return RedirectToAction("Index");
+            }
 
             int? restaurantId = basket.RestaurantId;
             int? clientId = GetUserIdInSession();
@@ -293,7 +300,7 @@ namespace TakeAway.Controllers
 
             bool isDelivery = basket.OrderType == "Delivery";
 
-            Order order = new Order(0,0, isDelivery, DateTime.Now,s, r, c);
+            Order order = new Order(0, 0, isDelivery, DateTime.Now, s, r, c);
 
             foreach ((int mealId, int quantity) in basket.Items)
             {
@@ -328,25 +335,30 @@ namespace TakeAway.Controllers
             return RedirectToAction("Index");
         }
 
+
         public IActionResult UnFound()
         {
             return RedirectToAction("Logout", "Account");
         }
+
 
         private int? GetUserIdInSession()
         {
             return HttpContext.Session.GetInt32("userId");
         }
 
+
         private string? GetUserTypeInSession()
         {
             return HttpContext.Session.GetString("userType");
         }
 
+
         private int? GetRestaurantId()
         {
             return HttpContext.Session.GetInt32("restaurantId");
         }
+
 
         private IActionResult? CheckIsClient()
         {
@@ -357,11 +369,13 @@ namespace TakeAway.Controllers
             return null;
         }
 
+
         private void SetUserViewData()
         {
             ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
             ViewData["userType"] = HttpContext.Session.GetString("userType");
         }
+
 
         private double CalculateDistance(Restaurant restaurant, Client client)
         {

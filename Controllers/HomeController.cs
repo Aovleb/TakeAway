@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using TakeAway.ViewModels;
-using Microsoft.AspNetCore.Http;
 
 namespace TakeAway.Controllers
 {

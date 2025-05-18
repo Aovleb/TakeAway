@@ -1,7 +1,5 @@
-﻿using Microsoft.Identity.Client;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TakeAway.DAL.Interfaces;
-using TakeAway.Validations;
 
 namespace TakeAway.Models
 {
@@ -17,24 +15,27 @@ namespace TakeAway.Models
             set { id = value; }
         }
 
-        [Required(ErrorMessage ="Email address is required.")]
+
+        [Required(ErrorMessage = "Email address is required.")]
         [Display(Name = "Email")]
-        [EmailAddress(ErrorMessage="Address email invalide.")]
-        [RegularExpression(@"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$", ErrorMessage= "Address email invalide !")]
+        [EmailAddress(ErrorMessage = "Address email invalide.")]
+        [RegularExpression(@"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$", ErrorMessage = "Address email invalide !")]
         public string Email
         {
             get { return email; }
             set { email = value; }
         }
 
-        [Required(ErrorMessage="Password is required.")]
-        [Display(Name="Password")]
+
+        [Required(ErrorMessage = "Password is required.")]
+        [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password
         {
             get { return password; }
             set { password = value; }
         }
+
 
         public User(int id, string email, string password)
         {
@@ -43,12 +44,16 @@ namespace TakeAway.Models
             Password = password;
         }
 
+
         public User() { }
+
 
         public static async Task<User> GetUserAsync(IUserDAL userDAL, string email, string password)
         {
             return await userDAL.GetUserAsync(email, password);
         }
+
+
         public abstract Task<bool> CreateAsync(IUserDAL userDAL);
     }
 }

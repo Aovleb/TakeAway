@@ -13,6 +13,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
+
         public async Task<List<Restaurant>> GetRestaurantsAsync()
         {
             List<Restaurant> restaurants = new List<Restaurant>();
@@ -45,23 +46,15 @@ namespace TakeAway.DAL
                         string city = reader.GetString("city");
                         string country = reader.GetString("country");
 
-                        Service lunchService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
-                        {
-                            int lunchServiceId = reader.GetInt32("lunch_service_id");
-                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
-                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
-                            lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
-                        }
+                        int lunchServiceId = reader.GetInt32("lunch_service_id");
+                        TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
+                        TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
+                        Service lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
 
-                        Service dinnerService = null;
-                        if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
-                        {
-                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
-                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
-                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
-                            dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
-                        }
+                        int dinnerServiceId = reader.GetInt32("dinner_service_id");
+                        TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
+                        TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
+                        Service dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
 
                         Restaurant r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
                         restaurants.Add(r);
@@ -77,6 +70,7 @@ namespace TakeAway.DAL
             return withMeals ? await GetRestaurantWithMealsAsync(id) : await GetRestaurantWithOutMealsAsync(id);
         }
 
+
         private async Task<Restaurant> GetRestaurantWithOutMealsAsync(int id)
         {
             Restaurant r = null;
@@ -84,15 +78,15 @@ namespace TakeAway.DAL
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 string query = @"
-            SELECT r.id_restaurant, r.name, r.description, r.phoneNumber,
-                   a.street_name, a.street_number, a.postal_code, a.city, a.country,
-                   s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
-                   s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
-            FROM Restaurant r
-            INNER JOIN Address a ON a.id_address = r.id_address
-            LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-            LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
-            WHERE r.id_restaurant = @id";
+                    SELECT r.id_restaurant, r.name, r.description, r.phoneNumber,
+                           a.street_name, a.street_number, a.postal_code, a.city, a.country,
+                           s1.id_service AS lunch_service_id, s1.startTime AS lunch_startTime, s1.endTime AS lunch_endTime,
+                           s2.id_service AS dinner_service_id, s2.startTime AS dinner_startTime, s2.endTime AS dinner_endTime
+                    FROM Restaurant r
+                    INNER JOIN Address a ON a.id_address = r.id_address
+                    LEFT JOIN Service s1 ON s1.id_restaurant = r.id_restaurant AND s1.startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                    LEFT JOIN Service s2 ON s2.id_restaurant = r.id_restaurant AND s2.startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = r.id_restaurant)
+                    WHERE r.id_restaurant = @id";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", id);
@@ -114,23 +108,15 @@ namespace TakeAway.DAL
                             string city = reader.GetString("city");
                             string country = reader.GetString("country");
 
-                            Service lunchService = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
-                            {
-                                int lunchServiceId = reader.GetInt32("lunch_service_id");
-                                TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
-                                TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
-                                lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
-                            }
-
-                            Service dinnerService = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
-                            {
-                                int dinnerServiceId = reader.GetInt32("dinner_service_id");
-                                TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
-                                TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
-                                dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
-                            }
+                            int lunchServiceId = reader.GetInt32("lunch_service_id");
+                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
+                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
+                            Service lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
+                            
+                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
+                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
+                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
+                            Service dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
 
                             r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
                         }
@@ -140,6 +126,7 @@ namespace TakeAway.DAL
 
             return r;
         }
+
 
         private async Task<Restaurant> GetRestaurantWithMealsAsync(int id)
         {
@@ -197,23 +184,15 @@ namespace TakeAway.DAL
                             string city = reader.GetString("city");
                             string country = reader.GetString("country");
 
-                            Service lunchService = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("lunch_service_id")))
-                            {
-                                int lunchServiceId = reader.GetInt32("lunch_service_id");
-                                TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
-                                TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
-                                lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
-                            }
+                            int lunchServiceId = reader.GetInt32("lunch_service_id");
+                            TimeSpan lunchStartTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_startTime"));
+                            TimeSpan lunchEndTime = reader.GetTimeSpan(reader.GetOrdinal("lunch_endTime"));
+                            Service lunchService = new Service(lunchServiceId, lunchStartTime, lunchEndTime);
 
-                            Service dinnerService = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("dinner_service_id")))
-                            {
-                                int dinnerServiceId = reader.GetInt32("dinner_service_id");
-                                TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
-                                TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
-                                dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
-                            }
+                            int dinnerServiceId = reader.GetInt32("dinner_service_id");
+                            TimeSpan dinnerStartTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_startTime"));
+                            TimeSpan dinnerEndTime = reader.GetTimeSpan(reader.GetOrdinal("dinner_endTime"));
+                            Service dinnerService = new Service(dinnerServiceId, dinnerStartTime, dinnerEndTime);
 
                             r = new Restaurant(restaurantId, name, description, phoneNumber, streetName, streetNumber, postalCode, city, country, lunchService, dinnerService);
                         }
@@ -268,6 +247,8 @@ namespace TakeAway.DAL
             }
             return r;
         }
+
+
         public async Task<bool> InsertRestaurantAsync(Restaurant restaurant, int userId)
         {
             bool success = false;
@@ -338,7 +319,6 @@ namespace TakeAway.DAL
             }
             return success;
         }
-
     }
 }
 

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
 namespace TakeAway.Models
@@ -8,7 +7,6 @@ namespace TakeAway.Models
     {
         private string name;
         private List<Restaurant> restaurants;
-
 
         [Required(ErrorMessage = "Name is required.")]
         [Display(Name = "Restaurant Owner Name")]
@@ -19,11 +17,13 @@ namespace TakeAway.Models
             set { name = value; }
         }
 
+
         public List<Restaurant> Restaurants
         {
             get { return restaurants; }
             set { restaurants = value; }
         }
+
 
         public RestaurantOwner(int id, string email, string password, string name)
             : base(id, email, password)
@@ -31,7 +31,11 @@ namespace TakeAway.Models
             Name = name;
             Restaurants = new List<Restaurant>();
         }
+
+
         public RestaurantOwner() { Restaurants = new List<Restaurant>(); }
+
+
 
         public void AddRestaurant(Restaurant restaurant)
         {
@@ -41,10 +45,12 @@ namespace TakeAway.Models
             }
         }
 
+
         public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
         }
+
 
         public static async Task<RestaurantOwner> GetRestaurantOwnerAsync(IUserDAL userDAL, int userId)
         {

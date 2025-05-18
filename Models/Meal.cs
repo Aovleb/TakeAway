@@ -19,6 +19,7 @@ namespace TakeAway.Models
             set { id = value; }
         }
 
+
         [Required(ErrorMessage = "Name is required.")]
         [Display(Name = "Name")]
         public string Name
@@ -26,6 +27,7 @@ namespace TakeAway.Models
             get { return name; }
             set { name = value; }
         }
+
 
         [Required(ErrorMessage = "Description is required.")]
         [Display(Name = "Description")]
@@ -35,13 +37,16 @@ namespace TakeAway.Models
             set { description = value; }
         }
 
+
         [Required(ErrorMessage = "Price is required.")]
         [Display(Name = "Price")]
+        [DataType(DataType.Currency)]
         public decimal Price
         {
             get { return price; }
             set { price = value; }
         }
+
 
         [Display(Name = "Lunch Service")]
         public Service? LunchService
@@ -50,12 +55,14 @@ namespace TakeAway.Models
             set { lunchService = value; }
         }
 
+
         [Display(Name = "Dinner Service")]
         public Service? DinnerService
         {
             get { return dinnerService; }
             set { dinnerService = value; }
         }
+
 
         public Meal(int id, string name, string description, decimal price, Service? lunchService, Service? dinnerService)
         {
@@ -67,6 +74,7 @@ namespace TakeAway.Models
             DinnerService = dinnerService;
         }
 
+
         public Meal(int id, string name, string description, decimal price)
         {
             Id = id;
@@ -77,26 +85,32 @@ namespace TakeAway.Models
             DinnerService = null;
         }
 
+
         public Meal()
         {
             LunchService = new Service();
             DinnerService = new Service();
         }
 
+
         public async static Task<Meal> GetMealAsync(IMealDAL mealDAL, int mealId)
         {
             return await mealDAL.GetMealAsync(mealId);
         }
+
+
         public abstract Task<bool> CreateAsync(IMealDAL mealDAL, int restaurantId);
 
-        public override bool Equals(object obj)
+
+        public override bool Equals(object? obj)
         {
-            if (obj == null)
+            if (obj == null || obj is not Meal)
                 return false;
 
             Meal other = (Meal)obj;
             return Id == other.Id;
         }
+
 
         public override int GetHashCode()
         {

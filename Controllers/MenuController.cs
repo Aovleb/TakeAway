@@ -111,6 +111,11 @@ namespace TakeAway.Controllers
                 menu.DinnerService = chooseDinnerService ? r.DinnerService : null;
             }
 
+            if (menu.Price < 0)
+            {
+                ModelState.AddModelError("Price", "Price must be a positive number.");
+            }
+
             if (ModelState.IsValid)
             {
                 bool success = await menu.CreateAsync(mealDAL, (int)restaurantId);

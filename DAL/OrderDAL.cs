@@ -14,6 +14,7 @@ namespace TakeAway.DAL
             this.connectionString = connectionString;
         }
 
+
         public async Task<bool> Create(Order order)
         {
             bool success = false;
@@ -25,9 +26,13 @@ namespace TakeAway.DAL
                     try
                     {
                         string query = @"
-                    INSERT INTO ClientOrder (status, isDelivery, orderDate, id_person, id_service, id_restaurant)
-                    VALUES (@status, @isDelivery, @orderDate, @id_person, @id_service, @id_restaurant);
-                    SELECT SCOPE_IDENTITY();";
+                            INSERT INTO ClientOrder (status, isDelivery, orderDate, id_person, id_service, id_restaurant)
+                            VALUES (@status, @isDelivery, @orderDate, @id_person, @id_service, @id_restaurant);
+                            SELECT SCOPE_IDENTITY();";
+
+                        string insertOrderMealQuery = @"
+                            INSERT INTO ClientOrder_Meal (orderNumber, id_meal, quantity)
+                            VALUES (@orderNumber, @id_meal, @quantity);";
 
                         SqlCommand cmd = new SqlCommand(query, conn, transaction);
                         cmd.Parameters.AddWithValue("@status", (int)order.Status);
@@ -45,10 +50,6 @@ namespace TakeAway.DAL
                             transaction.Rollback();
                             return success;
                         }
-
-                        string insertOrderMealQuery = @"
-                    INSERT INTO ClientOrder_Meal (orderNumber, id_meal, quantity)
-                    VALUES (@orderNumber, @id_meal, @quantity);";
 
                         foreach ((Meal meal, int quantity) in order.Meals)
                         {
@@ -74,39 +75,39 @@ namespace TakeAway.DAL
             return success;
         }
 
+
         public async Task<List<Order>> GetOrdersAsync(Restaurant restaurant)
         {
             List<Order> orders = new List<Order>();
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                string query = @"
-                SELECT o.orderNumber, o.status, o.isDelivery, o.orderDate, o.id_person, o.id_service, o.id_restaurant,
-                       s.startTime AS serviceStartTime, s.endTime AS serviceEndTime,
-                       c.lastName, c.firstName, c.phoneNumber AS personPhoneNumber, p.email, p.password,
-                       caddr.street_name AS personStreetName, caddr.street_number AS personStreetNumber, 
-                       caddr.postal_code AS personPostalCode, caddr.city AS personCity, caddr.country AS personCountry,
-                       com.orderNumber AS mealOrderNumber, com.id_meal, com.quantity,
-                       m.name AS mealName, m.description AS mealDescription, m.price AS mealPrice,
-                       ms1.id_service AS meal_lunch_service_id, ms2.id_service AS meal_dinner_service_id,
-                       m2.id_meal AS menuId, d2.id_meal AS dishId,
-                       md.id_menu, md.id_dish,
-                       dm.id_meal AS dishMealId, dm.name AS dishName, dm.description AS dishDescription, dm.price AS dishPrice
-                FROM ClientOrder o
-                LEFT JOIN Service s ON s.id_service = o.id_service
-                LEFT JOIN Client c ON c.id_person = o.id_person
-                INNER JOIN Person p ON p.id_person = c.id_person
-                LEFT JOIN Address caddr ON caddr.id_address = c.id_address
-                LEFT JOIN ClientOrder_Meal com ON com.orderNumber = o.orderNumber
-                LEFT JOIN Meal m ON m.id_meal = com.id_meal
-                LEFT JOIN Meal_Service ms1 ON ms1.id_meal = m.id_meal AND ms1.id_service = (SELECT id_service FROM Service WHERE id_restaurant = o.id_restaurant AND startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = o.id_restaurant))
-                LEFT JOIN Meal_Service ms2 ON ms2.id_meal = m.id_meal AND ms2.id_service = (SELECT id_service FROM Service WHERE id_restaurant = o.id_restaurant AND startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = o.id_restaurant))
-                LEFT JOIN Menu m2 ON m2.id_meal = m.id_meal
-                LEFT JOIN Dish d2 ON d2.id_meal = m.id_meal
-                LEFT JOIN Menu_Dish md ON md.id_menu = m2.id_meal
-                LEFT JOIN Dish d ON d.id_meal = md.id_dish
-                LEFT JOIN Meal dm ON dm.id_meal = d.id_meal
-                WHERE o.id_restaurant = @id";
+                string query = @"SELECT o.orderNumber, o.status, o.isDelivery, o.orderDate, o.id_person, o.id_service, o.id_restaurant,
+                                        s.startTime AS serviceStartTime, s.endTime AS serviceEndTime,
+                                        c.lastName, c.firstName, c.phoneNumber AS personPhoneNumber, p.email, p.password,
+                                        caddr.street_name AS personStreetName, caddr.street_number AS personStreetNumber, 
+                                        caddr.postal_code AS personPostalCode, caddr.city AS personCity, caddr.country AS personCountry,
+                                        com.orderNumber AS mealOrderNumber, com.id_meal, com.quantity,
+                                        m.name AS mealName, m.description AS mealDescription, m.price AS mealPrice,
+                                        ms1.id_service AS meal_lunch_service_id, ms2.id_service AS meal_dinner_service_id,
+                                        m2.id_meal AS menuId, d2.id_meal AS dishId,
+                                        md.id_menu, md.id_dish,
+                                        dm.id_meal AS dishMealId, dm.name AS dishName, dm.description AS dishDescription, dm.price AS dishPrice
+                                FROM ClientOrder o
+                                LEFT JOIN Service s ON s.id_service = o.id_service
+                                LEFT JOIN Client c ON c.id_person = o.id_person
+                                INNER JOIN Person p ON p.id_person = c.id_person
+                                LEFT JOIN Address caddr ON caddr.id_address = c.id_address
+                                LEFT JOIN ClientOrder_Meal com ON com.orderNumber = o.orderNumber
+                                LEFT JOIN Meal m ON m.id_meal = com.id_meal
+                                LEFT JOIN Meal_Service ms1 ON ms1.id_meal = m.id_meal AND ms1.id_service = (SELECT id_service FROM Service WHERE id_restaurant = o.id_restaurant AND startTime = (SELECT MIN(startTime) FROM Service WHERE id_restaurant = o.id_restaurant))
+                                LEFT JOIN Meal_Service ms2 ON ms2.id_meal = m.id_meal AND ms2.id_service = (SELECT id_service FROM Service WHERE id_restaurant = o.id_restaurant AND startTime = (SELECT MAX(startTime) FROM Service WHERE id_restaurant = o.id_restaurant))
+                                LEFT JOIN Menu m2 ON m2.id_meal = m.id_meal
+                                LEFT JOIN Dish d2 ON d2.id_meal = m.id_meal
+                                LEFT JOIN Menu_Dish md ON md.id_menu = m2.id_meal
+                                LEFT JOIN Dish d ON d.id_meal = md.id_dish
+                                LEFT JOIN Meal dm ON dm.id_meal = d.id_meal
+                                WHERE o.id_restaurant = @id";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", restaurant.Id);
@@ -127,13 +128,9 @@ namespace TakeAway.DAL
                             int id_person = reader.GetInt32("id_person");
                             int id_service = reader.GetInt32("id_service");
 
-                            Service orderService = null;
-                            if (!reader.IsDBNull(reader.GetOrdinal("serviceStartTime")))
-                            {
-                                TimeSpan serviceStartTime = reader.GetTimeSpan(reader.GetOrdinal("serviceStartTime"));
-                                TimeSpan serviceEndTime = reader.GetTimeSpan(reader.GetOrdinal("serviceEndTime"));
-                                orderService = new Service(id_service, serviceStartTime, serviceEndTime);
-                            }
+                            TimeSpan serviceStartTime = reader.GetTimeSpan(reader.GetOrdinal("serviceStartTime"));
+                            TimeSpan serviceEndTime = reader.GetTimeSpan(reader.GetOrdinal("serviceEndTime"));
+                            Service orderService = new Service(id_service, serviceStartTime, serviceEndTime);
 
                             Client client = new Client(
                                 id_person,
