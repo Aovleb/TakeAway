@@ -116,6 +116,7 @@ namespace TakeAway.Controllers
                 bool success = await menu.CreateAsync(mealDAL, (int)restaurantId);
                 if (success)
                 {
+                    TempData["SuccessMessage"] = "Menu created successfully.";
                     return RedirectToAction("Menus", "Restaurant", new { id = restaurantId });
                 }
                 else

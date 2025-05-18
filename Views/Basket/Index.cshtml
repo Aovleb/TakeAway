@@ -111,7 +111,6 @@
                                 MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
                                 if (meal != null)
                                 {
-                                    // Vérifier si le repas est compatible avec le type de service sélectionné
                                     bool isCompatible = string.IsNullOrEmpty(Model.ServiceType) ||
                                     (Model.ServiceType == "Lunch" && meal.LunchService != null) ||
                                     (Model.ServiceType == "Dinner" && meal.DinnerService != null);

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
-using Microsoft.AspNetCore.Http;
 
 namespace TakeAway.Controllers
 {
@@ -57,6 +55,7 @@ namespace TakeAway.Controllers
                 bool success = await r.CreateAsync(restaurantDAL, (int)userId);
                 if (success)
                 {
+                    TempData["SuccessMessage"] = "Restaurant created successfully.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
@@ -80,7 +79,7 @@ namespace TakeAway.Controllers
 
             HttpContext.Session.SetInt32("restaurantId", id);
 
-            
+
             Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id, true);
             List<Dish> dishes = new List<Dish>();
             restaurant.Meals.ForEach(m =>

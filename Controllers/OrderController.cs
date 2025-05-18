@@ -51,7 +51,7 @@ namespace TakeAway.Controllers
             IActionResult? checkOwnedByUser = await CheckIsOwnedByUser((int)restaurantId);
             if (checkOwnedByUser != null)
             {
-                TempData["ErrorMessage"] = "Vous n'êtes pas autorisé à modifier cette commande.";
+                TempData["ErrorMessage"] = "You are not authorized to modify this order.";
                 return checkOwnedByUser;
             }
 
@@ -60,11 +60,11 @@ namespace TakeAway.Controllers
             bool updated = await order.UpdateOrderStatusAsync(orderDAL, status);
             if (!updated)
             {
-                TempData["ErrorMessage"] = "Échec de la mise à jour du statut.";
+                TempData["ErrorMessage"] = "Status update failed.";
                 return RedirectToAction("Index", new { id = (int)restaurantId });
             }
 
-            TempData["SuccessMessage"] = "Statut de la commande mis à jour.";
+            TempData["SuccessMessage"] = "Order status updated.";
             return RedirectToAction("Index", new { id = (int)restaurantId });
         }
 

@@ -55,11 +55,13 @@ namespace TakeAway.Controllers
                 if (user is Client)
                 {
                     HttpContext.Session.SetString("userType", "Client");
+                    TempData["SuccessMessage"] = "Welcome back, client!";
                     return RedirectToAction("Index", "Home");
                 }
                 else if (user is RestaurantOwner)
                 {
                     HttpContext.Session.SetString("userType", "Restaurateur");
+                    TempData["SuccessMessage"] = "Welcome back, restaurateur!";
                     return RedirectToAction("Index", "Restaurant");
                 }
             }

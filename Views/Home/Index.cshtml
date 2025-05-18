@@ -3,11 +3,25 @@
 
 @{
     ViewData["Title"] = "Discover the best restaurants";
-    }
+}
 <div class="mb-xxl">
     <h1 class="page-title gold-accent"> <img src="~/img/Logo.png" height="125" width="125"/> DLISH</h1>
     <p class="page-subtitle">Find the best restaurants near you</p>
 </div>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible flash-message" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible flash-message" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <div class="grid">
     @foreach (var restaurant in Model)
@@ -17,10 +31,6 @@
                 <h2 class="card-title">@restaurant.Name</h2>
                 <div class="card-description">
                     <span>@restaurant.Description</span>
-                    @* <div class="rating">
-                        <span class="rating-star">★</span>
-                        <span class="rating-value">@restaurant.Rating</span>
-                    </div> *@
                 </div>
             </div>
             <div class="card-content">
