@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 
@@ -18,6 +17,7 @@ namespace TakeAway.Controllers
             this.userDAL = userDAL;
         }
 
+
         public async Task<IActionResult> Create()
         {
             SetUserViewData();
@@ -33,7 +33,7 @@ namespace TakeAway.Controllers
             if (checkOwnedByUser != null)
                 return checkOwnedByUser;
 
-            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId,true);
+            Restaurant r = await Restaurant.GetRestaurantAsync(restaurantDAL, (int)restaurantId, true);
             List<Dish> dishes = new();
             r.Meals.ForEach(m =>
             {
@@ -44,7 +44,6 @@ namespace TakeAway.Controllers
                 }
             });
 
-
             ViewData["LunchService"] = r.LunchService;
             ViewData["DinnerService"] = r.DinnerService;
             ViewData["Dishes"] = dishes;
@@ -52,6 +51,7 @@ namespace TakeAway.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

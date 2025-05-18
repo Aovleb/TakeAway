@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 
@@ -17,6 +16,7 @@ namespace TakeAway.Controllers
             this.restaurantDAL = restaurantDAL;
             this.userDAL = userDAL;
         }
+
 
         public async Task<IActionResult> Index(int id)
         {
@@ -37,6 +37,7 @@ namespace TakeAway.Controllers
 
             return View(orders);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -68,20 +69,24 @@ namespace TakeAway.Controllers
             return RedirectToAction("Index", new { id = (int)restaurantId });
         }
 
+
         public IActionResult UnFound()
         {
             return RedirectToAction("Logout", "Account");
         }
+
 
         private int? GetUserIdInSession()
         {
             return HttpContext.Session.GetInt32("userId");
         }
 
+
         private string? GetUserTypeInSession()
         {
             return HttpContext.Session.GetString("userType");
         }
+
 
         private IActionResult? CheckIsRestaurateur()
         {
@@ -91,6 +96,7 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
             return null;
         }
+
 
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
@@ -106,6 +112,7 @@ namespace TakeAway.Controllers
             }
             return null;
         }
+
 
         private void SetUserViewData()
         {
