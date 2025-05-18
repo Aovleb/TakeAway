@@ -53,6 +53,15 @@ namespace TakeAway.Controllers
 
             int? userId = GetUserIdInSession();
 
+            if (r.LunchService.StartTime == r.DinnerService.StartTime && r.LunchService.EndTime == r.DinnerService.EndTime)
+            {
+                ModelState.AddModelError("LunchService", "The two services must be different.");
+            }
+            if (r.LunchService.EndTime >= r.DinnerService.StartTime)
+            {
+                ModelState.AddModelError("LunchService", "The two services cannot overlap.");
+            }
+
             if (ModelState.IsValid)
             {
                 bool success = await r.CreateAsync(restaurantDAL, (int)userId);
