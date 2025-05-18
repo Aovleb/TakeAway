@@ -3,6 +3,7 @@ using System.Diagnostics;
 using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
+using TakeAway.ViewModels;
 using Microsoft.AspNetCore.Http;
 
 namespace TakeAway.Controllers
@@ -22,6 +23,19 @@ namespace TakeAway.Controllers
             IActionResult? checkResult = CheckIsNotRestaurateur();
             if (checkResult != null)
                 return checkResult;
+
+            if (GetUserIdInSession() == null)
+            {
+                BasketViewModel newBasket = new BasketViewModel
+                {
+                    ClientId = null,
+                    Items = new Dictionary<int, int>(),
+                    Total = 0,
+                    ServiceType = "Lunch",
+                    RestaurantId = null
+                };
+                CookieHelper.SetBasketCookie(Response, newBasket);
+            }
 
             List<Restaurant> restaurants = await Restaurant.GetRestaurantsAsync(restaurantDAL);
             return View(restaurants);
