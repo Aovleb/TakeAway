@@ -15,6 +15,7 @@ namespace TakeAway.Controllers
             this.userDAL = userDAL;
         }
 
+
         public async Task<IActionResult> Index()
         {
             SetUserViewData();
@@ -29,6 +30,7 @@ namespace TakeAway.Controllers
             return View(restaurantOwner.Restaurants);
         }
 
+
         public IActionResult Create()
         {
             SetUserViewData();
@@ -38,6 +40,7 @@ namespace TakeAway.Controllers
 
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -66,6 +69,7 @@ namespace TakeAway.Controllers
             return View(r);
         }
 
+
         public async Task<IActionResult> Dishes(int id)
         {
             SetUserViewData();
@@ -79,7 +83,6 @@ namespace TakeAway.Controllers
 
             HttpContext.Session.SetInt32("restaurantId", id);
 
-
             Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id, true);
             List<Dish> dishes = new List<Dish>();
             restaurant.Meals.ForEach(m =>
@@ -91,6 +94,7 @@ namespace TakeAway.Controllers
             });
             return View(dishes);
         }
+
 
         public async Task<IActionResult> Menus(int id)
         {
@@ -117,20 +121,25 @@ namespace TakeAway.Controllers
             return View(menus);
         }
 
+
         public IActionResult UnFound()
         {
             return RedirectToAction("Logout", "Account");
         }
+
 
         private int? GetUserIdInSession()
         {
             return HttpContext.Session.GetInt32("userId");
         }
 
+
         private string? GetUserTypeInSession()
         {
+           
             return HttpContext.Session.GetString("userType");
         }
+
 
         private IActionResult? CheckIsRestaurateur()
         {
@@ -140,6 +149,7 @@ namespace TakeAway.Controllers
                 return RedirectToAction("UnFound");
             return null;
         }
+
 
         private async Task<IActionResult?> CheckIsOwnedByUser(int id_restaurant)
         {
@@ -152,6 +162,7 @@ namespace TakeAway.Controllers
             }
             return null;
         }
+
 
         private void SetUserViewData()
         {

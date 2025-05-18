@@ -163,6 +163,15 @@ namespace TakeAway.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            BasketViewModel newBasket = new BasketViewModel
+            {
+                ClientId = null,
+                Items = new Dictionary<int, int>(),
+                Total = 0,
+                ServiceType = "Lunch",
+                RestaurantId = null
+            };
+            CookieHelper.SetBasketCookie(Response, newBasket);
             return RedirectToAction("Index", "Home");
         }
 
