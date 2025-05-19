@@ -99,6 +99,12 @@ namespace TakeAway.Models
         }
 
 
+        public static async Task<List<Order>> GetOrdersAsync(Restaurant restaurant, IOrderDAL orderDAL)
+        {
+            return await orderDAL.GetOrdersAsync(restaurant);
+        }
+
+
         public void AddMeal(Meal meal, int quantity)
         {
             Meals.Add(meal, quantity);
@@ -117,12 +123,6 @@ namespace TakeAway.Models
                 totalPrice += 5;
             }
             return totalPrice;
-        }
-
-
-        public static async Task<List<Order>> GetOrdersAsync(Restaurant restaurant, IOrderDAL orderDAL)
-        {
-            return await orderDAL.GetOrdersAsync(restaurant);
         }
 
 

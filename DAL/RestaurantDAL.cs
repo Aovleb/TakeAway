@@ -232,7 +232,7 @@ namespace TakeAway.DAL
                                     string dishDescription = reader.GetString("dishDescription");
                                     decimal dishPrice = reader.GetDecimal("dishPrice");
 
-                                    Dish dish = new Dish(dishMealId, dishName, dishDescription, dishPrice, mealLunchService, mealDinnerService);
+                                    Dish dish = new Dish(dishMealId, dishName, dishDescription, dishPrice);
                                     currentMenu.AddDish(dish);
                                 }
                             }

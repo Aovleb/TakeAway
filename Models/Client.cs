@@ -114,15 +114,15 @@ namespace TakeAway.Models
         public Client() { }
 
 
-        public async override Task<bool> CreateAsync(IUserDAL userDAL)
+        public async static Task<Client> GetClientAsync(IUserDAL userDAL, int userId)
         {
-            return await userDAL.CreateAsync(this);
+            return await userDAL.GetClientAsync(userId);
         }
 
 
-        public async static Task<Client> GetClientAsync(IUserDAL userDAL, int id)
+        public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
-            return await userDAL.GetClientAsync(id);
+            return await userDAL.CreateAsync(this);
         }
     }
 }

@@ -124,6 +124,8 @@ namespace TakeAway.Models
             set { meals = value; }
         }
 
+        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
+
 
         public Restaurant(int id, string name, string description, string phoneNumber, string street_name, string street_number, string postal_code, string city, string country, Service lunchService, Service dinnerService)
         {
@@ -142,21 +144,18 @@ namespace TakeAway.Models
         }
 
 
-        public void AddMeal(Meal meal)
-        {
-            if (meal != null && !Meals.Contains(meal))
-                Meals.Add(meal);
-        }
-
-
-        public string Address() => $"{StreetNumber} {StreetName}, {PostalCode} {City}, {Country}";
-
-
         public Restaurant()
         {
             Meals = new List<Meal>();
             LunchService = new Service();
             DinnerService = new Service();
+        }
+
+
+        public void AddMeal(Meal meal)
+        {
+            if (meal != null && !Meals.Contains(meal))
+                Meals.Add(meal);
         }
 
 

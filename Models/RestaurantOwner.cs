@@ -36,6 +36,11 @@ namespace TakeAway.Models
         public RestaurantOwner() { Restaurants = new List<Restaurant>(); }
 
 
+        public static async Task<RestaurantOwner> GetRestaurantOwnerAsync(IUserDAL userDAL, int userId)
+        {
+            return await userDAL.GetRestaurantOwnerAsync(userId);
+        }
+
 
         public void AddRestaurant(Restaurant restaurant)
         {
@@ -49,12 +54,6 @@ namespace TakeAway.Models
         public async override Task<bool> CreateAsync(IUserDAL userDAL)
         {
             return await userDAL.CreateAsync(this);
-        }
-
-
-        public static async Task<RestaurantOwner> GetRestaurantOwnerAsync(IUserDAL userDAL, int userId)
-        {
-            return await userDAL.GetRestaurantOwnerAsync(userId);
         }
     }
 }

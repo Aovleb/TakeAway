@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using TakeAway.ViewModels;
 
-namespace TakeAway
+namespace TakeAway.Utilities
 {
     public static class CookieHelper
     {
