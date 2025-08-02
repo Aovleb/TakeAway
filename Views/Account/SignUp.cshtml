@@ -29,7 +29,6 @@
 
                     <!-- Client -->
                     <form id="clientForm" asp-action="RegisterClient" method="post" class="registration-form" style="@(activeForm == "Client" ? "" : "display: none")">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="mb-3">
                             <label asp-for="Client.LastName" class="form-label"></label>
                             <input asp-for="Client.LastName" class="form-control" id="clientLastName" />
@@ -95,7 +94,6 @@
 
                     <!-- Restaurant Owner -->
                     <form id="restaurantForm" asp-action="RegisterRestaurantOwner" method="post" class="registration-form" style="@(activeForm == "RestaurantOwner" ? "" : "display: none")">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         <div class="mb-3">
                             <label asp-for="RestaurantOwner.Name" class="form-label"></label>
                             <input asp-for="RestaurantOwner.Name" class="form-control" id="restaurantName" />
