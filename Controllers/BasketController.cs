@@ -24,6 +24,7 @@ namespace TakeAway.Controllers
         public async Task<IActionResult> Index()
         {
             SetUserViewData();
+            //un test
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
