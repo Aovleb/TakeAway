@@ -39,6 +39,10 @@ The project comes with several pre-created accounts to test both customer and re
 | sophie.dubois@example.com | `hashed_password_012` |
 | luc.renaud@example.com | `hashed_password_345` |
 
+Here is a quick look at how the restaurateur can use our website (click to enlarge).
+
+<img src="https://github.com/user-attachments/assets/8b4f8790-9c93-4e35-83b7-37eac70d4195" width="60%">
+
 ### Clients
 | Email | Password |
 |-------|---------|
@@ -52,3 +56,8 @@ The project comes with several pre-created accounts to test both customer and re
 | hugo.lambert@example.com | `hashed_password_9012` |
 | isabelle.morin@example.com | `hashed_password_3456` |
 | julien.petit@example.com | `hashed_password_7890` |
+
+Here is a quick look at how the client can use our website (click to enlarge).
+
+<img src="https://github.com/user-attachments/assets/8f309287-d7f3-4e8f-84aa-0efd07603a96" width="60%">
+
