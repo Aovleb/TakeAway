@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TakeAway.BL.Interfaces;
 using TakeAway.DAL.Interfaces;
 using TakeAway.Models;
 using TakeAway.Utilities;
@@ -12,19 +13,20 @@ namespace TakeAway.Controllers
         private IOrderDAL orderDAL;
         private IRestaurantDAL restaurantDAL;
         private IUserDAL userDAL;
+        private IBasketBL basketBL;
 
-        public BasketController(IMealDAL mealDAL, IOrderDAL orderDAL, IRestaurantDAL restaurantDAL, IUserDAL userDAL)
+        public BasketController(IMealDAL mealDAL, IOrderDAL orderDAL, IRestaurantDAL restaurantDAL, IUserDAL userDAL, IBasketBL basketBL)
         {
             this.mealDAL = mealDAL;
             this.orderDAL = orderDAL;
             this.restaurantDAL = restaurantDAL;
             this.userDAL = userDAL;
+            this.basketBL = basketBL;
         }
 
         public async Task<IActionResult> Index()
         {
             SetUserViewData();
-            //un test
             IActionResult? checkResult = CheckIsClient();
             if (checkResult != null)
             {
@@ -40,7 +42,7 @@ namespace TakeAway.Controllers
             {
                 Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, basket.RestaurantId.Value);
                 Client client = await Client.GetClientAsync(userDAL, (int)userId);
-                double distance = CalculateDistance(restaurant, client);
+                double distance = this.basketBL.CalculateDistance(restaurant, client);
                 isDeliveryAvailable = distance <= 10;
             }
             ViewBag.IsDeliveryAvailable = isDeliveryAvailable;
@@ -135,7 +137,7 @@ namespace TakeAway.Controllers
             {
                 Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, basket.RestaurantId.Value);
                 Client client = await Client.GetClientAsync(userDAL, (int)GetUserIdInSession());
-                double distance = CalculateDistance(restaurant, client);
+                double distance = this.basketBL.CalculateDistance(restaurant, client);
                 if (orderType == "Delivery")
                 {
                     if (distance > 10)
@@ -292,7 +294,7 @@ namespace TakeAway.Controllers
 
             if (basket.OrderType == "Delivery")
             {
-                double distance = CalculateDistance(r, c);
+                double distance = this.basketBL.CalculateDistance(r, c);
                 if (distance > 10)
                 {
                     TempData["ErrorMessage"] = "Delivery not available for this distance !";
@@ -376,17 +378,6 @@ namespace TakeAway.Controllers
         {
             ViewData["userId"] = HttpContext.Session.GetInt32("userId")?.ToString();
             ViewData["userType"] = HttpContext.Session.GetString("userType");
-        }
-
-
-        private double CalculateDistance(Restaurant restaurant, Client client)
-        {
-            string restaurantAddress = $"{restaurant.StreetNumber} {restaurant.StreetName}, {restaurant.City}, {restaurant.PostalCode}, {restaurant.Country}";
-            string clientAddress = $"{client.StreetNumber} {client.StreetName}, {client.City}, {client.PostalCode}, {client.Country}";
-
-            if (restaurant.PostalCode == client.PostalCode)
-                return 5.0;
-            return 15.0;
         }
     }
 }

@@ -42,6 +42,7 @@ namespace TakeAway.DAL
                         cmd.Parameters.AddWithValue("@id_service", order.Service.Id);
                         cmd.Parameters.AddWithValue("@id_restaurant", order.Restaurant.Id);
 
+                        //Si je change en double le programme n'accepte pas la commande et plante.
                         decimal newOrderNumber = (decimal)await cmd.ExecuteScalarAsync();
                         int orderNumber = (int)newOrderNumber;
 
@@ -75,6 +76,34 @@ namespace TakeAway.DAL
             return success;
         }
 
+        public async Task<Order?> GetOrderAsync(int orderNumber)
+        {
+            Order? order = null;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = @"SELECT *
+                                FROM ClientOrder o                                
+                                WHERE orderNumber = @id";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@id", orderNumber);
+                await conn.OpenAsync();
+
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    await reader.ReadAsync();
+                    orderNumber = reader.GetInt32("orderNumber");
+                    int status = reader.GetInt32("status");
+                    bool isDelivery = reader.GetBoolean("isDelivery");
+                    DateTime orderDate = reader.GetDateTime("orderDate");
+                        
+                    order = new Order(orderNumber, (StatusOrderEnum)status, isDelivery, orderDate, null, null, null);
+                }
+            }
+
+            return order;
+        }
 
         public async Task<List<Order>> GetOrdersAsync(Restaurant restaurant)
         {
@@ -155,7 +184,7 @@ namespace TakeAway.DAL
                             int mealId = reader.GetInt32("id_meal");
                             string mealName = reader.GetString("mealName");
                             string mealDescription = reader.GetString("mealDescription");
-                            decimal mealPrice = reader.GetDecimal("mealPrice");
+                            double mealPrice = reader.GetDouble("mealPrice");
                             int quantity = reader.GetInt32("quantity");
 
                             Service mealLunchService = null;
@@ -186,7 +215,7 @@ namespace TakeAway.DAL
                                     int dishMealId = reader.GetInt32("dishMealId");
                                     string dishName = reader.GetString("dishName");
                                     string dishDescription = reader.GetString("dishDescription");
-                                    decimal dishPrice = reader.GetDecimal("dishPrice");
+                                    double dishPrice = reader.GetDouble("dishPrice");
 
                                     if (!menu.Dishes.Any(d => d.Id == dishMealId))
                                     {
@@ -209,6 +238,22 @@ namespace TakeAway.DAL
             }
 
             return orders;
+        }
+
+        public async Task<bool> UpdateOrderAsync(Order order)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("UPDATE ClientOrder SET status = @status, isDelivery = @isDelivery, orderDate = @orderDate WHERE orderNumber = @orderNumber", conn);
+                cmd.Parameters.AddWithValue("@status", (int)order.Status);
+                cmd.Parameters.AddWithValue("@isDelivery", (bool)order.IsDelivery);
+                cmd.Parameters.AddWithValue("@orderDate", (DateTime)order.Date);
+                cmd.Parameters.AddWithValue("@orderNumber", (int)order.OrderNumber);
+                
+                await conn.OpenAsync();
+                int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                return rowsAffected > 0;
+            }
         }
 
         public async Task<bool> UpdateOrderStatusAsync(int orderNumber, StatusOrderEnum status)

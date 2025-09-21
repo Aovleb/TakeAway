@@ -36,7 +36,7 @@ namespace TakeAway.DAL
                         int dishId = reader.GetInt32("id_meal");
                         string name = reader.GetString("name");
                         string description = reader.GetString("description");
-                        decimal price = reader.GetDecimal("price");
+                        double price = reader.GetDouble("price");
 
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
@@ -88,7 +88,7 @@ namespace TakeAway.DAL
                         int menuId = reader.GetInt32("id_meal");
                         string name = reader.GetString("name");
                         string description = reader.GetString("description");
-                        decimal price = reader.GetDecimal("price");
+                        double price = reader.GetDouble("price");
 
                         await reader.CloseAsync();
                         cmd = new SqlCommand(@"
@@ -131,7 +131,7 @@ namespace TakeAway.DAL
                                 WHERE md.id_menu = @menuId", conn);
                         cmd.Parameters.AddWithValue("@menuId", menuId);
 
-                        List<(int id, string name, string description, decimal price)> tempDishes = new List<(int, string, string, decimal)>();
+                        List<(int id, string name, string description, double price)> tempDishes = new List<(int, string, string, double)>();
                         using (SqlDataReader dishReader = await cmd.ExecuteReaderAsync())
                         {
                             while (await dishReader.ReadAsync())
@@ -139,7 +139,7 @@ namespace TakeAway.DAL
                                 int dishId = dishReader.GetInt32("id_meal");
                                 string dishName = dishReader.GetString("name");
                                 string dishDescription = dishReader.GetString("description");
-                                decimal dishPrice = dishReader.GetDecimal("price");
+                                double dishPrice = dishReader.GetDouble("price");
                                 tempDishes.Add((dishId, dishName, dishDescription, dishPrice));
                             }
                         }
@@ -149,7 +149,7 @@ namespace TakeAway.DAL
                             int dishId = tempDish.id;
                             string dishName = tempDish.name;
                             string dishDescription = tempDish.description;
-                            decimal dishPrice = tempDish.price;
+                            double dishPrice = tempDish.price;
 
                             cmd = new SqlCommand(@"
                                     SELECT s.id_service, s.startTime, s.endTime

@@ -14,7 +14,7 @@ namespace TakeAway.Models
         }
 
 
-        public Menu(int id, string name, string description, decimal price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
+        public Menu(int id, string name, string description, double price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService)
         {
             Dishes = new List<Dish>();
         }

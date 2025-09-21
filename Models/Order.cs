@@ -107,13 +107,16 @@ namespace TakeAway.Models
 
         public void AddMeal(Meal meal, int quantity)
         {
-            Meals.Add(meal, quantity);
+            if (meal != null && quantity > 0)
+            {
+                Meals.Add(meal, quantity);
+            }
         }
 
 
-        public decimal GetTotalPrice()
+        public double GetTotalPrice()
         {
-            decimal totalPrice = 0;
+            double totalPrice = 0;
             foreach (var meal in Meals)
             {
                 totalPrice += meal.Key.Price * meal.Value;
@@ -129,6 +132,16 @@ namespace TakeAway.Models
         public async Task<bool> UpdateOrderStatusAsync(IOrderDAL orderDAL, StatusOrderEnum status)
         {
             return await orderDAL.UpdateOrderStatusAsync(this.OrderNumber, status);
+        }
+
+        public async Task<bool> UpdateOrder(IOrderDAL orderDAL)
+        {
+            return await orderDAL.UpdateOrderAsync(this);
+        }
+
+        public async Task<Order?> GetOrder(IOrderDAL orderDAL)
+        {
+            return await orderDAL.GetOrderAsync(this.OrderNumber);
         }
 
 

@@ -17,8 +17,7 @@ namespace TakeAway.Controllers
             this.userDAL = userDAL;
         }
 
-
-        public async Task<IActionResult> Index(int id)
+        public async Task<IActionResult> Index(int id, [FromQuery] bool showAllOrders = false)
         {
             SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
@@ -31,9 +30,20 @@ namespace TakeAway.Controllers
 
             Restaurant restaurant = await Restaurant.GetRestaurantAsync(restaurantDAL, id);
 
-            List<Order> orders = await Order.GetOrdersAsync(restaurant, orderDAL);
+            List<Order> orders = (await Order.GetOrdersAsync(restaurant, orderDAL)).Where(x =>
+            {
+                if (showAllOrders)
+                {
+                    return true;
+                }
+                else
+                {
+                    return x.Date.Date >= DateTime.Today || x.Status != StatusOrderEnum.Delivered;
+                }
+            }).ToList();
 
             HttpContext.Session.SetInt32("restaurantId", id);
+            ViewData["ShowAllOrders"] = showAllOrders;
 
             return View(orders);
         }
@@ -41,7 +51,7 @@ namespace TakeAway.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int orderNumber, StatusOrderEnum status)
+        public async Task<IActionResult> UpdateStatus(int orderNumber, StatusOrderEnum status, bool showAllOrders = false)
         {
             SetUserViewData();
             IActionResult? checkResult = CheckIsRestaurateur();
@@ -56,17 +66,24 @@ namespace TakeAway.Controllers
                 return checkOwnedByUser;
             }
 
-            Order order = new Order() { OrderNumber = orderNumber };
+            Order? order = await orderDAL.GetOrderAsync(orderNumber);
 
-            bool updated = await order.UpdateOrderStatusAsync(orderDAL, status);
+            if (order == null)
+            {
+                TempData["ErrorMessage"] = "Order not found.";
+                return RedirectToAction("Index", new { id = (int)restaurantId, showAllOrders });
+            }
+
+            order.Status = status;
+            bool updated = await order.UpdateOrder(orderDAL);
             if (!updated)
             {
                 TempData["ErrorMessage"] = "Status update failed.";
-                return RedirectToAction("Index", new { id = (int)restaurantId });
+                return RedirectToAction("Index", new { id = (int)restaurantId, showAllOrders });
             }
 
             TempData["SuccessMessage"] = "Order status updated.";
-            return RedirectToAction("Index", new { id = (int)restaurantId });
+            return RedirectToAction("Index", new { id = (int)restaurantId, showAllOrders });
         }
 
 

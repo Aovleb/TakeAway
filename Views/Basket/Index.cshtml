@@ -6,7 +6,7 @@
     ViewData["Title"] = "Your basket";
     List<MealViewModel> mealDetails = ViewBag.MealDetails as List<MealViewModel> ?? new List<MealViewModel>();
 
-    decimal incompatibleTotal = 0;
+    double incompatibleTotal = 0;
     foreach ((int id, int quantity) in Model.Items)
     {
         MealViewModel meal = mealDetails.FirstOrDefault(m => m.Id == id);
@@ -21,7 +21,7 @@
             }
         }
     }
-    decimal adjustedTotal = Model.Total - incompatibleTotal;
+    double adjustedTotal = Model.Total - incompatibleTotal;
 }
 
 <div class="container py-5">

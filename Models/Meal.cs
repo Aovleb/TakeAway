@@ -9,7 +9,7 @@ namespace TakeAway.Models
         private int id;
         private string name;
         private string description;
-        private decimal price;
+        private double price;
         private Service? lunchService;
         private Service? dinnerService;
 
@@ -41,7 +41,7 @@ namespace TakeAway.Models
         [Required(ErrorMessage = "Price is required.")]
         [Display(Name = "Price")]
         [DataType(DataType.Currency)]
-        public decimal Price
+        public double Price
         {
             get { return price; }
             set { price = value; }
@@ -64,7 +64,7 @@ namespace TakeAway.Models
         }
 
 
-        public Meal(int id, string name, string description, decimal price, Service? lunchService, Service? dinnerService)
+        public Meal(int id, string name, string description, double price, Service? lunchService, Service? dinnerService)
         {
             Id = id;
             Name = name;
@@ -75,7 +75,7 @@ namespace TakeAway.Models
         }
 
 
-        public Meal(int id, string name, string description, decimal price)
+        public Meal(int id, string name, string description, double price)
         {
             Id = id;
             Name = name;

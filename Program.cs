@@ -1,3 +1,5 @@
+using TakeAway.BL;
+using TakeAway.BL.Interfaces;
 using TakeAway.DAL;
 using TakeAway.DAL.Interfaces;
 
@@ -12,6 +14,7 @@ builder.Services.AddScoped<IMealDAL>(x => new MealDAL(connectionString));
 builder.Services.AddScoped<IOrderDAL>(x => new OrderDAL(connectionString));
 builder.Services.AddScoped<IUserDAL>(x => new UserDAL(connectionString));
 builder.Services.AddScoped<IRestaurantDAL>(x => new RestaurantDAL(connectionString));
+builder.Services.AddScoped<IBasketBL, BasketBL>();
 
 builder.Services.AddSession(options =>
 {

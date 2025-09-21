@@ -202,7 +202,7 @@ namespace TakeAway.DAL
                             int mealId = reader.GetInt32("id_meal");
                             string mealName = reader.GetString("mealName");
                             string mealDescription = reader.GetString("mealDescription");
-                            decimal mealPrice = reader.GetDecimal("mealPrice");
+                            double mealPrice = reader.GetDouble("mealPrice");
 
                             Service mealLunchService = null;
                             if (!reader.IsDBNull(reader.GetOrdinal("meal_lunch_service_id")))
@@ -230,7 +230,7 @@ namespace TakeAway.DAL
                                     int dishMealId = reader.GetInt32("dishMealId");
                                     string dishName = reader.GetString("dishName");
                                     string dishDescription = reader.GetString("dishDescription");
-                                    decimal dishPrice = reader.GetDecimal("dishPrice");
+                                    double dishPrice = reader.GetDouble("dishPrice");
 
                                     Dish dish = new Dish(dishMealId, dishName, dishDescription, dishPrice);
                                     currentMenu.AddDish(dish);

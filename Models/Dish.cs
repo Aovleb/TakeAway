@@ -4,10 +4,10 @@ namespace TakeAway.Models
 {
     public class Dish : Meal
     {
-        public Dish(int id, string name, string description, decimal price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService) { }
+        public Dish(int id, string name, string description, double price, Service lunchService, Service dinnerService) : base(id, name, description, price, lunchService, dinnerService) { }
 
 
-        public Dish(int id, string name, string description, decimal price) : base(id, name, description, price) { }
+        public Dish(int id, string name, string description, double price) : base(id, name, description, price) { }
 
 
         public Dish() : base() { }

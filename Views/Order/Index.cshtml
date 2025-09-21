@@ -25,7 +25,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-    <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-secondary btn-back ms-3 mb-1">Back to restaurants</a>
+    <div class="d-flex flex-row justify-content-between align-items-center">
+        <a asp-controller="Restaurant" asp-action="Index" class="btn btn-outline-secondary btn-back ms-3 mb-1">Back to restaurants</a>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="switchCheckDefault" onchange="(function(event){window.location.href = document.location.origin + window.location.pathname + '?showAllOrders=' + event.target.checked})(event)"
+            @((bool)ViewData["ShowAllOrders"]! == true ? "checked" : "")>
+            <label class="form-check-label" for="switchCheckDefault">Show all orders</label>
+        </div>
+    </div>
     
 
     @if (Model == null || Model.Count == 0)
@@ -85,8 +92,8 @@
                                         }
                                     </td>
                                     <td style="width: auto">
-                                        <form asp-action="UpdateStatus" asp-route-orderNumber="@order.OrderNumber" method="post">
-                                            <select name="status" class="form-select" style="width:150px" onchange="this.form.submit()">
+                                        <form asp-action="UpdateStatus" asp-route-orderNumber="@order.OrderNumber" asp-route-showAllOrders="@ViewData["ShowAllOrders"]" method="post">
+                                            <select name="status" class="form-select orderStatus" style="width:150px">
                                                 <option value="InPreparation" selected="@(order.Status == StatusOrderEnum.InPreparation)">In preparation</option>
                                                 <option value="Ready" selected="@(order.Status == StatusOrderEnum.Ready)">Ready</option>
                                                 <option value="Delivered" selected="@(order.Status == StatusOrderEnum.Delivered)">Delivered</option>
@@ -102,3 +109,31 @@
         </div>
     }
 </div>
+
+<script>
+    //Logique de confirmation de changement d'étape de commande
+    document.querySelectorAll('.orderStatus').forEach(el => {
+        let oldValue = el.value;
+
+        el.addEventListener('change', (event) => {
+            let newValue = event.target.value;
+            let confirmValue = true;
+
+            if ((oldValue == 'Ready' && newValue == 'InPreparation') || 
+                (oldValue == 'Delivered' && (newValue == 'Ready' || newValue == 'InPreparation')))
+            {
+                confirmValue = confirm(`Do you really want to go from ${oldValue} to ${newValue}`);
+            }
+
+            if (confirmValue)
+            {
+                oldValue = newValue;
+                event.target.closest('form').submit();
+            }
+            else
+            {
+                event.target.value = oldValue;
+            }
+        });
+    });
+</script>
